@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.09</title>
+  <title>Prime Battle Academy1.1</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -392,7 +392,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.09</h1>   <div class="level-indicator" id="levelIndicator">
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.1</h1>   <div class="level-indicator" id="levelIndicator">
     레벨 1
    </div>
    <div class="records-section" id="recordsSection">
@@ -523,6 +523,8 @@
   <audio id="hero-hit" src="quick-swing-sound-419581.mp3"></audio>
   <audio id="boss-hit" src="deadly-strike-352458.mp3"></audio>
   <audio id="upgrade-sound" src="bonus-points-190035.mp3"></audio>
+  <audio id="healing-magic" src="healing-magic-4-378668.mp3"></audio>
+
 
 
   <script>
@@ -562,7 +564,7 @@
 
         // 설정 객체
         const defaultConfig = {
-            game_title: "Prime Battle Academy1.09",
+            game_title: "Prime Battle Academy1.1",
             player_name: "용사",
             villain_name: "수학 마왕"
         };
@@ -965,8 +967,10 @@
                 gameState.player.mana -= 20;
                 gameState.player.hp = gameState.player.maxHp;
                 addBattleLog(`🔮 리커버리 마법으로 체력을 완전 회복했습니다!`);
+                playhealingSound()
                 updateDisplay();
                 saveGameProgress();
+
             }
         }
 
@@ -1221,6 +1225,11 @@
             audio.currentTime = 0;
             audio.play();
         }
+        function playhealingSound() {
+        const audio = document.getElementById('healing-magic');
+        audio.currentTime = 0;
+        audio.play();
+      }
     </script>
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99d1eb14d076ea9f',t:'MTc2MjkwNzQwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
