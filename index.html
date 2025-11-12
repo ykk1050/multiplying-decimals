@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.15</title>
+  <title>Prime Battle Academy1.16</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -403,7 +403,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.15</h1>   <div class="level-indicator" id="levelIndicator">
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.16</h1>   <div class="level-indicator" id="levelIndicator">
     레벨 1
    </div>
    <div class="records-section" id="recordsSection">
@@ -1004,6 +1004,57 @@
                 gameState.currentStats.totalDamage += playerDamage;
                 updateRecordsDisplay();
                 addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${playerDamage}의 피해를 입혔습니다!`);
+                playHeroAttackSound(); 
+                
+                // ✨ [수정] 마왕에게는 용사 공격 효과(ID: 'heroattack')를 보여줍니다.
+                triggerHitEffect('heroattack'); 
+
+                if (gameState.villain.hp <= 0) {
+                    victory();
+                    return;
+                }
+                
+                // 빌런 공격
+                setTimeout(() => {
+                    if (!gameState.gameActive) return;
+                    
+                    const villainDamage = Math.max(1, gameState.villain.attack - gameState.player.defense);
+                    gameState.player.hp = Math.max(0, gameState.player.hp - villainDamage);
+                    addBattleLog(`${document.getElementById('villainName').textContent}이(가) ${villainDamage}의 피해를 입혔습니다!`);
+                    playBossAttackSound(); 
+                    
+                    // ✨ [수정] 용사에게는 악마 공격 효과(ID: 'devilattack')를 보여줍니다.
+                    triggerHitEffect('devilattack'); 
+                    
+                    if (gameState.player.hp <= 0) {
+                        gameOver();
+                        return;
+                    }
+                    
+                    updateDisplay();
+                    saveGameProgress();
+                }, 1500);
+                
+                updateDisplay();
+                saveGameProgress();
+            }, 3000);
+        }
+
+        /* // 전투 시스템
+        function startBattle() {
+            if (gameState.battleInterval) {
+                clearInterval(gameState.battleInterval);
+            }
+            
+            gameState.battleInterval = setInterval(() => {
+                if (!gameState.gameActive) return;
+                
+                // 플레이어 공격
+                const playerDamage = Math.max(1, gameState.player.attack - gameState.villain.defense);
+                gameState.villain.hp = Math.max(0, gameState.villain.hp - playerDamage);
+                gameState.currentStats.totalDamage += playerDamage;
+                updateRecordsDisplay();
+                addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${playerDamage}의 피해를 입혔습니다!`);
                 playHeroAttackSound(); // ✨ 여기에 용사 공격 소리 추가!
                 triggerHitEffect('devil-attack-gif'); // ✨ [추가] 마왕에게 타격 효과 출력
 
@@ -1033,7 +1084,7 @@
                 updateDisplay();
                 saveGameProgress();
             }, 3000);
-        }
+        } */
 
         // 화면 업데이트
         function updateDisplay() {
@@ -1256,6 +1307,12 @@
         // 타격 효과를 출력하고 숨기는 함수
         function triggerHitEffect(targetId) {
             const effectElement = document.getElementById(targetId);
+
+            // ✨ [안전 장치 추가] 요소를 찾지 못하면(null) 오류 없이 종료합니다.
+        if (!effectElement) { 
+            console.error(`타격 효과 요소(ID: ${targetId})를 찾을 수 없어 효과를 표시할 수 없습니다.`);
+            return;
+    }
             
             // 1. 효과 출력 (display: block으로 변경)
             effectElement.style.display = 'block';
