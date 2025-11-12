@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.02</title>
+  <title>Prime Battle Academy1.03</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -392,7 +392,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.02</h1>   <div class="level-indicator" id="levelIndicator">
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.03</h1>   <div class="level-indicator" id="levelIndicator">
     레벨 1
    </div>
    <div class="records-section" id="recordsSection">
@@ -522,6 +522,8 @@
   </div>
   <audio id="hero-hit" src="quick-swing-sound-419581.mp3"></audio>
   <audio id="boss-hit" src="deadly-strike-352458.mp3"></audio>
+  <audio id="upgrade-sound" src="bonus-points-190035"></audio>
+
 
   <script>
         // 게임 상태
@@ -560,7 +562,7 @@
 
         // 설정 객체
         const defaultConfig = {
-            game_title: "Prime Battle Academy1.02",
+            game_title: "Prime Battle Academy1.03",
             player_name: "용사",
             villain_name: "수학 마왕"
         };
@@ -918,14 +920,17 @@
                     gameState.player.maxHp += 20;
                     gameState.player.hp += 20;
                     addBattleLog(`${document.getElementById('playerName').textContent}의 체력이 20 증가했습니다!`);
+                    playupgradeSound()
                     break;
                 case 'attack':
                     gameState.player.attack += 5;
                     addBattleLog(`${document.getElementById('playerName').textContent}의 공격력이 5 증가했습니다!`);
+                    playupgradeSound()
                     break;
                 case 'defense':
                     gameState.player.defense += 3;
                     addBattleLog(`${document.getElementById('playerName').textContent}의 방어력이 3 증가했습니다!`);
+                    playupgradeSound()
                     break;
             }
             
@@ -1197,6 +1202,12 @@
       }
         function playBossAttackSound() {
             const audio = document.getElementById('boss-hit');
+            audio.currentTime = 0;
+            audio.play();
+        }
+
+        function playupgradeSound() {
+            const audio = document.getElementById('upgrade-sound');
             audio.currentTime = 0;
             audio.play();
         }
