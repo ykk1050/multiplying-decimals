@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.04</title>
+  <title>Prime Battle Academy1.05</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -392,7 +392,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.04</h1>   <div class="level-indicator" id="levelIndicator">
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.05</h1>   <div class="level-indicator" id="levelIndicator">
     레벨 1
    </div>
    <div class="records-section" id="recordsSection">
@@ -562,7 +562,7 @@
 
         // 설정 객체
         const defaultConfig = {
-            game_title: "Prime Battle Academy1.04",
+            game_title: "Prime Battle Academy1.05",
             player_name: "용사",
             villain_name: "수학 마왕"
         };
@@ -908,7 +908,7 @@
                 document.getElementById('upgradeSection').style.display = 'block';
                 document.getElementById('submitBtn').disabled = true;
             } else {
-                addBattleLog(`틀렸습니다. 정답은 ${correctAnswer}입니다. 다시 시도하세요!`);
+                addBattleLog(`틀렸습니다. 다시 시도하세요!`);
                 document.getElementById('answerInput').value = '';
             }
         }
