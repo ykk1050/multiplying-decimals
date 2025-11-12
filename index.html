@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.05</title>
+  <title>Prime Battle Academy1.06</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -392,7 +392,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.05</h1>   <div class="level-indicator" id="levelIndicator">
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.06</h1>   <div class="level-indicator" id="levelIndicator">
     레벨 1
    </div>
    <div class="records-section" id="recordsSection">
@@ -426,8 +426,11 @@
    <div class="battle-arena">
     <div class="character-card player-card">
      <div class="character-avatar player-avatar">
+      <img src="hero.jpg" alt="용사" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+     </div>   
+     /* <div class="character-avatar player-avatar">
       🛡️
-     </div>
+     </div> */
      <div class="character-name" id="playerName">
       용사
      </div>
@@ -562,7 +565,7 @@
 
         // 설정 객체
         const defaultConfig = {
-            game_title: "Prime Battle Academy1.05",
+            game_title: "Prime Battle Academy1.06",
             player_name: "용사",
             villain_name: "수학 마왕"
         };
@@ -595,8 +598,11 @@
                     onConfigChange: async (config) => {
                         document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
                         document.getElementById('playerName').textContent = config.player_name || defaultConfig.player_name;
-                        document.getElementById('villainName').textContent = config.villain_name || defaultConfig.villain_name;
+                        const baseVillainName = config.villain_name || defaultConfig.villain_name;
+                        document.getElementById('villainName').textContent = `Lv${gameState.level} ${baseVillainName}`;
                     },
+                        /* document.getElementById('villainName').textContent = config.villain_name || defaultConfig.villain_name;
+                    }, */
                     mapToCapabilities: (config) => ({
                         recolorables: [],
                         borderables: [],
@@ -1044,6 +1050,13 @@
             
             // 레벨 표시
             document.getElementById('levelIndicator').textContent = `레벨 ${gameState.level}`;
+
+            // ✨ [추가] 마왕 이름에 레벨 표시
+            let baseVillainName = defaultConfig.villain_name;
+            if (window.elementSdk && window.elementSdk.config && window.elementSdk.config.villain_name) {
+                baseVillainName = window.elementSdk.config.villain_name;
+            }
+            document.getElementById('villainName').textContent = `Lv${gameState.level} ${baseVillainName}`;
         }
 
         // 전투 로그 추가
