@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.01</title>
+  <title>Prime Battle Academy1.02</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -392,7 +392,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.01</h1>   <div class="level-indicator" id="levelIndicator">
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.02</h1>   <div class="level-indicator" id="levelIndicator">
     레벨 1
    </div>
    <div class="records-section" id="recordsSection">
@@ -560,7 +560,7 @@
 
         // 설정 객체
         const defaultConfig = {
-            game_title: "Prime Battle Academy1.01",
+            game_title: "Prime Battle Academy1.02",
             player_name: "용사",
             villain_name: "수학 마왕"
         };
@@ -977,7 +977,8 @@
                 gameState.currentStats.totalDamage += playerDamage;
                 updateRecordsDisplay();
                 addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${playerDamage}의 피해를 입혔습니다!`);
-                
+                playHeroAttackSound(); // ✨ 여기에 용사 공격 소리 추가!
+
                 if (gameState.villain.hp <= 0) {
                     victory();
                     return;
@@ -990,7 +991,7 @@
                     const villainDamage = Math.max(1, gameState.villain.attack - gameState.player.defense);
                     gameState.player.hp = Math.max(0, gameState.player.hp - villainDamage);
                     addBattleLog(`${document.getElementById('villainName').textContent}이(가) ${villainDamage}의 피해를 입혔습니다!`);
-                    
+                    playBossAttackSound(); // ✨ 여기에 마왕 공격 소리 추가!
                     if (gameState.player.hp <= 0) {
                         gameOver();
                         return;
