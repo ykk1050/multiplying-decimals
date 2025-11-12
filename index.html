@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.1</title>
+  <title>Prime Battle Academy1.11</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -392,7 +392,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.1</h1>   <div class="level-indicator" id="levelIndicator">
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.11</h1>   <div class="level-indicator" id="levelIndicator">
     레벨 1
    </div>
    <div class="records-section" id="recordsSection">
@@ -524,6 +524,7 @@
   <audio id="boss-hit" src="deadly-strike-352458.mp3"></audio>
   <audio id="upgrade-sound" src="bonus-points-190035.mp3"></audio>
   <audio id="healing-magic" src="healing-magic-4-378668.mp3"></audio>
+  <audio id="game-over" src="deadly-strike-352458.mp3"></audio>
 
 
 
@@ -1107,6 +1108,7 @@
             
             document.getElementById('gameOverSection').style.display = 'block';
             addBattleLog('💀 패배했습니다... 💀');
+            playgameoverSound()
         }
 
         // 다음 레벨
@@ -1227,6 +1229,11 @@
         }
         function playhealingSound() {
         const audio = document.getElementById('healing-magic');
+        audio.currentTime = 0;
+        audio.play();
+      }
+        function playgameoverSound() {
+        const audio = document.getElementById('game-over');
         audio.currentTime = 0;
         audio.play();
       }
