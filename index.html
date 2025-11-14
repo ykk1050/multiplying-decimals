@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.16</title>
+  <title>Prime Battle Academy 2.0</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -36,11 +36,174 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
         
+        /* 코인 표시 영역 */
+        .coin-display {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: 3px solid #ff8c00;
+            border-radius: 15px;
+            padding: 10px 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #744210;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .coin-icon {
+            font-size: 1.5rem;
+        }
+        
+        /* 훈련장 버튼 */
+        .shop-btn {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(159, 122, 234, 0.4);
+        }
+        
+        .shop-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 훈련장 모달 */
+        .shop-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .shop-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .shop-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+            background: none;
+            border: none;
+        }
+        
+        .shop-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .skill-card {
+            background: linear-gradient(145deg, #f7fafc, #edf2f7);
+            border: 3px solid #cbd5e0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .skill-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .skill-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .skill-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        
+        .skill-cost {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ff8c00;
+            margin-bottom: 10px;
+        }
+        
+        .buy-skill-btn {
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .buy-skill-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .buy-skill-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .owned-badge {
+            background: #48bb78;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
         .battle-arena {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
             margin-bottom: 30px;
+            position: relative;
         }
         
         .character-card {
@@ -72,18 +235,18 @@
             color: white;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            position: relative; /* ✨ [추가] GIF 효과의 기준 위치 설정 */
+            position: relative;
         }
 
         .hero-attack-gif, .devil-attack-gif {
-            position: absolute; /* 부모(.character-avatar) 기준으로 위치 설정 */
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: none; /* 초기에는 보이지 않도록 숨김 */
-            z-index: 10; /* 캐릭터 이미지 위에 표시되도록 레이어 순서 지정 */
-}
+            display: none;
+            z-index: 10;
+        }
         
         .player-avatar {
             background: linear-gradient(135deg, #48bb78, #38a169);
@@ -125,7 +288,6 @@
             height: 25px;
             flex: 1;
             position: relative;
-            /* overflow: hidden; */
         }
         
         .stat-fill {
@@ -181,8 +343,6 @@
             margin-bottom: 20px;
         }
         
-
-        
         .answer-input {
             padding: 12px 20px;
             font-size: 1.2rem;
@@ -216,878 +376,845 @@
             transform: none;
         }
         
+        /* 스킬 버튼 영역 */
+        .skill-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .skill-use-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .skill-use-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(237, 137, 54, 0.4);
+        }
+        
+        .skill-use-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .skill-cost-badge {
+            font-size: 0.8rem;
+            display: block;
+            margin-top: 3px;
+        }
+        
         .upgrade-section {
             display: none;
             text-align: center;
             margin-top: 20px;
         }
         
-        .upgrade-buttons {
+        .upgrade-container {
             display: flex;
             gap: 15px;
             justify-content: center;
+            align-items: center;
             margin-top: 15px;
         }
         
         .upgrade-btn {
-            padding: 10px 20px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s;
-            color: white;
         }
         
         .upgrade-btn:hover {
             transform: translateY(-2px);
-        }
-        
-        .upgrade-hp { background: linear-gradient(135deg, #f56565, #e53e3e); }
-        .upgrade-attack { background: linear-gradient(135deg, #ed8936, #dd6b20); }
-        .upgrade-defense { background: linear-gradient(135deg, #4299e1, #3182ce); }
-        
-        .game-over {
-            display: none;
-            text-align: center;
-            background: linear-gradient(145deg, #fed7d7, #feb2b2);
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 20px;
-            border: 3px solid #f56565;
-        }
-        
-        .victory {
-            display: none;
-            text-align: center;
-            background: linear-gradient(145deg, #c6f6d5, #9ae6b4);
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 20px;
-            border: 3px solid #48bb78;
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
         }
         
         .next-level-btn {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #805ad5, #6b46c1);
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
             color: white;
             border: none;
             border-radius: 10px;
             font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 15px;
             transition: transform 0.2s;
         }
         
         .next-level-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(128, 90, 213, 0.4);
+            box-shadow: 0 5px 15px rgba(159, 122, 234, 0.4);
+        }
+        
+        .victory-section, .game-over-section {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(145deg, #c6f6d5, #9ae6b4);
+            border-radius: 15px;
+            border: 3px solid #48bb78;
+        }
+        
+        .game-over-section {
+            background: linear-gradient(145deg, #fed7d7, #fc8181);
+            border-color: #f56565;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .restart-btn {
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(237, 137, 54, 0.4);
         }
         
         .level-indicator {
-            text-align: center;
-            font-size: 1.2rem;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
             font-weight: bold;
-            color: #553c9a;
-            margin-bottom: 20px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
         }
         
         .records-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-            background: linear-gradient(145deg, #f0f4f8, #e2e8f0);
+            background: linear-gradient(145deg, #e6fffa, #b2f5ea);
             border-radius: 15px;
-            padding: 25px;
-            border: 2px solid #cbd5e0;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 3px solid #38b2ac;
         }
         
-        .current-stats h3, .best-records h3 {
+        .records-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #234e52;
+            margin-bottom: 15px;
             text-align: center;
-            margin-bottom: 20px;
-            color: #2d3748;
-            font-size: 1.3rem;
         }
         
-        .stats-grid {
+        .records-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
         }
         
-        .stat-item {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-number {
-            display: block;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #4299e1;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #718096;
-            font-weight: 600;
-        }
-        
         .record-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
         }
         
         .record-label {
-            font-weight: 600;
+            font-size: 0.9rem;
             color: #4a5568;
+            margin-bottom: 5px;
         }
         
         .record-value {
+            font-size: 1.3rem;
             font-weight: bold;
-            color: #805ad5;
-            font-size: 1.1rem;
-        }
-        
-        .new-record {
-            animation: recordGlow 2s ease-in-out;
-            background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
-            color: #744210 !important;
-        }
-        
-        @keyframes recordGlow {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        @media (max-width: 768px) {
-            .battle-arena {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .records-section {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            
-            .answer-section {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .upgrade-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
+            color: #2d3748;
         }
     </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
  </head>
  <body>
+  <audio id="hero-hit" src="https://docs.google.com/uc?export=download&id=1nR9a7y9tSpyq2pfaWy8qvmFqVIqINAjp"></audio>
+  <audio id="boss-hit" src="https://docs.google.com/uc?export=download&id=1SYrF0EqHxe2dkdwS2d4KhEMp1cDbL_wh"></audio>
+  <audio id="upgrade-sound" src="https://docs.google.com/uc?export=download&id=1HjsOdPDvhK4TWMi0ZW0mLrj7msCcjYOp"></audio>
+  <audio id="healing-magic" src="https://docs.google.com/uc?export=download&id=1JLQXBQKxXD7lWGkPEYP-d9MYNDaMvH7F"></audio>
+  <audio id="game-over" src="https://docs.google.com/uc?export=download&id=1vPKNIAYGhHuFZJt0GSTDGQV4SoIvg0Eq"></audio>
+  
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.16</h1>   <div class="level-indicator" id="levelIndicator">
-    레벨 1
-   </div>
-   <div class="records-section" id="recordsSection">
-    <div class="current-stats">
-     <h3>🏆 현재 플레이 기록</h3>
-     <div class="stats-grid">
-      <div class="stat-item"><span class="stat-number" id="currentLevel">1</span> <span class="stat-label">현재 레벨</span>
-      </div>
-      <div class="stat-item"><span class="stat-number" id="problemsSolved">0</span> <span class="stat-label">해결한 문제</span>
-      </div>
-      <div class="stat-item"><span class="stat-number" id="totalDamage">0</span> <span class="stat-label">총 피해량</span>
-      </div>
-      <div class="stat-item"><span class="stat-number" id="playTime">0:00</span> <span class="stat-label">플레이 시간</span>
-      </div>
-     </div>
+    <!-- 훈련장 버튼 -->
+    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
+    
+    <!-- 코인 표시 -->
+    <div class="coin-display">
+        <span class="coin-icon">🪙</span>
+        <span id="coinAmount">0</span>
     </div>
-    <div class="best-records">
-     <h3>⭐ 최고 기록</h3>
-     <div class="record-item"><span class="record-label">최고 레벨:</span> <span class="record-value" id="bestLevel">-</span>
-     </div>
-     <div class="record-item"><span class="record-label">최다 문제 해결:</span> <span class="record-value" id="bestProblems">-</span>
-     </div>
-     <div class="record-item"><span class="record-label">최대 총 피해량:</span> <span class="record-value" id="bestDamage">-</span>
-     </div>
-     <div class="record-item"><span class="record-label">최강 체력:</span> <span class="record-value" id="bestHp">-</span>
-     </div>
-     <div class="record-item"><span class="record-label">최강 공격력:</span> <span class="record-value" id="bestAttack">-</span>
-     </div>
-    </div>
-   </div>
-   <div class="battle-arena">
-    <div class="character-card player-card">
-     <div class="character-avatar player-avatar">
-      <img src="hero.png" alt="용사" style="width: 100%; height: 100%; object-fit: cover;">
-      <img id="devilattack" src="devilattack.gif" alt="악마 타격 효과" class="devil-attack-gif">
-      
-     </div>   
-     <div class="character-name" id="playerName">
-      용사
-     </div>
-     <div class="stats">
-      <div class="stat-bar"><span class="stat-label">체력</span>
-       <div class="stat-value">
-        <div class="stat-fill hp-fill" id="playerHpBar">
-         100/100
+    
+    <h1 class="game-title" id="dynamicGameTitle">🎮 Prime Battle Academy 🎮</h1>
+    
+    <!-- 기록 섹션 -->
+    <div class="records-section">
+        <div class="records-title">📊 현재 플레이 기록</div>
+        <div class="records-grid">
+            <div class="record-item">
+                <div class="record-label">도달 레벨</div>
+                <div class="record-value" id="currentLevel">1</div>
+            </div>
+            <div class="record-item">
+                <div class="record-label">해결한 문제</div>
+                <div class="record-value" id="currentProblems">0</div>
+            </div>
+            <div class="record-item">
+                <div class="record-label">총 데미지</div>
+                <div class="record-value" id="currentDamage">0</div>
+            </div>
+            <div class="record-item">
+                <div class="record-label">플레이 시간</div>
+                <div class="record-value" id="currentTime">0:00</div>
+            </div>
         </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">공격력</span>
-       <div class="stat-value">
-        <div class="stat-fill attack-fill" id="playerAttackBar">
-         15
-        </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">방어력</span>
-       <div class="stat-value">
-        <div class="stat-fill defense-fill" id="playerDefenseBar">
-         10
-        </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">마나</span>
-       <div class="stat-value">
-        <div class="stat-fill mana-fill" id="playerManaBar">
-         0/20
-        </div>
-       </div>
-      </div>
-     </div>
     </div>
-    <div class="character-card villain-card">
-     <div class="character-avatar villain-avatar">
-      <img src="devilking.png" alt="수학 마왕" style="width: 100%; height: 100%; object-fit: cover;">
-      <img id="heroattack" src="heroattack.gif" alt="용사 타격 효과" class="hero-attack-gif">  
-      </div>   
-     <div class="character-name" id="villainName">
-      수학 마왕
-     </div>
-     <div class="stats">
-      <div class="stat-bar"><span class="stat-label">체력</span>
-       <div class="stat-value">
-        <div class="stat-fill hp-fill" id="villainHpBar">
-         80/80
+    
+    <div class="records-section" style="background: linear-gradient(145deg, #fef5e7, #feebc8); border-color: #ed8936;">
+        <div class="records-title">🏆 최고 기록</div>
+        <div class="records-grid">
+            <div class="record-item">
+                <div class="record-label">최고 레벨</div>
+                <div class="record-value" id="bestLevel">1</div>
+            </div>
+            <div class="record-item">
+                <div class="record-label">최다 문제</div>
+                <div class="record-value" id="bestProblems">0</div>
+            </div>
+            <div class="record-item">
+                <div class="record-label">최대 데미지</div>
+                <div class="record-value" id="bestDamage">0</div>
+            </div>
+            <div class="record-item">
+                <div class="record-label">최장 시간</div>
+                <div class="record-value" id="bestTime">0:00</div>
+            </div>
         </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">공격력</span>
-       <div class="stat-value">
-        <div class="stat-fill attack-fill" id="villainAttackBar">
-         12
+    </div>
+    
+    <div class="battle-arena">
+        <div class="level-indicator" id="levelIndicator">레벨 1</div>
+        
+        <!-- 플레이어 카드 -->
+        <div class="character-card player-card">
+            <div class="character-avatar player-avatar">
+                <img id="heroImage" src="https://i.ibb.co/BNGByb7/image.png" style="width: 100%; height: 100%; object-fit: cover;">
+                <img id="heroAttackGif" class="hero-attack-gif" src="https://i.ibb.co/7Yb7VhG/image.gif">
+            </div>
+            <div class="character-name" id="playerName">⚔️ 용사</div>
+            <div class="stats">
+                <div class="stat-bar">
+                    <span class="stat-label">체력</span>
+                    <div class="stat-value">
+                        <div class="stat-fill hp-fill" id="playerHpBar">100/100</div>
+                    </div>
+                </div>
+                <div class="stat-bar">
+                    <span class="stat-label">공격력</span>
+                    <div class="stat-value">
+                        <div class="stat-fill attack-fill" id="playerAttackBar" style="width: 100%;">15</div>
+                    </div>
+                </div>
+                <div class="stat-bar">
+                    <span class="stat-label">방어력</span>
+                    <div class="stat-value">
+                        <div class="stat-fill defense-fill" id="playerDefenseBar" style="width: 100%;">10</div>
+                    </div>
+                </div>
+                <div class="stat-bar">
+                    <span class="stat-label">마나</span>
+                    <div class="stat-value">
+                        <div class="stat-fill mana-fill" id="playerManaBar">0/20</div>
+                    </div>
+                </div>
+            </div>
         </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">방어력</span>
-       <div class="stat-value">
-        <div class="stat-fill defense-fill" id="villainDefenseBar">
-         8
+        
+        <!-- 빌런 카드 -->
+        <div class="character-card villain-card">
+            <div class="character-avatar villain-avatar">
+                <img id="devilImage" src="https://i.ibb.co/FhwMhzN/2.png" style="width: 100%; height: 100%; object-fit: cover;">
+                <img id="devilAttackGif" class="devil-attack-gif" src="https://i.ibb.co/4YcZQN2/devil-attack.gif">
+            </div>
+            <div class="character-name" id="villainName">👿 수학 마왕</div>
+            <div class="stats">
+                <div class="stat-bar">
+                    <span class="stat-label">체력</span>
+                    <div class="stat-value">
+                        <div class="stat-fill hp-fill" id="villainHpBar">80/80</div>
+                    </div>
+                </div>
+                <div class="stat-bar">
+                    <span class="stat-label">공격력</span>
+                    <div class="stat-value">
+                        <div class="stat-fill attack-fill" id="villainAttackBar" style="width: 100%;">12</div>
+                    </div>
+                </div>
+                <div class="stat-bar">
+                    <span class="stat-label">방어력</span>
+                    <div class="stat-value">
+                        <div class="stat-fill defense-fill" id="villainDefenseBar" style="width: 100%;">8</div>
+                    </div>
+                </div>
+            </div>
         </div>
-       </div>
-      </div>
-     </div>
     </div>
-   </div>
-   <div class="battle-log" id="battleLog">
-    게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
-   </div>
-   <div class="math-section">
-    <div class="math-problem" id="mathProblem">
-     2 × 3 = ?
+    
+    <div class="battle-log" id="battleLog">전투가 시작되었습니다!<br></div>
+    
+    <div class="math-section">
+        <div class="math-problem" id="mathProblem">2 × 3 = ?</div>
+        <div class="answer-section">
+            <input type="number" id="answerInput" class="answer-input" placeholder="답">
+            <button id="submitBtn" class="submit-btn" onclick="checkAnswer()">공격!</button>
+        </div>
+        
+        <!-- 스킬 버튼 영역 -->
+        <div class="skill-buttons" id="skillButtons">
+            <button id="recoveryBtn" class="skill-use-btn" onclick="useRecovery()" disabled>
+                💚 체력 회복
+                <span class="skill-cost-badge">마나 20</span>
+            </button>
+        </div>
+        
+        <div class="upgrade-section" id="upgradeSection">
+            <div class="section-title">⚡ 강화하기</div>
+            <div class="upgrade-container">
+                <button class="upgrade-btn" onclick="upgradeAttack()">🗡️ 공격력 +5</button>
+                <button class="upgrade-btn" onclick="upgradeDefense()">🛡️ 방어력 +3</button>
+                <button class="upgrade-btn" onclick="upgradeMaxHp()">❤️ 최대체력 +20</button>
+            </div>
+        </div>
+        
+        <div class="victory-section" id="victorySection">
+            <div class="section-title">🎉 승리! 🎉</div>
+            <p>레벨을 클리어했습니다!</p>
+            <button class="next-level-btn" onclick="nextLevel()">다음 레벨 →</button>
+        </div>
+        
+        <div class="game-over-section" id="gameOverSection">
+            <div class="section-title">💀 게임 오버 💀</div>
+            <p>다시 도전해보세요!</p>
+            <button class="restart-btn" onclick="restartGame()">재시작</button>
+        </div>
     </div>
-    <div class="answer-section"><input type="number" step="0.001" class="answer-input" id="answerInput" placeholder="답을 입력하세요"> <button class="submit-btn" id="submitBtn">제출</button>
-    </div>
-    <div class="upgrade-section" id="upgradeSection">
-     <h3 style="color: #744210; margin-bottom: 10px;">정답입니다! 능력치를 선택하여 강화하세요:</h3>
-     <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" onclick="upgradePlayer('defense')">방어력 +3</button>
-     </div>
-    </div>
-    <div style="text-align: center; margin-top: 20px;"><button class="upgrade-btn" id="recoveryBtn" onclick="useRecovery()" style="background: linear-gradient(135deg, #9f7aea, #805ad5); font-size: 1.1rem; padding: 12px 25px;" disabled> 🔮 리커버리 (마나 20) </button>
-    </div>
-   </div>
-   <div class="victory" id="victorySection">
-    <h2 style="color: #22543d; margin-bottom: 15px;">🎉 승리했습니다! 🎉</h2>
-    <p style="color: #2f855a;">빌런을 물리쳤습니다! 더 강한 적이 나타났습니다.</p><button class="next-level-btn" onclick="nextLevel()">다음 레벨로</button>
-   </div>
-   <div class="game-over" id="gameOverSection">
-    <h2 style="color: #742a2a; margin-bottom: 15px;">💀 패배했습니다 💀</h2>
-    <p style="color: #c53030;">더 많은 문제를 풀어서 강해져야 합니다!</p><button class="next-level-btn" onclick="restartGame()">다시 시작</button>
-   </div>
   </div>
-  <audio id="hero-hit" src="quick-swing-sound-419581.mp3"></audio>
-  <audio id="boss-hit" src="deadly-strike-352458.mp3"></audio>
-  <audio id="upgrade-sound" src="bonus-points-190035.mp3"></audio>
-  <audio id="healing-magic" src="healing-magic-4-378668.mp3"></audio>
-  <audio id="game-over" src="game-over-417465.mp3"></audio>
-
-
-
+  
+  <!-- 훈련장 모달 -->
+  <div class="shop-modal" id="shopModal">
+    <div class="shop-content">
+        <button class="shop-close" onclick="closeShop()">×</button>
+        <h2 class="shop-title">🏪 훈련장 - 스킬 상점</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span style="font-size: 1.3rem; font-weight: bold; color: #ff8c00;">
+                보유 코인: <span id="shopCoinAmount">0</span> 🪙
+            </span>
+        </div>
+        
+        <div class="skill-grid" id="skillShop"></div>
+    </div>
+  </div>
+  
   <script>
+        const defaultConfig = {
+            game_title: "Prime Battle Academy",
+            player_name: "⚔️ 용사",
+            villain_name: "👿 수학 마왕",
+            hero_image_url: "https://i.ibb.co/BNGByb7/image.png",
+            devil_image_url: "https://i.ibb.co/FhwMhzN/2.png",
+            hero_attack_gif_url: "https://i.ibb.co/7Yb7VhG/image.gif",
+            devil_attack_gif_url: "https://i.ibb.co/4YcZQN2/devil-attack.gif"
+        };
+
+        if (window.elementSdk && window.elementSdk.config) {
+            const config = window.elementSdk.config;
+            if (config.game_title) {
+                document.getElementById('dynamicGameTitle').textContent = config.game_title;
+            }
+            if (config.player_name) {
+                document.getElementById('playerName').textContent = config.player_name;
+            }
+            if (config.villain_name) {
+                document.getElementById('villainName').textContent = `Lv1 ${config.villain_name}`;
+            }
+            if (config.hero_image_url) {
+                document.getElementById('heroImage').src = config.hero_image_url;
+            }
+            if (config.devil_image_url) {
+                document.getElementById('devilImage').src = config.devil_image_url;
+            }
+            if (config.hero_attack_gif_url) {
+                document.getElementById('heroAttackGif').src = config.hero_attack_gif_url;
+            }
+            if (config.devil_attack_gif_url) {
+                document.getElementById('devilAttackGif').src = config.devil_attack_gif_url;
+            }
+        }
+
+        // 스킬 정의
+        const SKILLS = {
+            fireball: {
+                id: 'fireball',
+                name: '🔥 파이어볼',
+                description: '강력한 화염구를 발사합니다',
+                icon: '🔥',
+                cost: 50,
+                useCost: { type: 'mana', amount: 15 },
+                effect: { type: 'damage', value: 40 }
+            },
+            lightning: {
+                id: 'lightning',
+                name: '⚡ 번개',
+                description: '빠른 번개 공격',
+                icon: '⚡',
+                cost: 70,
+                useCost: { type: 'mana', amount: 18 },
+                effect: { type: 'damage', value: 50 }
+            },
+            meteor: {
+                id: 'meteor',
+                name: '☄️ 메테오',
+                description: '거대한 운석을 떨어뜨립니다',
+                icon: '☄️',
+                cost: 100,
+                useCost: { type: 'mana', amount: 20 },
+                effect: { type: 'damage', value: 70 }
+            },
+            berserk: {
+                id: 'berserk',
+                name: '💥 광폭화',
+                description: '공격력이 일시적으로 증가',
+                icon: '💥',
+                cost: 80,
+                useCost: { type: 'hp', amount: 15 },
+                effect: { type: 'damage', value: 45 }
+            },
+            ultimate: {
+                id: 'ultimate',
+                name: '🌟 궁극기',
+                description: '최강의 공격!',
+                icon: '🌟',
+                cost: 150,
+                useCost: { type: 'hp', amount: 20, mana: 20 },
+                effect: { type: 'damage', value: 100 }
+            }
+        };
+
         // 게임 상태
         let gameState = {
             level: 1,
-            player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
-            villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
-            currentProblem: { num1: 2, num2: 3, answer: 6 },
+            coins: 0,
+            ownedSkills: [],
+            player: {
+                hp: 100,
+                maxHp: 100,
+                attack: 15,
+                defense: 10,
+                mana: 0,
+                maxMana: 20
+            },
+            villain: {
+                hp: 80,
+                maxHp: 80,
+                attack: 12,
+                defense: 8
+            },
+            currentProblem: {
+                num1: 2,
+                num2: 3,
+                answer: 6
+            },
             battleInterval: null,
             manaInterval: null,
             gameActive: true,
-            // 현재 플레이 기록
             currentStats: {
                 problemsSolved: 0,
                 totalDamage: 0,
                 startTime: Date.now()
             },
-            // 최고 기록
             bestRecords: {
-                level: 0,
-                problemsSolved: 0,
-                totalDamage: 0,
-                maxHp: 0,
-                maxAttack: 0,
-                maxDefense: 0
+                maxLevel: 1,
+                maxProblems: 0,
+                maxDamage: 0,
+                maxTime: 0
             }
         };
 
-        // 데이터 저장을 위한 변수
         let allRecords = [];
-        let dataInitialized = false;
         let gameLoaded = false;
 
-        // 소수 배열 (100 이하)
-        const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
-
-        // 설정 객체
-        const defaultConfig = {
-            game_title: "Prime Battle Academy1.1",
-            player_name: "용사",
-            villain_name: "수학 마왕"
-        };
-
-        // Data SDK 초기화
-        const dataHandler = {
-            onDataChanged(data) {
-                allRecords = data;
-                if (!dataInitialized) {
-                    loadBestRecords();
-                    loadGameProgress();
-                    dataInitialized = true;
-                }
-                updateRecordsDisplay();
-            }
-        };
-
-        // SDK 초기화
-        async function initializeSDKs() {
-            if (window.dataSdk) {
-                const result = await window.dataSdk.init(dataHandler);
-                if (!result.isOk) {
-                    console.error("Data SDK 초기화 실패");
-                }
-            }
-
-            if (window.elementSdk) {
-                window.elementSdk.init({
-                    defaultConfig: defaultConfig,
-                    onConfigChange: async (config) => {
-                        document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
-                        document.getElementById('playerName').textContent = config.player_name || defaultConfig.player_name;
-                        const baseVillainName = config.villain_name || defaultConfig.villain_name;
-                        document.getElementById('villainName').textContent = `Lv${gameState.level} ${baseVillainName}`;
-                    },
-                        /* document.getElementById('villainName').textContent = config.villain_name || defaultConfig.villain_name;
-                    }, */
-                    mapToCapabilities: (config) => ({
-                        recolorables: [],
-                        borderables: [],
-                        fontEditable: undefined,
-                        fontSizeable: undefined
-                    }),
-                    mapToEditPanelValues: (config) => new Map([
-                        ["game_title", config.game_title || defaultConfig.game_title],
-                        ["player_name", config.player_name || defaultConfig.player_name],
-                        ["villain_name", config.villain_name || defaultConfig.villain_name]
-                    ])
-                });
-            }
-        }
-
-        // 페이지 로드 시 SDK 초기화
-        initializeSDKs();
-
-        // 게임 진행 상황 불러오기
-        function loadGameProgress() {
-            const progressRecords = allRecords.filter(record => record.record_type === 'game_progress');
-            
-            if (progressRecords.length > 0) {
-                // 가장 최근 진행 상황 찾기
-                const latestProgress = progressRecords.reduce((latest, current) => {
-                    return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
-                });
+        // 데이터 SDK 초기화
+        if (window.dataSdk) {
+            window.dataSdk.getAll().then(records => {
+                allRecords = records || [];
                 
-                // 게임이 진행 중이었다면 복원
-                if (latestProgress.game_active) {
-                    gameState.level = latestProgress.level;
-                    gameState.player = {
-                        hp: latestProgress.player_hp,
-                        maxHp: latestProgress.player_max_hp,
-                        attack: latestProgress.player_attack,
-                        defense: latestProgress.player_defense,
-                        mana: latestProgress.player_mana,
-                        maxMana: 20
+                // 최고 기록 로드
+                const bestRecords = allRecords.filter(r => r.record_type === 'best_records');
+                if (bestRecords.length > 0) {
+                    const latest = bestRecords.reduce((a, b) => 
+                        new Date(a.timestamp) > new Date(b.timestamp) ? a : b
+                    );
+                    gameState.bestRecords = {
+                        maxLevel: latest.max_level || 1,
+                        maxProblems: latest.max_problems || 0,
+                        maxDamage: latest.max_damage || 0,
+                        maxTime: latest.max_time || 0
                     };
+                }
+                
+                // 게임 진행 상황 로드
+                const progressRecords = allRecords.filter(r => r.record_type === 'game_progress');
+                if (progressRecords.length > 0) {
+                    const latest = progressRecords.reduce((a, b) => 
+                        new Date(a.timestamp) > new Date(b.timestamp) ? a : b
+                    );
+                    
+                    gameState.level = latest.level || 1;
+                    gameState.coins = latest.coins || 0;
+                    gameState.ownedSkills = latest.owned_skills || [];
+                    gameState.player = latest.player_stats || gameState.player;
+                    
+                    const levelMultiplier = 1 + (gameState.level - 1) * 0.3;
                     gameState.villain = {
-                        hp: latestProgress.villain_hp,
-                        maxHp: latestProgress.villain_max_hp,
-                        attack: latestProgress.villain_attack,
-                        defense: latestProgress.villain_defense
+                        hp: Math.floor(80 * levelMultiplier),
+                        maxHp: Math.floor(80 * levelMultiplier),
+                        attack: Math.floor(12 * levelMultiplier),
+                        defense: Math.floor(8 * levelMultiplier)
                     };
-                    gameState.currentStats.problemsSolved = latestProgress.problems_solved;
-                    gameState.currentStats.totalDamage = latestProgress.total_damage;
-                    gameState.gameActive = true;
+                    
+                    gameState.currentStats = latest.current_stats || gameState.currentStats;
                     gameLoaded = true;
                     
-                    addBattleLog(`이전 게임을 불러왔습니다! 레벨 ${gameState.level}부터 계속합니다.`);
-                    updateDisplay();
+                    addBattleLog('이전 게임을 불러왔습니다!');
                 }
-            }
+                
+                updateDisplay();
+                updateRecordsDisplay();
+                renderSkillButtons();
+            });
         }
 
-        // 게임 진행 상황 저장
-        async function saveGameProgress() {
-            if (!window.dataSdk) return;
-            
-            // 기존 진행 상황 레코드 삭제
-            const progressRecords = allRecords.filter(record => record.record_type === 'game_progress');
-            for (const record of progressRecords) {
-                await window.dataSdk.delete(record);
+        // 소수 생성
+        function generatePrime(min, max) {
+            const primes = [];
+            for (let num = min; num <= max; num++) {
+                let isPrime = num > 1;
+                for (let i = 2; i <= Math.sqrt(num); i++) {
+                    if (num % i === 0) {
+                        isPrime = false;
+                        break;
+                    }
+                }
+                if (isPrime) primes.push(num);
             }
-            
-            // 새로운 진행 상황 저장
-            const progressData = {
-                record_type: 'game_progress',
-                level: gameState.level,
-                problems_solved: gameState.currentStats.problemsSolved,
-                total_damage: gameState.currentStats.totalDamage,
-                max_hp: 0,
-                max_attack: 0,
-                max_defense: 0,
-                play_time: 0,
-                player_hp: gameState.player.hp,
-                player_max_hp: gameState.player.maxHp,
-                player_attack: gameState.player.attack,
-                player_defense: gameState.player.defense,
-                player_mana: gameState.player.mana,
-                villain_hp: gameState.villain.hp,
-                villain_max_hp: gameState.villain.maxHp,
-                villain_attack: gameState.villain.attack,
-                villain_defense: gameState.villain.defense,
-                game_active: gameState.gameActive,
-                timestamp: new Date().toISOString()
-            };
-            
-            await window.dataSdk.create(progressData);
+            return primes[Math.floor(Math.random() * primes.length)];
         }
 
-        // 기록 관리 함수들
-        function loadBestRecords() {
-            const records = allRecords.filter(record => record.record_type === 'best_record');
-            if (records.length > 0) {
-                const bestRecord = records[0];
-                gameState.bestRecords = {
-                    level: bestRecord.level || 0,
-                    problemsSolved: bestRecord.problems_solved || 0,
-                    totalDamage: bestRecord.total_damage || 0,
-                    maxHp: bestRecord.max_hp || 0,
-                    maxAttack: bestRecord.max_attack || 0,
-                    maxDefense: bestRecord.max_defense || 0
-                };
-            }
-        }
-
-        async function saveBestRecords() {
-            if (!window.dataSdk) return;
-
-            const existingRecords = allRecords.filter(record => record.record_type === 'best_record');
-            
-            const recordData = {
-                record_type: 'best_record',
-                level: gameState.bestRecords.level,
-                problems_solved: gameState.bestRecords.problemsSolved,
-                total_damage: gameState.bestRecords.totalDamage,
-                max_hp: gameState.bestRecords.maxHp,
-                max_attack: gameState.bestRecords.maxAttack,
-                max_defense: gameState.bestRecords.maxDefense,
-                play_time: 0,
-                player_hp: 0,
-                player_max_hp: 0,
-                player_attack: 0,
-                player_defense: 0,
-                player_mana: 0,
-                villain_hp: 0,
-                villain_max_hp: 0,
-                villain_attack: 0,
-                villain_defense: 0,
-                game_active: false,
-                timestamp: new Date().toISOString()
-            };
-
-            if (existingRecords.length > 0) {
-                const existingRecord = existingRecords[0];
-                const updatedRecord = { ...existingRecord, ...recordData };
-                await window.dataSdk.update(updatedRecord);
-            } else {
-                await window.dataSdk.create(recordData);
-            }
-        }
-
-        async function saveGameSession() {
-            if (!window.dataSdk) return;
-
-            const playTime = Math.floor((Date.now() - gameState.currentStats.startTime) / 1000);
-            
-            const sessionData = {
-                record_type: 'game_session',
-                level: gameState.level,
-                problems_solved: gameState.currentStats.problemsSolved,
-                total_damage: gameState.currentStats.totalDamage,
-                max_hp: gameState.player.maxHp,
-                max_attack: gameState.player.attack,
-                max_defense: gameState.player.defense,
-                play_time: playTime,
-                player_hp: 0,
-                player_max_hp: 0,
-                player_attack: 0,
-                player_defense: 0,
-                player_mana: 0,
-                villain_hp: 0,
-                villain_max_hp: 0,
-                villain_attack: 0,
-                villain_defense: 0,
-                game_active: false,
-                timestamp: new Date().toISOString()
-            };
-
-            await window.dataSdk.create(sessionData);
-        }
-
-        function updateBestRecords() {
-            let newRecord = false;
-            
-            if (gameState.level > gameState.bestRecords.level) {
-                gameState.bestRecords.level = gameState.level;
-                highlightNewRecord('bestLevel');
-                newRecord = true;
-            }
-            
-            if (gameState.currentStats.problemsSolved > gameState.bestRecords.problemsSolved) {
-                gameState.bestRecords.problemsSolved = gameState.currentStats.problemsSolved;
-                highlightNewRecord('bestProblems');
-                newRecord = true;
-            }
-            
-            if (gameState.currentStats.totalDamage > gameState.bestRecords.totalDamage) {
-                gameState.bestRecords.totalDamage = gameState.currentStats.totalDamage;
-                highlightNewRecord('bestDamage');
-                newRecord = true;
-            }
-            
-            if (gameState.player.maxHp > gameState.bestRecords.maxHp) {
-                gameState.bestRecords.maxHp = gameState.player.maxHp;
-                highlightNewRecord('bestHp');
-                newRecord = true;
-            }
-            
-            if (gameState.player.attack > gameState.bestRecords.maxAttack) {
-                gameState.bestRecords.maxAttack = gameState.player.attack;
-                highlightNewRecord('bestAttack');
-                newRecord = true;
-            }
-            
-            if (gameState.player.defense > gameState.bestRecords.maxDefense) {
-                gameState.bestRecords.maxDefense = gameState.player.defense;
-                newRecord = true;
-            }
-            
-            if (newRecord) {
-                saveBestRecords();
-                addBattleLog('🎉 새로운 최고 기록을 달성했습니다!');
-            }
-        }
-
-        function highlightNewRecord(elementId) {
-            const element = document.getElementById(elementId);
-            if (element && element.parentElement) {
-                element.parentElement.classList.add('new-record');
-                setTimeout(() => {
-                    element.parentElement.classList.remove('new-record');
-                }, 2000);
-            }
-        }
-
-        function updateRecordsDisplay() {
-            // 현재 플레이 기록 업데이트
-            document.getElementById('currentLevel').textContent = gameState.level;
-            document.getElementById('problemsSolved').textContent = gameState.currentStats.problemsSolved;
-            document.getElementById('totalDamage').textContent = gameState.currentStats.totalDamage;
-            
-            const playTime = Math.floor((Date.now() - gameState.currentStats.startTime) / 1000);
-            const minutes = Math.floor(playTime / 60);
-            const seconds = playTime % 60;
-            document.getElementById('playTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            // 최고 기록 업데이트
-            document.getElementById('bestLevel').textContent = gameState.bestRecords.level || '-';
-            document.getElementById('bestProblems').textContent = gameState.bestRecords.problemsSolved || '-';
-            document.getElementById('bestDamage').textContent = gameState.bestRecords.totalDamage || '-';
-            document.getElementById('bestHp').textContent = gameState.bestRecords.maxHp || '-';
-            document.getElementById('bestAttack').textContent = gameState.bestRecords.maxAttack || '-';
-        }
-
-        // 새로운 소수 곱셈 문제 생성
+        // 문제 생성
         function generateProblem() {
-            // 자연수 배열 (1-20)
-            const naturalNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-            
-            // 한자리 소수 (0.1 ~ 0.9)
-            const oneDigitDecimals = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
-            
-            // 두자리 소수 (0.10 ~ 0.99, 0.05 간격)
-            const twoDigitDecimals = [];
-            for (let i = 10; i <= 99; i += 5) {
-                twoDigitDecimals.push(i / 100);
-            }
-            
-            // 문제 유형 선택 (1: 자연수×소수, 2: 소수×자연수, 3: 소수×소수)
-            const problemType = Math.floor(Math.random() * 3) + 1;
-            let num1, num2, answer;
-            
-            if (problemType === 1) {
-                // 자연수 × 소수 (한자리 또는 두자리)
-                num1 = naturalNumbers[Math.floor(Math.random() * naturalNumbers.length)];
-                const useOneDigit = Math.random() < 0.5;
-                if (useOneDigit) {
-                    num2 = oneDigitDecimals[Math.floor(Math.random() * oneDigitDecimals.length)];
-                } else {
-                    num2 = twoDigitDecimals[Math.floor(Math.random() * twoDigitDecimals.length)];
-                }
-            } else if (problemType === 2) {
-                // 소수 × 자연수
-                const useOneDigit = Math.random() < 0.5;
-                if (useOneDigit) {
-                    num1 = oneDigitDecimals[Math.floor(Math.random() * oneDigitDecimals.length)];
-                } else {
-                    num1 = twoDigitDecimals[Math.floor(Math.random() * twoDigitDecimals.length)];
-                }
-                num2 = naturalNumbers[Math.floor(Math.random() * naturalNumbers.length)];
-            } else {
-                // 소수 × 소수 (둘 다 한자리)
-                num1 = oneDigitDecimals[Math.floor(Math.random() * oneDigitDecimals.length)];
-                num2 = oneDigitDecimals[Math.floor(Math.random() * oneDigitDecimals.length)];
-            }
-            
-            answer = Math.round((num1 * num2) * 1000) / 1000; // 소수점 3자리까지 반올림
-            
-            gameState.currentProblem = { num1, num2, answer };
+            const num1 = generatePrime(2, 20);
+            const num2 = generatePrime(2, 20);
+            gameState.currentProblem = {
+                num1: num1,
+                num2: num2,
+                answer: num1 * num2
+            };
             document.getElementById('mathProblem').textContent = `${num1} × ${num2} = ?`;
             document.getElementById('answerInput').value = '';
-            document.getElementById('upgradeSection').style.display = 'none';
+            document.getElementById('answerInput').focus();
         }
 
-        // 답안 확인
+        // 정답 체크
         function checkAnswer() {
-            const userAnswer = parseFloat(document.getElementById('answerInput').value);
-            const correctAnswer = gameState.currentProblem.answer;
+            if (!gameState.gameActive) return;
             
-            // 소수점 계산의 오차를 고려하여 0.001 범위 내에서 정답 처리
-            if (Math.abs(userAnswer - correctAnswer) < 0.001) {
-                addBattleLog(`정답입니다! ${gameState.currentProblem.num1} × ${gameState.currentProblem.num2} = ${correctAnswer}`);
+            const userAnswer = parseInt(document.getElementById('answerInput').value);
+            
+            if (userAnswer === gameState.currentProblem.answer) {
+                const damage = Math.max(1, gameState.player.attack - gameState.villain.defense);
+                gameState.villain.hp = Math.max(0, gameState.villain.hp - damage);
+                
+                // 코인 획득
+                const coinsEarned = 5;
+                gameState.coins += coinsEarned;
+                
                 gameState.currentStats.problemsSolved++;
-                updateBestRecords();
-                updateRecordsDisplay();
-                document.getElementById('upgradeSection').style.display = 'block';
-                document.getElementById('submitBtn').disabled = true;
+                gameState.currentStats.totalDamage += damage;
+                
+                addBattleLog(`✅ 정답! ${damage} 데미지! (+${coinsEarned} 🪙)`);
+                playHeroAttackSound();
+                triggerHitEffect('heroAttackGif');
+                
+                if (gameState.villain.hp <= 0) {
+                    victory();
+                    return;
+                }
+                
+                generateProblem();
             } else {
-                addBattleLog(`틀렸습니다. 다시 시도하세요!`);
-                document.getElementById('answerInput').value = '';
-            }
-        }
-
-        // 플레이어 강화
-        function upgradePlayer(stat) {
-            switch(stat) {
-                case 'hp':
-                    gameState.player.maxHp += 20;
-                    gameState.player.hp += 20;
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 체력이 20 증가했습니다!`);
-                    playupgradeSound()
-                    break;
-                case 'attack':
-                    gameState.player.attack += 5;
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 공격력이 5 증가했습니다!`);
-                    playupgradeSound()
-                    break;
-                case 'defense':
-                    gameState.player.defense += 3;
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 방어력이 3 증가했습니다!`);
-                    playupgradeSound()
-                    break;
+                addBattleLog(`❌ 오답! 정답은 ${gameState.currentProblem.answer}입니다.`);
+                generateProblem();
             }
             
             updateDisplay();
             saveGameProgress();
-            generateProblem();
-            document.getElementById('submitBtn').disabled = false;
         }
 
-        // 마나 회복 시스템
-        function startManaRegeneration() {
-            if (gameState.manaInterval) {
-                clearInterval(gameState.manaInterval);
+        // 체력 회복
+        function useRecovery() {
+            if (gameState.player.mana >= 20) {
+                const healAmount = 30;
+                gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
+                gameState.player.mana -= 20;
+                addBattleLog(`💚 체력을 ${healAmount} 회복했습니다!`);
+                playhealingSound();
+                updateDisplay();
+                saveGameProgress();
+            }
+        }
+
+        // 스킬 사용
+        function useSkill(skillId) {
+            if (!gameState.gameActive) return;
+            
+            const skill = SKILLS[skillId];
+            if (!skill) return;
+            
+            // 비용 체크
+            if (skill.useCost.type === 'mana' && gameState.player.mana < skill.useCost.amount) {
+                addBattleLog(`❌ 마나가 부족합니다! (필요: ${skill.useCost.amount})`);
+                return;
+            }
+            if (skill.useCost.type === 'hp' && gameState.player.hp <= skill.useCost.amount) {
+                addBattleLog(`❌ 체력이 부족합니다! (필요: ${skill.useCost.amount})`);
+                return;
+            }
+            if (skill.useCost.mana && gameState.player.mana < skill.useCost.mana) {
+                addBattleLog(`❌ 마나가 부족합니다! (필요: ${skill.useCost.mana})`);
+                return;
+            }
+            if (skill.useCost.hp && gameState.player.hp <= skill.useCost.hp) {
+                addBattleLog(`❌ 체력이 부족합니다! (필요: ${skill.useCost.hp})`);
+                return;
             }
             
-            gameState.manaInterval = setInterval(() => {
+            // 비용 차감
+            if (skill.useCost.type === 'mana') {
+                gameState.player.mana -= skill.useCost.amount;
+            } else if (skill.useCost.type === 'hp') {
+                gameState.player.hp -= skill.useCost.amount;
+            }
+            if (skill.useCost.mana) {
+                gameState.player.mana -= skill.useCost.mana;
+            }
+            if (skill.useCost.hp) {
+                gameState.player.hp -= skill.useCost.hp;
+            }
+            
+            // 효과 적용
+            if (skill.effect.type === 'damage') {
+                const damage = skill.effect.value;
+                gameState.villain.hp = Math.max(0, gameState.villain.hp - damage);
+                gameState.currentStats.totalDamage += damage;
+                addBattleLog(`${skill.icon} ${skill.name} 사용! ${damage} 데미지!`);
+                playHeroAttackSound();
+                triggerHitEffect('heroAttackGif');
+                
+                if (gameState.villain.hp <= 0) {
+                    victory();
+                    return;
+                }
+            }
+            
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        // 전투 시작
+        function startBattle() {
+            gameState.battleInterval = setInterval(() => {
                 if (!gameState.gameActive) return;
                 
+                const damage = Math.max(1, gameState.villain.attack - gameState.player.defense);
+                gameState.player.hp = Math.max(0, gameState.player.hp - damage);
+                
+                addBattleLog(`👿 마왕의 공격! ${damage} 데미지를 받았습니다!`);
+                playBossAttackSound();
+                triggerHitEffect('devilAttackGif');
+                
+                if (gameState.player.hp <= 0) {
+                    gameOver();
+                }
+                
+                updateDisplay();
+            }, 3000);
+        }
+
+        // 마나 재생
+        function startManaRegeneration() {
+            gameState.manaInterval = setInterval(() => {
+                if (!gameState.gameActive) return;
                 if (gameState.player.mana < gameState.player.maxMana) {
                     gameState.player.mana = Math.min(gameState.player.maxMana, gameState.player.mana + 1);
                     updateDisplay();
                 }
-            }, 2000); // 2초마다 마나 1씩 회복
+            }, 2000);
         }
 
-        // 리커버리 마법 사용
-        function useRecovery() {
-            if (gameState.player.mana >= 20) {
-                gameState.player.mana -= 20;
-                gameState.player.hp = gameState.player.maxHp;
-                addBattleLog(`🔮 리커버리 마법으로 체력을 완전 회복했습니다!`);
-                playhealingSound()
-                updateDisplay();
-                saveGameProgress();
+        // 스탯 업그레이드
+        function upgradeAttack() {
+            gameState.player.attack += 5;
+            addBattleLog('⚔️ 공격력이 5 증가했습니다!');
+            playupgradeSound();
+            document.getElementById('upgradeSection').style.display = 'none';
+            updateDisplay();
+            saveGameProgress();
+        }
 
+        function upgradeDefense() {
+            gameState.player.defense += 3;
+            addBattleLog('🛡️ 방어력이 3 증가했습니다!');
+            playupgradeSound();
+            document.getElementById('upgradeSection').style.display = 'none';
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        function upgradeMaxHp() {
+            gameState.player.maxHp += 20;
+            gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + 20);
+            addBattleLog('❤️ 최대 체력이 20 증가했습니다!');
+            playupgradeSound();
+            document.getElementById('upgradeSection').style.display = 'none';
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        // 기록 업데이트
+        function updateBestRecords() {
+            let updated = false;
+            
+            if (gameState.level > gameState.bestRecords.maxLevel) {
+                gameState.bestRecords.maxLevel = gameState.level;
+                updated = true;
             }
-        }
-
-        // 전투 시스템
-        function startBattle() {
-            if (gameState.battleInterval) {
-                clearInterval(gameState.battleInterval);
+            if (gameState.currentStats.problemsSolved > gameState.bestRecords.maxProblems) {
+                gameState.bestRecords.maxProblems = gameState.currentStats.problemsSolved;
+                updated = true;
+            }
+            if (gameState.currentStats.totalDamage > gameState.bestRecords.maxDamage) {
+                gameState.bestRecords.maxDamage = gameState.currentStats.totalDamage;
+                updated = true;
             }
             
-            gameState.battleInterval = setInterval(() => {
-                if (!gameState.gameActive) return;
-                
-                // 플레이어 공격
-                const playerDamage = Math.max(1, gameState.player.attack - gameState.villain.defense);
-                gameState.villain.hp = Math.max(0, gameState.villain.hp - playerDamage);
-                gameState.currentStats.totalDamage += playerDamage;
-                updateRecordsDisplay();
-                addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${playerDamage}의 피해를 입혔습니다!`);
-                playHeroAttackSound(); 
-                
-                // ✨ [수정] 마왕에게는 용사 공격 효과(ID: 'heroattack')를 보여줍니다.
-                triggerHitEffect('heroattack'); 
-
-                if (gameState.villain.hp <= 0) {
-                    victory();
-                    return;
-                }
-                
-                // 빌런 공격
-                setTimeout(() => {
-                    if (!gameState.gameActive) return;
-                    
-                    const villainDamage = Math.max(1, gameState.villain.attack - gameState.player.defense);
-                    gameState.player.hp = Math.max(0, gameState.player.hp - villainDamage);
-                    addBattleLog(`${document.getElementById('villainName').textContent}이(가) ${villainDamage}의 피해를 입혔습니다!`);
-                    playBossAttackSound(); 
-                    
-                    // ✨ [수정] 용사에게는 악마 공격 효과(ID: 'devilattack')를 보여줍니다.
-                    triggerHitEffect('devilattack'); 
-                    
-                    if (gameState.player.hp <= 0) {
-                        gameOver();
-                        return;
-                    }
-                    
-                    updateDisplay();
-                    saveGameProgress();
-                }, 1500);
-                
-                updateDisplay();
-                saveGameProgress();
-            }, 3000);
-        }
-
-        /* // 전투 시스템
-        function startBattle() {
-            if (gameState.battleInterval) {
-                clearInterval(gameState.battleInterval);
+            const playTime = Math.floor((Date.now() - gameState.currentStats.startTime) / 1000);
+            if (playTime > gameState.bestRecords.maxTime) {
+                gameState.bestRecords.maxTime = playTime;
+                updated = true;
             }
             
-            gameState.battleInterval = setInterval(() => {
-                if (!gameState.gameActive) return;
-                
-                // 플레이어 공격
-                const playerDamage = Math.max(1, gameState.player.attack - gameState.villain.defense);
-                gameState.villain.hp = Math.max(0, gameState.villain.hp - playerDamage);
-                gameState.currentStats.totalDamage += playerDamage;
-                updateRecordsDisplay();
-                addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${playerDamage}의 피해를 입혔습니다!`);
-                playHeroAttackSound(); // ✨ 여기에 용사 공격 소리 추가!
-                triggerHitEffect('devil-attack-gif'); // ✨ [추가] 마왕에게 타격 효과 출력
+            if (updated && window.dataSdk) {
+                window.dataSdk.create({
+                    record_type: 'best_records',
+                    max_level: gameState.bestRecords.maxLevel,
+                    max_problems: gameState.bestRecords.maxProblems,
+                    max_damage: gameState.bestRecords.maxDamage,
+                    max_time: gameState.bestRecords.maxTime,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
 
-                if (gameState.villain.hp <= 0) {
-                    victory();
-                    return;
-                }
+        function updateRecordsDisplay() {
+            document.getElementById('currentLevel').textContent = gameState.level;
+            document.getElementById('currentProblems').textContent = gameState.currentStats.problemsSolved;
+            document.getElementById('currentDamage').textContent = gameState.currentStats.totalDamage;
+            
+            const currentPlayTime = Math.floor((Date.now() - gameState.currentStats.startTime) / 1000);
+            const currentMinutes = Math.floor(currentPlayTime / 60);
+            const currentSeconds = currentPlayTime % 60;
+            document.getElementById('currentTime').textContent = 
+                `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('bestLevel').textContent = gameState.bestRecords.maxLevel;
+            document.getElementById('bestProblems').textContent = gameState.bestRecords.maxProblems;
+            document.getElementById('bestDamage').textContent = gameState.bestRecords.maxDamage;
+            
+            const bestMinutes = Math.floor(gameState.bestRecords.maxTime / 60);
+            const bestSeconds = gameState.bestRecords.maxTime % 60;
+            document.getElementById('bestTime').textContent = 
+                `${bestMinutes}:${bestSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function saveGameSession() {
+            if (window.dataSdk) {
+                window.dataSdk.create({
+                    record_type: 'game_session',
+                    level_reached: gameState.level,
+                    problems_solved: gameState.currentStats.problemsSolved,
+                    total_damage: gameState.currentStats.totalDamage,
+                    play_time: Math.floor((Date.now() - gameState.currentStats.startTime) / 1000),
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+
+        function saveGameProgress() {
+            if (window.dataSdk) {
+                const progressRecords = allRecords.filter(record => record.record_type === 'game_progress');
+                progressRecords.forEach(async (record) => {
+                    await window.dataSdk.delete(record);
+                });
                 
-                // 빌런 공격
-                setTimeout(() => {
-                    if (!gameState.gameActive) return;
-                    
-                    const villainDamage = Math.max(1, gameState.villain.attack - gameState.player.defense);
-                    gameState.player.hp = Math.max(0, gameState.player.hp - villainDamage);
-                    addBattleLog(`${document.getElementById('villainName').textContent}이(가) ${villainDamage}의 피해를 입혔습니다!`);
-                    playBossAttackSound(); // ✨ 여기에 마왕 공격 소리 추가!
-                    triggerHitEffect('hero-attack-gif'); // ✨ [추가] 용사에게 타격 효과 출력
-                    if (gameState.player.hp <= 0) {
-                        gameOver();
-                        return;
-                    }
-                    
-                    updateDisplay();
-                    saveGameProgress();
-                }, 1500);
-                
-                updateDisplay();
-                saveGameProgress();
-            }, 3000);
-        } */
+                window.dataSdk.create({
+                    record_type: 'game_progress',
+                    level: gameState.level,
+                    coins: gameState.coins,
+                    owned_skills: gameState.ownedSkills,
+                    player_stats: gameState.player,
+                    current_stats: gameState.currentStats,
+                    timestamp: new Date().toISOString()
+                }).then(record => {
+                    allRecords.push(record);
+                });
+            }
+        }
 
         // 화면 업데이트
         function updateDisplay() {
+            // 코인 표시
+            document.getElementById('coinAmount').textContent = gameState.coins;
+            document.getElementById('shopCoinAmount').textContent = gameState.coins;
+            
             // 플레이어 스탯 업데이트
             const playerHpPercent = (gameState.player.hp / gameState.player.maxHp) * 100;
             document.getElementById('playerHpBar').style.width = `${playerHpPercent}%`;
@@ -1095,12 +1222,11 @@
             document.getElementById('playerAttackBar').textContent = gameState.player.attack;
             document.getElementById('playerDefenseBar').textContent = gameState.player.defense;
             
-            // 마나 바 업데이트
             const playerManaPercent = (gameState.player.mana / gameState.player.maxMana) * 100;
             document.getElementById('playerManaBar').style.width = `${playerManaPercent}%`;
             document.getElementById('playerManaBar').textContent = `${gameState.player.mana}/${gameState.player.maxMana}`;
             
-            // 리커버리 버튼 활성화/비활성화
+            // 회복 버튼 상태
             const recoveryBtn = document.getElementById('recoveryBtn');
             if (gameState.player.mana >= 20) {
                 recoveryBtn.disabled = false;
@@ -1109,6 +1235,31 @@
                 recoveryBtn.disabled = true;
                 recoveryBtn.style.opacity = '0.6';
             }
+            
+            // 스킬 버튼 상태 업데이트
+            gameState.ownedSkills.forEach(skillId => {
+                const btn = document.getElementById(`skill-${skillId}`);
+                if (btn) {
+                    const skill = SKILLS[skillId];
+                    let canUse = true;
+                    
+                    if (skill.useCost.type === 'mana' && gameState.player.mana < skill.useCost.amount) {
+                        canUse = false;
+                    }
+                    if (skill.useCost.type === 'hp' && gameState.player.hp <= skill.useCost.amount) {
+                        canUse = false;
+                    }
+                    if (skill.useCost.mana && gameState.player.mana < skill.useCost.mana) {
+                        canUse = false;
+                    }
+                    if (skill.useCost.hp && gameState.player.hp <= skill.useCost.hp) {
+                        canUse = false;
+                    }
+                    
+                    btn.disabled = !canUse;
+                    btn.style.opacity = canUse ? '1' : '0.6';
+                }
+            });
             
             // 빌런 스탯 업데이트
             const villainHpPercent = (gameState.villain.hp / gameState.villain.maxHp) * 100;
@@ -1120,7 +1271,6 @@
             // 레벨 표시
             document.getElementById('levelIndicator').textContent = `레벨 ${gameState.level}`;
 
-            // ✨ [추가] 마왕 이름에 레벨 표시
             let baseVillainName = defaultConfig.villain_name;
             if (window.elementSdk && window.elementSdk.config && window.elementSdk.config.villain_name) {
                 baseVillainName = window.elementSdk.config.villain_name;
@@ -1140,13 +1290,11 @@
             gameState.gameActive = false;
             clearInterval(gameState.battleInterval);
             
-            // 문제 풀이 비활성화
             document.getElementById('submitBtn').disabled = true;
             document.getElementById('answerInput').disabled = true;
             document.getElementById('answerInput').style.opacity = '0.6';
             document.getElementById('submitBtn').style.opacity = '0.6';
             
-            // 기록 업데이트 및 저장
             updateBestRecords();
             saveGameSession();
             saveGameProgress();
@@ -1161,11 +1309,9 @@
             gameState.gameActive = false;
             clearInterval(gameState.battleInterval);
             
-            // 기록 저장
             updateBestRecords();
             saveGameSession();
             
-            // 진행 상황 삭제 (게임오버 시 저장된 진행 상황 제거)
             const progressRecords = allRecords.filter(record => record.record_type === 'game_progress');
             progressRecords.forEach(async (record) => {
                 if (window.dataSdk) {
@@ -1175,7 +1321,7 @@
             
             document.getElementById('gameOverSection').style.display = 'block';
             addBattleLog('💀 패배했습니다... 💀');
-            playgameoverSound()
+            playgameoverSound();
         }
 
         // 다음 레벨
@@ -1183,7 +1329,6 @@
             gameState.level++;
             gameState.gameActive = true;
             
-            // 빌런 강화
             const levelMultiplier = 1 + (gameState.level - 1) * 0.3;
             gameState.villain = {
                 hp: Math.floor(80 * levelMultiplier),
@@ -1192,12 +1337,10 @@
                 defense: Math.floor(8 * levelMultiplier)
             };
             
-            // UI 초기화
             document.getElementById('victorySection').style.display = 'none';
             document.getElementById('gameOverSection').style.display = 'none';
             document.getElementById('upgradeSection').style.display = 'none';
             
-            // 문제 풀이 재활성화
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('answerInput').disabled = false;
             document.getElementById('answerInput').style.opacity = '1';
@@ -1216,26 +1359,25 @@
         function restartGame() {
             gameState = {
                 level: 1,
+                coins: 0,
+                ownedSkills: [],
                 player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
                 villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
                 currentProblem: { num1: 2, num2: 3, answer: 6 },
                 battleInterval: null,
                 manaInterval: null,
                 gameActive: true,
-                // 현재 플레이 기록 초기화
                 currentStats: {
                     problemsSolved: 0,
                     totalDamage: 0,
                     startTime: Date.now()
                 },
-                // 최고 기록은 유지
                 bestRecords: gameState.bestRecords
             };
             
             document.getElementById('gameOverSection').style.display = 'none';
             document.getElementById('upgradeSection').style.display = 'none';
             
-            // 문제 풀이 재활성화
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('answerInput').disabled = false;
             document.getElementById('answerInput').style.opacity = '1';
@@ -1243,11 +1385,120 @@
             
             document.getElementById('battleLog').innerHTML = '게임이 다시 시작되었습니다!<br>';
             
+            renderSkillButtons();
             updateDisplay();
             saveGameProgress();
             generateProblem();
             startBattle();
             startManaRegeneration();
+        }
+
+        // 훈련장 열기/닫기
+        function openShop() {
+            document.getElementById('shopModal').style.display = 'flex';
+            renderShop();
+        }
+
+        function closeShop() {
+            document.getElementById('shopModal').style.display = 'none';
+        }
+
+        // 상점 렌더링
+        function renderShop() {
+            const shopElement = document.getElementById('skillShop');
+            shopElement.innerHTML = '';
+            
+            Object.values(SKILLS).forEach(skill => {
+                const owned = gameState.ownedSkills.includes(skill.id);
+                const canBuy = gameState.coins >= skill.cost && !owned;
+                
+                const card = document.createElement('div');
+                card.className = 'skill-card';
+                card.innerHTML = `
+                    <div class="skill-icon">${skill.icon}</div>
+                    <div class="skill-name">${skill.name}</div>
+                    <div class="skill-description">${skill.description}</div>
+                    <div class="skill-cost">💰 ${skill.cost} 코인</div>
+                    <div style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">
+                        사용 비용: ${skill.useCost.type === 'mana' ? `마나 ${skill.useCost.amount}` : ''}
+                        ${skill.useCost.type === 'hp' ? `체력 ${skill.useCost.amount}` : ''}
+                        ${skill.useCost.mana ? `마나 ${skill.useCost.mana}` : ''}
+                        ${skill.useCost.hp ? ` 체력 ${skill.useCost.hp}` : ''}
+                    </div>
+                    ${owned ? 
+                        '<div class="owned-badge">✅ 보유중</div>' :
+                        `<button class="buy-skill-btn" onclick="buySkill('${skill.id}')" ${!canBuy ? 'disabled' : ''}>
+                            구매하기
+                        </button>`
+                    }
+                `;
+                shopElement.appendChild(card);
+            });
+        }
+
+        // 스킬 구매
+        function buySkill(skillId) {
+            const skill = SKILLS[skillId];
+            if (!skill) return;
+            
+            if (gameState.coins < skill.cost) {
+                addBattleLog('❌ 코인이 부족합니다!');
+                return;
+            }
+            
+            if (gameState.ownedSkills.includes(skillId)) {
+                addBattleLog('❌ 이미 보유한 스킬입니다!');
+                return;
+            }
+            
+            gameState.coins -= skill.cost;
+            gameState.ownedSkills.push(skillId);
+            
+            addBattleLog(`✨ ${skill.name} 스킬을 획득했습니다!`);
+            playupgradeSound();
+            
+            renderShop();
+            renderSkillButtons();
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        // 스킬 버튼 렌더링
+        function renderSkillButtons() {
+            const container = document.getElementById('skillButtons');
+            
+            // 회복 버튼 제외하고 모든 버튼 제거
+            const recoveryBtn = document.getElementById('recoveryBtn');
+            container.innerHTML = '';
+            container.appendChild(recoveryBtn);
+            
+            // 보유한 스킬 버튼 추가
+            gameState.ownedSkills.forEach(skillId => {
+                const skill = SKILLS[skillId];
+                if (!skill) return;
+                
+                const btn = document.createElement('button');
+                btn.id = `skill-${skillId}`;
+                btn.className = 'skill-use-btn';
+                btn.onclick = () => useSkill(skillId);
+                
+                let costText = '';
+                if (skill.useCost.type === 'mana') {
+                    costText = `마나 ${skill.useCost.amount}`;
+                } else if (skill.useCost.type === 'hp') {
+                    costText = `체력 ${skill.useCost.amount}`;
+                }
+                if (skill.useCost.mana && skill.useCost.hp) {
+                    costText = `체력 ${skill.useCost.hp} / 마나 ${skill.useCost.mana}`;
+                }
+                
+                btn.innerHTML = `
+                    ${skill.icon} ${skill.name}
+                    <span class="skill-cost-badge">${costText}</span>
+                `;
+                
+                container.appendChild(btn);
+            });
         }
 
         // 이벤트 리스너
@@ -1261,28 +1512,27 @@
         // 게임 초기화
         updateDisplay();
         updateRecordsDisplay();
+        renderSkillButtons();
         
-        // 데이터가 로드될 때까지 대기 후 게임 시작
         setTimeout(() => {
             if (!gameLoaded) {
-                // 저장된 게임이 없으면 새 게임 시작
                 generateProblem();
                 startBattle();
                 startManaRegeneration();
             } else {
-                // 저장된 게임이 있으면 그대로 시작
                 startBattle();
                 startManaRegeneration();
             }
         }, 500);
         
-        // 기록 표시 업데이트 타이머
         setInterval(updateRecordsDisplay, 1000);
+        
         function playHeroAttackSound() {
-        const audio = document.getElementById('hero-hit');
-        audio.currentTime = 0;
-        audio.play();
-      }
+            const audio = document.getElementById('hero-hit');
+            audio.currentTime = 0;
+            audio.play();
+        }
+        
         function playBossAttackSound() {
             const audio = document.getElementById('boss-hit');
             audio.currentTime = 0;
@@ -1294,34 +1544,30 @@
             audio.currentTime = 0;
             audio.play();
         }
+        
         function playhealingSound() {
-        const audio = document.getElementById('healing-magic');
-        audio.currentTime = 0;
-        audio.play();
-      }
+            const audio = document.getElementById('healing-magic');
+            audio.currentTime = 0;
+            audio.play();
+        }
+        
         function playgameoverSound() {
-        const audio = document.getElementById('game-over');
-        audio.currentTime = 0;
-        audio.play();
-      }
-        // 타격 효과를 출력하고 숨기는 함수
+            const audio = document.getElementById('game-over');
+            audio.currentTime = 0;
+            audio.play();
+        }
+        
         function triggerHitEffect(targetId) {
             const effectElement = document.getElementById(targetId);
-
-            // ✨ [안전 장치 추가] 요소를 찾지 못하면(null) 오류 없이 종료합니다.
-        if (!effectElement) { 
-            console.error(`타격 효과 요소(ID: ${targetId})를 찾을 수 없어 효과를 표시할 수 없습니다.`);
-            return;
-    }
-            
-            // 1. 효과 출력 (display: block으로 변경)
+            if (!effectElement) { 
+                console.error(`타격 효과 요소(ID: ${targetId})를 찾을 수 없어 효과를 표시할 수 없습니다.`);
+                return;
+            }
             effectElement.style.display = 'block';
-            
-            // 2. 잠시 후 효과 숨김 (300ms = 0.3초)
             setTimeout(() => {
                 effectElement.style.display = 'none';
             }, 300); 
         }
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99d1eb14d076ea9f',t:'MTc2MjkwNzQwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
