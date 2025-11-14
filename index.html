@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.172</title>
+  <title>Prime Battle Academy1.18</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -630,7 +630,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.172</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.18</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -670,6 +670,11 @@
      </div>
      <div class="record-item"><span class="record-label">최강 공격력:</span> <span class="record-value" id="bestAttack">-</span>
      </div>
+     <!-- 👇 이 부분 추가 -->
+     <div style="text-align: center; margin-top: 15px;">
+         <button onclick="resetBestRecords()" style="padding: 8px 20px; background: linear-gradient(135deg, #f56565, #e53e3e); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
+             🔄 기록 초기화
+         </button>
     </div>
    </div>
    <div class="battle-arena">
@@ -891,7 +896,21 @@
         };
 
         // Data SDK 초기화
+        // 수정 코드
         const dataHandler = {
+            onDataChanged(data) {
+                console.log('데이터 변경됨:', data.length, '개의 레코드'); // 디버깅용
+                allRecords = data;
+                if (!dataInitialized) {
+                    loadBestRecords(); // 최고 기록 먼저 로드
+                    loadGameProgress(); // 게임 진행 상황 로드
+                    dataInitialized = true;
+                    updateRecordsDisplay(); // 화면 업데이트
+                }
+            }
+        };
+
+        /* const dataHandler = {
             onDataChanged(data) {
                 allRecords = data;
                 if (!dataInitialized) {
@@ -901,7 +920,7 @@
                 }
                 updateRecordsDisplay();
             }
-        };
+        }; */
 
         // SDK 초기화
         async function initializeSDKs() {
@@ -1028,6 +1047,29 @@
         function loadBestRecords() {
             const records = allRecords.filter(record => record.record_type === 'best_record');
             if (records.length > 0) {
+                // 가장 최근 기록 찾기
+                const bestRecord = records.reduce((latest, current) => {
+                    return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
+                });
+                
+                gameState.bestRecords = {
+                    level: bestRecord.level || 0,
+                    problemsSolved: bestRecord.problems_solved || 0,
+                    totalDamage: bestRecord.total_damage || 0,
+                    maxHp: bestRecord.max_hp || 0,
+                    maxAttack: bestRecord.max_attack || 0,
+                    maxDefense: bestRecord.max_defense || 0
+                };
+                
+                console.log('최고 기록 로드됨:', gameState.bestRecords); // 디버깅용
+            } else {
+                console.log('저장된 최고 기록이 없습니다.'); // 디버깅용
+            }
+        }
+
+        /* function loadBestRecords() {
+            const records = allRecords.filter(record => record.record_type === 'best_record');
+            if (records.length > 0) {
                 const bestRecord = records[0];
                 gameState.bestRecords = {
                     level: bestRecord.level || 0,
@@ -1038,9 +1080,90 @@
                     maxDefense: bestRecord.max_defense || 0
                 };
             }
+        } */
+
+        // 기존 함수 삭제하고 아래로 교체
+        async function saveBestRecords() {
+            if (!window.dataSdk) {
+                console.log('dataSdk가 없어서 기록을 저장할 수 없습니다.');
+                return;
+            }
+
+            try {
+                // 기존 최고 기록 삭제
+                const existingRecords = allRecords.filter(record => record.record_type === 'best_record');
+                for (const record of existingRecords) {
+                    await window.dataSdk.delete(record);
+                }
+                
+                // 새로운 최고 기록 저장
+                const recordData = {
+                    record_type: 'best_record',
+                    level: gameState.bestRecords.level,
+                    problems_solved: gameState.bestRecords.problemsSolved,
+                    total_damage: gameState.bestRecords.totalDamage,
+                    max_hp: gameState.bestRecords.maxHp,
+                    max_attack: gameState.bestRecords.maxAttack,
+                    max_defense: gameState.bestRecords.maxDefense,
+                    timestamp: new Date().toISOString()
+                };
+
+                const savedRecord = await window.dataSdk.create(recordData);
+                
+                // allRecords 배열에 추가 (중요!)
+                allRecords = allRecords.filter(r => r.record_type !== 'best_record');
+                allRecords.push(savedRecord);
+                
+                console.log('최고 기록 저장됨:', recordData);
+            } catch (error) {
+                console.error('최고 기록 저장 중 오류:', error);
+            }
+        }       
+
+        // 최고 기록 초기화 함수
+        async function resetBestRecords() {
+            if (!confirm('정말 최고 기록을 초기화하시겠습니까?')) {
+                return;
+            }
+            
+            if (!window.dataSdk) {
+                alert('데이터 저장 기능을 사용할 수 없습니다.');
+                return;
+            }
+            
+            try {
+                // 데이터베이스에서 최고 기록 삭제
+                const existingRecords = allRecords.filter(record => record.record_type === 'best_record');
+                for (const record of existingRecords) {
+                    await window.dataSdk.delete(record);
+                }
+                
+                // 메모리에서도 초기화
+                gameState.bestRecords = {
+                    level: 0,
+                    problemsSolved: 0,
+                    totalDamage: 0,
+                    maxHp: 0,
+                    maxAttack: 0,
+                    maxDefense: 0
+                };
+                
+                // allRecords에서도 제거
+                allRecords = allRecords.filter(r => r.record_type !== 'best_record');
+                
+                // 화면 업데이트
+                updateRecordsDisplay();
+                addBattleLog('✨ 최고 기록이 초기화되었습니다!');
+                
+                alert('최고 기록이 초기화되었습니다.');
+                console.log('최고 기록 초기화 완료');
+            } catch (error) {
+                console.error('최고 기록 초기화 중 오류:', error);
+                alert('기록 초기화 중 오류가 발생했습니다.');
+            }
         }
 
-        async function saveBestRecords() {
+        /* async function saveBestRecords() {
             if (!window.dataSdk) return;
 
             const existingRecords = allRecords.filter(record => record.record_type === 'best_record');
@@ -1074,7 +1197,7 @@
             } else {
                 await window.dataSdk.create(recordData);
             }
-        }
+        } */
 
         async function saveGameSession() {
             if (!window.dataSdk) return;
@@ -1145,6 +1268,7 @@
             }
             
             if (newRecord) {
+                console.log('새 최고 기록 달성, 저장 시작...'); // 디버깅용
                 saveBestRecords();
                 addBattleLog('🎉 새로운 최고 기록을 달성했습니다!');
             }
