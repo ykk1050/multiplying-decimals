@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.171</title>
+  <title>Prime Battle Academy1.172</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -630,7 +630,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.171</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.172</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -1265,8 +1265,8 @@
                     playupgradeSound()
                     break;
                 case 'defense':
-                    gameState.player.defense += 3;
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 방어력이 3 증가했습니다!`);
+                    gameState.player.defense += 2;
+                    addBattleLog(`${document.getElementById('playerName').textContent}의 방어력이 2 증가했습니다!`);
                     playupgradeSound()
                     break;
             }
