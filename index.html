@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.19</title>
+  <title>Prime Battle Academy1.191</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -630,7 +630,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.19</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.191</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -918,6 +918,26 @@
             }
         };
 
+        // 5. loadBestRecords 함수 (반드시 여기!)
+        function loadBestRecords() {
+            const savedRecords = localStorageHelper.load('bestRecords');
+            
+            if (savedRecords) {
+                gameState.bestRecords = savedRecords;
+                console.log('최고 기록 로드됨:', gameState.bestRecords);
+            } else {
+                console.log('저장된 최고 기록이 없습니다.');
+                gameState.bestRecords = {
+                    level: 0,
+                    problemsSolved: 0,
+                    totalDamage: 0,
+                    maxHp: 0,
+                    maxAttack: 0,
+                    maxDefense: 0
+                };
+            }
+        }
+
         // 데이터 저장을 위한 변수
         let allRecords = [];
         let dataInitialized = false;
@@ -968,7 +988,25 @@
             }
             
             console.log('게임 초기화 완료');
-        });    
+        });
+        
+        // 게임 초기화 (맨 마지막!)
+        updateDisplay();
+        updateRecordsDisplay();
+        renderSkillButtons();
+        
+        setTimeout(() => {
+            if (!gameLoaded) {
+                generateProblem();
+                startBattle();
+                startManaRegeneration();
+            } else {
+                startBattle();
+                startManaRegeneration();
+            }
+        }, 500);
+        
+        setInterval(updateRecordsDisplay, 1000);
 
         /* // Data SDK 초기화
         // 수정 코드
