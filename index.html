@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.18</title>
+  <title>Prime Battle Academy1.19</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <style>
@@ -630,7 +630,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.18</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.19</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -804,6 +804,44 @@
 
 
   <script>
+        // localStorage를 사용한 데이터 저장/로드 함수
+        const localStorageHelper = {
+            save: function(key, data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                    console.log(`${key} 저장 완료:`, data);
+                    return true;
+                } catch (error) {
+                    console.error('저장 실패:', error);
+                    return false;
+                }
+            },
+            
+            load: function(key) {
+                try {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        console.log(`${key} 로드 완료`);
+                        return JSON.parse(data);
+                    }
+                    return null;
+                } catch (error) {
+                    console.error('로드 실패:', error);
+                    return null;
+                }
+            },
+            
+            remove: function(key) {
+                try {
+                    localStorage.removeItem(key);
+                    console.log(`${key} 삭제 완료`);
+                    return true;
+                } catch (error) {
+                    console.error('삭제 실패:', error);
+                    return false;
+                }
+            }
+        };
         // 게임 상태
         let gameState = {
             level: 1,
@@ -895,7 +933,44 @@
             villain_name: "수학 마왕"
         };
 
-        // Data SDK 초기화
+        // 페이지 로드 시 데이터 로드
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('게임 초기화 시작...');
+            
+            // 최고 기록 로드
+            loadBestRecords();
+            
+            // 게임 진행 상황 로드
+            loadGameProgress();
+            
+            // Element SDK 초기화 (있으면)
+            if (window.elementSdk) {
+                window.elementSdk.init({
+                    defaultConfig: defaultConfig,
+                    onConfigChange: async (config) => {
+                        document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+                        document.getElementById('playerName').textContent = config.player_name || defaultConfig.player_name;
+                        const baseVillainName = config.villain_name || defaultConfig.villain_name;
+                        document.getElementById('villainName').textContent = `Lv${gameState.level} ${baseVillainName}`;
+                    },
+                    mapToCapabilities: (config) => ({
+                        recolorables: [],
+                        borderables: [],
+                        fontEditable: undefined,
+                        fontSizeable: undefined
+                    }),
+                    mapToEditPanelValues: (config) => new Map([
+                        ["game_title", config.game_title || defaultConfig.game_title],
+                        ["player_name", config.player_name || defaultConfig.player_name],
+                        ["villain_name", config.villain_name || defaultConfig.villain_name]
+                    ])
+                });
+            }
+            
+            console.log('게임 초기화 완료');
+        });    
+
+        /* // Data SDK 초기화
         // 수정 코드
         const dataHandler = {
             onDataChanged(data) {
@@ -908,21 +983,10 @@
                     updateRecordsDisplay(); // 화면 업데이트
                 }
             }
-        };
-
-        /* const dataHandler = {
-            onDataChanged(data) {
-                allRecords = data;
-                if (!dataInitialized) {
-                    loadBestRecords();
-                    loadGameProgress();
-                    dataInitialized = true;
-                }
-                updateRecordsDisplay();
-            }
         }; */
 
-        // SDK 초기화
+
+        /* // SDK 초기화
         async function initializeSDKs() {
             if (window.dataSdk) {
                 const result = await window.dataSdk.init(dataHandler);
@@ -942,7 +1006,7 @@
                     },
                         /* document.getElementById('villainName').textContent = config.villain_name || defaultConfig.villain_name;
                     }, */
-                    mapToCapabilities: (config) => ({
+                    /* mapToCapabilities: (config) => ({
                         recolorables: [],
                         borderables: [],
                         fontEditable: undefined,
@@ -958,55 +1022,70 @@
         }
 
         // 페이지 로드 시 SDK 초기화
-        initializeSDKs();
+        initializeSDKs(); */ 
 
         // 게임 진행 상황 불러오기
         function loadGameProgress() {
-            const progressRecords = allRecords.filter(record => record.record_type === 'game_progress');
+            const savedProgress = localStorageHelper.load('gameProgress');
             
-            if (progressRecords.length > 0) {
-                // 가장 최근 진행 상황 찾기
-                const latestProgress = progressRecords.reduce((latest, current) => {
-                    return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
-                });
+            if (savedProgress && savedProgress.game_active) {
+                gameState.level = savedProgress.level;
+                gameState.coins = savedProgress.coins || 0;
+                gameState.ownedSkills = savedProgress.owned_skills || [];
+                gameState.player = {
+                    hp: savedProgress.player_hp,
+                    maxHp: savedProgress.player_max_hp,
+                    attack: savedProgress.player_attack,
+                    defense: savedProgress.player_defense,
+                    mana: savedProgress.player_mana,
+                    maxMana: 20
+                };
                 
-                // 게임이 진행 중이었다면 복원
-                if (latestProgress.game_active) {
-                    gameState.level = latestProgress.level;
-                    gameState.coins = latestProgress.coins || 0; // 추가
-                    gameState.ownedSkills = latestProgress.owned_skills || []; // 추가
-                    gameState.player = {
-                        hp: latestProgress.player_hp,
-                        maxHp: latestProgress.player_max_hp,
-                        attack: latestProgress.player_attack,
-                        defense: latestProgress.player_defense,
-                        mana: latestProgress.player_mana,
-                        maxMana: 20
-                    };
-
-
-                    gameState.villain = {
-                        hp: latestProgress.villain_hp,
-                        maxHp: latestProgress.villain_max_hp,
-                        attack: latestProgress.villain_attack,
-                        defense: latestProgress.villain_defense
-                    };
-                    gameState.currentStats.problemsSolved = latestProgress.problems_solved;
-                    gameState.currentStats.totalDamage = latestProgress.total_damage;
-                    gameState.gameActive = true;
-                    gameLoaded = true;
-                    
-                    addBattleLog(`이전 게임을 불러왔습니다! 레벨 ${gameState.level}부터 계속합니다.`);
-                    updateDisplay();
-
-                    renderSkillButtons(); // 추가: 스킬 버튼 렌더링
-
-                }
+                const levelMultiplier = 1 + (gameState.level - 1) * 0.3;
+                gameState.villain = {
+                    hp: Math.floor(80 * levelMultiplier),
+                    maxHp: Math.floor(80 * levelMultiplier),
+                    attack: Math.floor(12 * levelMultiplier),
+                    defense: Math.floor(8 * levelMultiplier)
+                };
+                
+                gameState.currentStats.problemsSolved = savedProgress.problems_solved || 0;
+                gameState.currentStats.totalDamage = savedProgress.total_damage || 0;
+                gameState.gameActive = true;
+                gameLoaded = true;
+                
+                addBattleLog(`이전 게임을 불러왔습니다! 레벨 ${gameState.level}부터 계속합니다.`);
+                updateDisplay();
+                renderSkillButtons();
             }
         }
 
         // 게임 진행 상황 저장
         async function saveGameProgress() {
+            const progressData = {
+                record_type: 'game_progress',
+                level: gameState.level,
+                coins: gameState.coins,
+                owned_skills: gameState.ownedSkills,
+                problems_solved: gameState.currentStats.problemsSolved,
+                total_damage: gameState.currentStats.totalDamage,
+                player_hp: gameState.player.hp,
+                player_max_hp: gameState.player.maxHp,
+                player_attack: gameState.player.attack,
+                player_defense: gameState.player.defense,
+                player_mana: gameState.player.mana,
+                villain_hp: gameState.villain.hp,
+                villain_max_hp: gameState.villain.maxHp,
+                villain_attack: gameState.villain.attack,
+                villain_defense: gameState.villain.defense,
+                game_active: gameState.gameActive,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorageHelper.save('gameProgress', progressData);
+        }
+
+        /* async function saveGameProgress() {
             if (!window.dataSdk) return;
             
             // 기존 진행 상황 레코드 삭제
@@ -1045,27 +1124,24 @@
 
         // 기록 관리 함수들
         function loadBestRecords() {
-            const records = allRecords.filter(record => record.record_type === 'best_record');
-            if (records.length > 0) {
-                // 가장 최근 기록 찾기
-                const bestRecord = records.reduce((latest, current) => {
-                    return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
-                });
-                
-                gameState.bestRecords = {
-                    level: bestRecord.level || 0,
-                    problemsSolved: bestRecord.problems_solved || 0,
-                    totalDamage: bestRecord.total_damage || 0,
-                    maxHp: bestRecord.max_hp || 0,
-                    maxAttack: bestRecord.max_attack || 0,
-                    maxDefense: bestRecord.max_defense || 0
-                };
-                
-                console.log('최고 기록 로드됨:', gameState.bestRecords); // 디버깅용
+            const savedRecords = localStorageHelper.load('bestRecords');
+            
+            if (savedRecords) {
+                gameState.bestRecords = savedRecords;
+                console.log('최고 기록 로드됨:', gameState.bestRecords);
             } else {
-                console.log('저장된 최고 기록이 없습니다.'); // 디버깅용
+                console.log('저장된 최고 기록이 없습니다.');
+                // 초기값 설정
+                gameState.bestRecords = {
+                    level: 0,
+                    problemsSolved: 0,
+                    totalDamage: 0,
+                    maxHp: 0,
+                    maxAttack: 0,
+                    maxDefense: 0
+                };
             }
-        }
+        } */
 
         /* function loadBestRecords() {
             const records = allRecords.filter(record => record.record_type === 'best_record');
@@ -1083,121 +1159,43 @@
         } */
 
         // 기존 함수 삭제하고 아래로 교체
+        // saveBestRecords 함수 - localStorage 사용
         async function saveBestRecords() {
-            if (!window.dataSdk) {
-                console.log('dataSdk가 없어서 기록을 저장할 수 없습니다.');
-                return;
+            const success = localStorageHelper.save('bestRecords', gameState.bestRecords);
+            
+            if (success) {
+                console.log('최고 기록 저장됨:', gameState.bestRecords);
+            } else {
+                console.error('최고 기록 저장 실패');
             }
+        }
 
-            try {
-                // 기존 최고 기록 삭제
-                const existingRecords = allRecords.filter(record => record.record_type === 'best_record');
-                for (const record of existingRecords) {
-                    await window.dataSdk.delete(record);
-                }
-                
-                // 새로운 최고 기록 저장
-                const recordData = {
-                    record_type: 'best_record',
-                    level: gameState.bestRecords.level,
-                    problems_solved: gameState.bestRecords.problemsSolved,
-                    total_damage: gameState.bestRecords.totalDamage,
-                    max_hp: gameState.bestRecords.maxHp,
-                    max_attack: gameState.bestRecords.maxAttack,
-                    max_defense: gameState.bestRecords.maxDefense,
-                    timestamp: new Date().toISOString()
-                };
-
-                const savedRecord = await window.dataSdk.create(recordData);
-                
-                // allRecords 배열에 추가 (중요!)
-                allRecords = allRecords.filter(r => r.record_type !== 'best_record');
-                allRecords.push(savedRecord);
-                
-                console.log('최고 기록 저장됨:', recordData);
-            } catch (error) {
-                console.error('최고 기록 저장 중 오류:', error);
-            }
-        }       
-
-        // 최고 기록 초기화 함수
+        // resetBestRecords 함수 - localStorage 사용
         async function resetBestRecords() {
             if (!confirm('정말 최고 기록을 초기화하시겠습니까?')) {
                 return;
             }
             
-            if (!window.dataSdk) {
-                alert('데이터 저장 기능을 사용할 수 없습니다.');
-                return;
-            }
+            // localStorage에서 삭제
+            localStorageHelper.remove('bestRecords');
             
-            try {
-                // 데이터베이스에서 최고 기록 삭제
-                const existingRecords = allRecords.filter(record => record.record_type === 'best_record');
-                for (const record of existingRecords) {
-                    await window.dataSdk.delete(record);
-                }
-                
-                // 메모리에서도 초기화
-                gameState.bestRecords = {
-                    level: 0,
-                    problemsSolved: 0,
-                    totalDamage: 0,
-                    maxHp: 0,
-                    maxAttack: 0,
-                    maxDefense: 0
-                };
-                
-                // allRecords에서도 제거
-                allRecords = allRecords.filter(r => r.record_type !== 'best_record');
-                
-                // 화면 업데이트
-                updateRecordsDisplay();
-                addBattleLog('✨ 최고 기록이 초기화되었습니다!');
-                
-                alert('최고 기록이 초기화되었습니다.');
-                console.log('최고 기록 초기화 완료');
-            } catch (error) {
-                console.error('최고 기록 초기화 중 오류:', error);
-                alert('기록 초기화 중 오류가 발생했습니다.');
-            }
-        }
-
-        /* async function saveBestRecords() {
-            if (!window.dataSdk) return;
-
-            const existingRecords = allRecords.filter(record => record.record_type === 'best_record');
-            
-            const recordData = {
-                record_type: 'best_record',
-                level: gameState.bestRecords.level,
-                problems_solved: gameState.bestRecords.problemsSolved,
-                total_damage: gameState.bestRecords.totalDamage,
-                max_hp: gameState.bestRecords.maxHp,
-                max_attack: gameState.bestRecords.maxAttack,
-                max_defense: gameState.bestRecords.maxDefense,
-                play_time: 0,
-                player_hp: 0,
-                player_max_hp: 0,
-                player_attack: 0,
-                player_defense: 0,
-                player_mana: 0,
-                villain_hp: 0,
-                villain_max_hp: 0,
-                villain_attack: 0,
-                villain_defense: 0,
-                game_active: false,
-                timestamp: new Date().toISOString()
+            // 메모리에서도 초기화
+            gameState.bestRecords = {
+                level: 0,
+                problemsSolved: 0,
+                totalDamage: 0,
+                maxHp: 0,
+                maxAttack: 0,
+                maxDefense: 0
             };
-
-            if (existingRecords.length > 0) {
-                const existingRecord = existingRecords[0];
-                const updatedRecord = { ...existingRecord, ...recordData };
-                await window.dataSdk.update(updatedRecord);
-            } else {
-                await window.dataSdk.create(recordData);
-            }
-        } */
+            
+            // 화면 업데이트
+            updateRecordsDisplay();
+            addBattleLog('✨ 최고 기록이 초기화되었습니다!');
+            
+            alert('최고 기록이 초기화되었습니다.');
+            console.log('최고 기록 초기화 완료');
+        }
 
         async function saveGameSession() {
             if (!window.dataSdk) return;
@@ -1801,14 +1799,10 @@
             // 기록 저장
             updateBestRecords();
             saveGameSession();
-            
-            // 진행 상황 삭제 (게임오버 시 저장된 진행 상황 제거)
-            const progressRecords = allRecords.filter(record => record.record_type === 'game_progress');
-            progressRecords.forEach(async (record) => {
-                if (window.dataSdk) {
-                    await window.dataSdk.delete(record);
-                }
-            });
+            saveBestRecords(); // 추가
+
+            // 진행 상황 삭제
+            localStorageHelper.remove('gameProgress');
             
             document.getElementById('gameOverSection').style.display = 'block';
             addBattleLog('💀 패배했습니다... 💀');
