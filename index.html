@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.3</title>
+  <title>Prime Battle Academy1.31</title>
   <style>
         body {
             box-sizing: border-box;
@@ -885,7 +885,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.3</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.31</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
  
@@ -2400,13 +2400,43 @@
             tbody.innerHTML = '<tr><td colspan="3" class="no-data">랭킹 데이터를 불러오는 중...</td></tr>';
             
             try {
-                const response = await fetch(`${SPREADSHEET_URL}?type=${currentRankingTab}`);
-                const data = await response.json();
+                const url = `${SPREADSHEET_URL}?type=${currentRankingTab}`;
+                console.log('🔍 요청 URL:', url);
+                
+                const response = await fetch(url);
+                console.log('📡 응답 상태:', response.status, response.statusText);
+                
+                const responseText = await response.text();
+                console.log('📄 응답 원본:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                    console.log('✅ 파싱된 데이터:', data);
+                    console.log('📊 데이터 타입:', typeof data);
+                    console.log('📋 배열인가?:', Array.isArray(data));
+                    if (Array.isArray(data)) {
+                        console.log('📏 데이터 길이:', data.length);
+                    }
+                } catch (parseError) {
+                    console.error('❌ JSON 파싱 실패:', parseError);
+                    tbody.innerHTML = '<tr><td colspan="3" class="no-data">데이터 형식 오류</td></tr>';
+                    return;
+                }
                 
                 if (!Array.isArray(data)) {
+                    console.error('❌ 배열이 아닙니다:', data);
                     tbody.innerHTML = '<tr><td colspan="3" class="no-data">아직 랭킹 데이터가 없습니다.</td></tr>';
                     return;
                 }
+                
+                if (data.length === 0) {
+                    console.log('⚠️ 빈 배열입니다');
+                    tbody.innerHTML = '<tr><td colspan="3" class="no-data">아직 랭킹 데이터가 없습니다.</td></tr>';
+                    return;
+                }
+                
+                console.log('🎯 렌더링 시작, 데이터 개수:', data.length);
                 
                 let label = '';
                 switch(currentRankingTab) {
@@ -2424,6 +2454,8 @@
                 tbody.innerHTML = '';
                 
                 data.forEach((record, index) => {
+                    console.log(`렌더링 ${index + 1}번째:`, record);
+                    
                     const rank = index + 1;
                     let medal = '';
                     
@@ -2458,12 +2490,13 @@
                     tbody.appendChild(row);
                 });
                 
+                console.log('✨ 렌더링 완료!');
+                
             } catch (error) {
-                console.error('랭킹 로드 실패:', error);
+                console.error('💥 랭킹 로드 실패:', error);
                 tbody.innerHTML = '<tr><td colspan="3" class="no-data">랭킹 데이터를 불러오는데 실패했습니다.</td></tr>';
             }
         }
-
         // 이벤트 리스너
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
         document.getElementById('answerInput').addEventListener('keypress', (e) => {
