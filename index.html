@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.332</title>
+  <title>Prime Battle Academy1.333</title>
   <style>
         body {
             box-sizing: border-box;
@@ -956,7 +956,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.332</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.333</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 치트</button>
@@ -1198,6 +1198,18 @@
                 </tbody>
             </table>
         </div>
+    </div>
+</div>
+
+<!-- 👇 여기에 치트 모달 HTML 추가 -->
+<div class="cheat-modal" id="cheatModal" onclick="closeCheatOnBackdrop(event)">
+    <div class="cheat-content" onclick="event.stopPropagation()">
+        <button class="cheat-close" onclick="closeCheat()">×</button>
+        <h2 class="cheat-title">🎮 치트 모드</h2>
+        <p style="color: #cbd5e0; margin-bottom: 20px;">비밀번호를 입력하세요</p>
+        <input type="password" class="cheat-input" id="cheatInput" placeholder="비밀번호" maxlength="4">
+        <br>
+        <button class="cheat-btn" onclick="activateCheat()">활성화</button>
     </div>
 </div>
 
