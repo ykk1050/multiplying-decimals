@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.322</title>
+  <title>Prime Battle Academy1.324</title>
   <style>
         body {
             box-sizing: border-box;
@@ -608,7 +608,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: black;
             font-weight: bold;
             font-size: 0.8rem;
         }
@@ -885,7 +885,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.322</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.324</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
  
@@ -1086,15 +1086,15 @@
     <div class="ranking-content" onclick="event.stopPropagation()">
         <button class="ranking-close" onclick="closeRanking()">×</button>
         <h2 class="ranking-title">🏆 전체 랭킹</h2>
-        <p class="ranking-subtitle">다른 플레이어들과 경쟁하세요!</p>
+        <p class="ranking-subtitle">다른 플레이어들과 경쟁하세요! 닉네임을 설정할때는 이름 등 개인정보를 넣지 마세요.</p>
         
         <!-- 사용자 이름 설정 -->
         <div class="username-section">
             <div>
-                <input type="text" class="username-input" id="usernameInput" placeholder="이름을 입력하세요" maxlength="10">
-                <button class="username-save-btn" onclick="saveUsername()">이름 저장</button>
+                <input type="text" class="username-input" id="usernameInput" placeholder="닉네임을 입력하세요" maxlength="10">
+                <button class="username-save-btn" onclick="saveUsername()">닉네임 저장</button>
             </div>
-            <div class="current-username" id="currentUsername">현재 이름: 익명</div>
+            <div class="current-username" id="currentUsername">현재 닉네임: 익명</div>
         </div>
         
         <!-- 랭킹 탭 -->
@@ -1110,7 +1110,7 @@
                 <thead>
                     <tr>
                         <th style="width: 80px;">순위</th>
-                        <th>이름</th>
+                        <th>닉네임</th>
                         <th style="width: 120px;">기록</th>
                     </tr>
                 </thead>
