@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.26</title>
+  <title>Prime Battle Academy1.27</title>
   <style>
         body {
             box-sizing: border-box;
@@ -433,7 +433,7 @@
         color: #e2e8f0;
         border-radius: 10px;
         padding: 20px;
-        height: 400px;
+        height: 100px;
         overflow-y: auto;
         margin-bottom: 0px;
         font-family: monospace;
@@ -694,7 +694,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.26</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.27</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -1907,8 +1907,8 @@
         // 전투 로그 추가
         function addBattleLog(message) {
             const log = document.getElementById('battleLog');
-            log.innerHTML += message + '<br>';
-            log.scrollTop = log.scrollHeight;
+            log.innerHTML = message + '<br>' + log.innerHTML;  // 👈 앞에 추가
+            
         }
 
         // 승리
