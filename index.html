@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.197</title>
+  <title>Prime Battle Academy1.198</title>
   <style>
         body {
             box-sizing: border-box;
@@ -479,7 +479,9 @@
         .upgrade-hp { background: linear-gradient(135deg, #f56565, #e53e3e); }
         .upgrade-attack { background: linear-gradient(135deg, #ed8936, #dd6b20); }
         .upgrade-defense { background: linear-gradient(135deg, #4299e1, #3182ce); }
-        
+        .upgrade-mana { background: linear-gradient(135deg, #9f7aea, #805ad5); }
+
+
         .game-over {
             display: none;
             text-align: center;
@@ -635,7 +637,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.197</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.198</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -767,7 +769,7 @@
     </div>
     <div class="upgrade-section" id="upgradeSection">
      <h3 style="color: #744210; margin-bottom: 10px;">정답입니다! 💰5코인을 얻었습니다. 능력치를 선택하여 강화하세요:</h3>
-     <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" onclick="upgradePlayer('defense')">방어력 +2</button>
+     <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" onclick="upgradePlayer('defense')">방어력 +2</button> <button class="upgrade-btn upgrade-mana" onclick="upgradePlayer('mana')">🔮 최대 마나 +5</button>
      </div>
     </div>
     <div class="skills-container">
@@ -1433,6 +1435,13 @@
                     addBattleLog(`${document.getElementById('playerName').textContent}의 방어력이 2 증가했습니다!`);
                     playupgradeSound()
                     break;
+                // 👇 이 부분 추가!
+                case 'mana':
+                    gameState.player.maxMana += 5;
+                    gameState.player.mana += 5;  // 최대 마나 증가와 함께 현재 마나도 5 증가
+                    addBattleLog(`${document.getElementById('playerName').textContent}의 최대 마나가 5 증가했습니다!`);
+                    playupgradeSound();
+                    break;    
             }
             
             updateDisplay();
