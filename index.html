@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.324</title>
+  <title>Prime Battle Academy1.325</title>
   <style>
         body {
             box-sizing: border-box;
@@ -885,7 +885,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.324</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.325</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
  
@@ -991,6 +991,8 @@
                 <div class="character-avatar villain-avatar">
                     <img src="devilking.png" alt="수학 마왕" style="width: 100%; height: 100%; object-fit: cover;">
                     <img id="heroattack" src="heroattack.gif" alt="용사 타격 효과" class="hero-attack-gif">
+                    <img id="explosion" src="explosion.gif" alt="폭발 효과" class="hero-attack-gif">  <!-- 추가 -->
+
                 </div>
             </div>
             <div class="character-right">
@@ -1130,6 +1132,8 @@
   <audio id="upgrade-sound" src="bonus-points-190035.mp3"></audio>
   <audio id="healing-magic" src="healing-magic-4-378668.mp3"></audio>
   <audio id="game-over" src="game-over-417465.mp3"></audio>
+  <audio id="fireball-sound" src="fireball-impact.mp3"></audio>
+
 
 
 
@@ -2140,8 +2144,22 @@
             gameState.currentStats.totalDamage += damage;
             
             addBattleLog(`${skill.icon} ${skill.name} 사용! ${damage} 데미지!`);
-            playHeroAttackSound();
-            triggerHitEffect('heroattack');
+
+            // 스킬별 효과음 및 이펙트
+            if (skillId === 'fireball') {
+                playFireballSound();
+                triggerHitEffect('explosion');
+            } else if (skillId === 'lightning') {
+                playHeroAttackSound();  // 또는 번개 전용 효과음
+                triggerHitEffect('heroattack');  // 또는 번개 전용 이펙트
+            } else if (skillId === 'meteor') {
+                playHeroAttackSound();  // 또는 메테오 전용 효과음
+                triggerHitEffect('heroattack');  // 또는 메테오 전용 이펙트
+            } else {
+                // 기타 스킬 (berserk, ultimate 등)
+                playHeroAttackSound();
+                triggerHitEffect('heroattack');
+            }
             
             if (gameState.villain.hp <= 0) {
                 victory();
