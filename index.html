@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.21</title>
+  <title>Prime Battle Academy1.22</title>
   <style>
         body {
             box-sizing: border-box;
@@ -659,7 +659,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.21</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.22</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -707,6 +707,7 @@
     </div>
    </div>
    <div class="battle-arena">
+    <!-- 용사 카드 -->
     <div class="character-card player-card">
         <div class="character-name" id="playerName">
             용사
@@ -751,19 +752,12 @@
                 </div>
             </div>
         </div>
-    /* </div> 
-      <div class="stat-bar"><span class="stat-label">마나</span>
-       <div class="stat-value">
-        <div class="stat-fill mana-fill" id="playerManaBar">
-         0/20
-        </div> */
-       </div>
-      </div>
-     </div>
     </div>
+    
+    <!-- 마왕 카드 -->
     <div class="character-card villain-card">
         <div class="character-name" id="villainName">
-        수학 마왕
+            수학 마왕
         </div>
         <div class="character-content">
             <div class="character-left">
@@ -799,6 +793,7 @@
             </div>
         </div>
     </div>
+   </div>
    <div class="battle-log" id="battleLog">
     게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
    </div>
