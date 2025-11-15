@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.195</title>
+  <title>Prime Battle Academy1.196</title>
   <style>
         body {
             box-sizing: border-box;
@@ -266,6 +266,8 @@
             grid-template-columns: 1fr 1fr;
             gap: 40px;
             margin-bottom: 30px;
+            position: relative; /* 추가 */
+
         }
         
         .character-card {
@@ -371,20 +373,23 @@
         .mana-fill { background: linear-gradient(90deg, #9f7aea, #805ad5); }
         
         .battle-log {
-            background: #2d3748;
-            color: #e2e8f0;
-            border-radius: 10px;
-            padding: 20px;
-            height: 120px;
-            overflow-y: auto;
-            margin-bottom: 30px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            position: static !important;
-            clear: both !important;
-            display: block !important;
-        }
+        background: #2d3748;
+        color: #e2e8f0;
+        border-radius: 10px;
+        padding: 20px;
+        height: 120px;
+        overflow-y: auto;
+        margin-bottom: 30px;
+        font-family: monospace;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        /* 기존 !important 삭제하고 아래 추가 */
+        position: relative;
+        display: block;
+        width: 100%;
+        clear: both;
+        grid-column: 1 / -1; /* 그리드의 영향을 받지 않도록 */
+    }
         
         .math-section {
             background: linear-gradient(145deg, #fef5e7, #fed7aa);
@@ -630,7 +635,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.195</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.196</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
