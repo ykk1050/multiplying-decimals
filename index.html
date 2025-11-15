@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.33</title>
+  <title>Prime Battle Academy1.331</title>
   <style>
         body {
             box-sizing: border-box;
@@ -956,7 +956,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.33</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.331</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 치트</button>
@@ -1065,6 +1065,8 @@
                     <img src="devilking.png" alt="수학 마왕" style="width: 100%; height: 100%; object-fit: cover;">
                     <img id="heroattack" src="heroattack.gif" alt="용사 타격 효과" class="hero-attack-gif">
                     <img id="explosion" src="explosion.gif" alt="폭발 효과" class="hero-attack-gif">  <!-- 추가 -->
+                    <img id="fullpower" src="fullpower.gif" alt="강타 효과" class="hero-attack-gif">  <!-- 추가 -->
+
 
                 </div>
             </div>
@@ -1245,6 +1247,7 @@ function activateCheat() {
   <audio id="healing-magic" src="healing-magic-4-378668.mp3"></audio>
   <audio id="game-over" src="game-over-417465.mp3"></audio>
   <audio id="fireball-sound" src="fireball-impact.mp3"></audio>
+  <audio id="fullpower-sound" src="swordattack.mp3"></audio>
 
 
 
@@ -1332,13 +1335,13 @@ function activateCheat() {
                 useCost: { type: 'mana', amount: 15 }, // 사용 비용
                 damage: 40
             },
-            lightning: {
-                id: 'lightning',
-                name: '⚡ 번개',
-                description: '빠른 번개 공격',
-                icon: '⚡',
+            fullpower: {
+                id: 'fullpower',
+                name: '💪 혼신의 힘',
+                description: '기의 힘을 실은 공격',
+                icon: '💪',
                 cost: 70,
-                useCost: { type: 'mana', amount: 18 },
+                useCost: { type: 'hp', amount: 18 },
                 damage: 50
             },
             meteor: {
@@ -1356,8 +1359,8 @@ function activateCheat() {
                 description: '체력을 소모해 강타',
                 icon: '💥',
                 cost: 80,
-                useCost: { type: 'hp', amount: 15 },
-                damage: 45
+                useCost: { type: 'hp', amount: 30 },
+                damage: 60
             },
             ultimate: {
                 id: 'ultimate',
@@ -2261,9 +2264,9 @@ function activateCheat() {
             if (skillId === 'fireball') {
                 playFireballSound();
                 triggerHitEffect('explosion');
-            } else if (skillId === 'lightning') {
-                playHeroAttackSound();  // 또는 번개 전용 효과음
-                triggerHitEffect('heroattack');  // 또는 번개 전용 이펙트
+            } else if (skillId === 'fullpower') {
+                playfullpowerSound()
+                triggerHitEffect('fullpower');  // 또는 번개 전용 이펙트
             } else if (skillId === 'meteor') {
                 playHeroAttackSound();  // 또는 메테오 전용 효과음
                 triggerHitEffect('heroattack');  // 또는 메테오 전용 이펙트
@@ -2690,6 +2693,13 @@ function activateCheat() {
             audio.currentTime = 0;
             audio.play();
       }
+
+        function playfullpowerSound() {
+        const audio = document.getElementById('fullpower-sound');
+        audio.currentTime = 0;
+        audio.play();
+      }
+
 
 
 
