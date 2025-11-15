@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.337</title>
+  <title>Prime Battle Academy1.3371</title>
   <style>
         body {
             box-sizing: border-box;
@@ -956,7 +956,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.337</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.3371</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 치트</button>
@@ -1067,7 +1067,7 @@
                     <img id="explosion" src="explosion.gif" alt="폭발 효과" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="fullpower" src="fullpower.gif" alt="강타 효과" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="meteor" src="meteo.gif" alt="메테오" class="hero-attack-gif">  <!-- 추가 -->
-                    <img id="berserk" src="berserk.gif" alt="버서커" class="berserk-attack-gif">  <!-- 추가 -->
+                    <img id="berserk" src="berserk.gif" alt="버서커" class="hero-attack-gif">  <!-- 추가 -->
 
 
 
@@ -2250,10 +2250,10 @@
                 playmeteoSound();  // 또는 메테오 전용 효과음
                 triggerHitEffect('meteor');  // 또는 메테오 전용 이펙트
             } else if (skillId === 'berserk') {
-                playmeteoSound();  // 또는 메테오 전용 효과음
+                playberserkSound();  // 또는 메테오 전용 효과음
                 triggerHitEffect('berserk');  // 또는 메테오 전용 이펙트    
             } else {
-                // 기타 스킬 (berserk, ultimate 등)
+                // 기타 스킬 (ultimate 등)
                 playHeroAttackSound();
                 triggerHitEffect('heroattack');
             }
