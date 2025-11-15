@@ -8,13 +8,11 @@
         body {
             box-sizing: border-box;
             margin: 0;
-            padding: 10px;  /* 20px → 10px */
+            padding: 20px;
             font-family: 'Comic Sans MS', cursive, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            min-height: 100%;
             color: #333;
-            overflow-x: hidden;  /* 추가 */
-
             
         }
 
@@ -248,7 +246,7 @@
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            padding: 15px;
+            padding: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             position: relative; /* 이 줄 추가 */
 
@@ -256,29 +254,49 @@
         
         .game-title {
             text-align: center;
-            font-size: 1.8rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: #4a5568;
-            margin-bottom: 15px;
+            margin-bottom: 30px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .battle-arena {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 40px;
+            margin-bottom: 30px;
             position: relative; /* 추가 */
 
         }
         
         .character-card {
             background: linear-gradient(145deg, #f7fafc, #edf2f7);
-            border-radius: 12px;
-            padding: 12px;
+            border-radius: 15px;
+            padding: 25px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border: 3px solid;
             position: relative;
+            display: flex;  /* 추가 */
+            flex-direction: column;  /* 추가 */
+        }
+
+        .character-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 15px;
+        }   
+
+        .character-left {
+            flex-shrink: 0;
+        }
+
+        .character-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
         
         .player-card {
@@ -290,9 +308,9 @@
         }
         
         .character-avatar {
-            width: 280px;
-            height: 280px;
-            margin: 0 auto 15px;
+            width: 200px;
+            height: 200px;
+            margin: 0;
             border-radius: 0%;
             display: flex;
             align-items: center;
@@ -301,7 +319,7 @@
             color: white;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            position: relative; /* ✨ [추가] GIF 효과의 기준 위치 설정 */
+            position: relative;
         }
 
         .hero-attack-gif, .devil-attack-gif {
@@ -324,9 +342,9 @@
         
         .character-name {
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #2d3748;
         }
         
@@ -378,13 +396,13 @@
         background: #2d3748;
         color: #e2e8f0;
         border-radius: 10px;
-        padding: 12px;
-        height: 80px;
+        padding: 20px;
+        height: 120px;
         overflow-y: auto;
-        margin-bottom: 15px;
+        margin-bottom: 30px;
         font-family: monospace;
-        font-size: 0.8rem;
-        line-height: 1.3;
+        font-size: 0.9rem;
+        line-height: 1.4;
         /* 기존 !important 삭제하고 아래 추가 */
         position: relative;
         display: block;
@@ -395,8 +413,8 @@
         
         .math-section {
             background: linear-gradient(145deg, #fef5e7, #fed7aa);
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 15px;
+            padding: 25px;
             border: 3px solid #f6ad55;
         }
         
@@ -524,20 +542,20 @@
         
         .level-indicator {
             text-align: center;
-            font-size: 1rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: #553c9a;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         
         .records-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 20px;
+            margin-bottom: 30px;
             background: linear-gradient(145deg, #f0f4f8, #e2e8f0);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 15px;
+            padding: 25px;
             border: 2px solid #cbd5e0;
         }
         
@@ -614,32 +632,8 @@
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
-            
-            .records-section {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            
-            .answer-section {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .upgrade-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
 
-        @media (max-width: 768px) {
-            .battle-arena {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+            
             
             .records-section {
                 grid-template-columns: 1fr;
@@ -659,74 +653,8 @@
                 flex-direction: column;
                 align-items: center;
             }
-            
-            /* 👇👇👇 여기부터 추가 👇👇👇 */
-            .character-avatar {
-                width: 200px;
-                height: 200px;
-            }
-            
-            .game-title {
-                font-size: 1.5rem;
-                margin-bottom: 10px;
-            }
-            
-            .battle-log {
-                height: 60px !important;
-                font-size: 0.75rem !important;
-            }
-            
-            .coin-display, .shop-btn {
-                font-size: 0.9rem;
-                padding: 8px 15px;
-            }
-            /* 👆👆👆 여기까지 추가 👆👆👆 */
         }
-        
-        /* 👇👇👇 태블릿용 전체 추가 👇👇👇 */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .character-avatar {
-                width: 240px;
-                height: 240px;
-            }
-            
-            .battle-arena {
-                gap: 20px;
-            }
-            
-            .game-container {
-                padding: 20px;
-            }
-        }
-        
-        /* 👇👇👇 작은 화면용 전체 추가 👇👇👇 */
-        @media (max-height: 800px) {
-            .character-avatar {
-                width: 220px !important;
-                height: 220px !important;
-            }
-            
-            .records-section {
-                padding: 8px;
-            }
-            
-            .stat-item {
-                padding: 8px;
-            }
-            
-            .record-item {
-                padding: 8px 10px;
-                margin-bottom: 5px;
-            }
-            
-            .battle-log {
-                height: 60px !important;
-            }
-        }
-        /* 👆👆👆 여기까지 추가 👆👆👆 */
     </style>
-
-
   <style>@view-transition { navigation: auto; }</style>
  </head>
  <body>
@@ -780,36 +708,50 @@
    </div>
    <div class="battle-arena">
     <div class="character-card player-card">
-     <div class="character-avatar player-avatar">
-      <img src="hero.png" alt="용사" style="width: 100%; height: 100%; object-fit: cover;">
-      <img id="devilattack" src="devilattack.gif" alt="악마 타격 효과" class="devil-attack-gif">
-      
-     </div>   
-     <div class="character-name" id="playerName">
-      용사
-     </div>
-     <div class="stats">
-      <div class="stat-bar"><span class="stat-label">체력</span>
-       <div class="stat-value">
-        <div class="stat-fill hp-fill" id="playerHpBar">
-         100/100
+        <div class="character-name" id="playerName">
+        용사
         </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">공격력</span>
-       <div class="stat-value">
-        <div class="stat-fill attack-fill" id="playerAttackBar">
-         15
+        <div class="character-content">
+            <div class="character-left">
+                <div class="character-avatar player-avatar">
+                    <img src="hero.png" alt="용사" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img id="devilattack" src="devilattack.gif" alt="악마 타격 효과" class="devil-attack-gif">
+                </div>
+            </div>
+            <div class="character-right">
+                <div class="stats">
+                    <div class="stat-bar"><span class="stat-label">체력</span>
+                        <div class="stat-value">
+                            <div class="stat-fill hp-fill" id="playerHpBar">
+                                100/100
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-bar"><span class="stat-label">공격력</span>
+                        <div class="stat-value">
+                            <div class="stat-fill attack-fill" id="playerAttackBar">
+                                15
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-bar"><span class="stat-label">방어력</span>
+                        <div class="stat-value">
+                            <div class="stat-fill defense-fill" id="playerDefenseBar">
+                                10
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-bar"><span class="stat-label">마나</span>
+                        <div class="stat-value">
+                            <div class="stat-fill mana-fill" id="playerManaBar">
+                                20/20
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">방어력</span>
-       <div class="stat-value">
-        <div class="stat-fill defense-fill" id="playerDefenseBar">
-         10
-        </div>
-       </div>
-      </div>
+    </div>  
       <div class="stat-bar"><span class="stat-label">마나</span>
        <div class="stat-value">
         <div class="stat-fill mana-fill" id="playerManaBar">
@@ -820,38 +762,43 @@
      </div>
     </div>
     <div class="character-card villain-card">
-     <div class="character-avatar villain-avatar">
-      <img src="devilking.png" alt="수학 마왕" style="width: 100%; height: 100%; object-fit: cover;">
-      <img id="heroattack" src="heroattack.gif" alt="용사 타격 효과" class="hero-attack-gif">  
-      </div>   
-     <div class="character-name" id="villainName">
-      수학 마왕
-     </div>
-     <div class="stats">
-      <div class="stat-bar"><span class="stat-label">체력</span>
-       <div class="stat-value">
-        <div class="stat-fill hp-fill" id="villainHpBar">
-         80/80
+        <div class="character-name" id="villainName">
+        수학 마왕
         </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">공격력</span>
-       <div class="stat-value">
-        <div class="stat-fill attack-fill" id="villainAttackBar">
-         12
+        <div class="character-content">
+            <div class="character-left">
+                <div class="character-avatar villain-avatar">
+                    <img src="devilking.png" alt="수학 마왕" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img id="heroattack" src="heroattack.gif" alt="용사 타격 효과" class="hero-attack-gif">
+                </div>
+            </div>
+            <div class="character-right">
+                <div class="stats">
+                    <div class="stat-bar"><span class="stat-label">체력</span>
+                        <div class="stat-value">
+                            <div class="stat-fill hp-fill" id="villainHpBar">
+                                80/80
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-bar"><span class="stat-label">공격력</span>
+                        <div class="stat-value">
+                            <div class="stat-fill attack-fill" id="villainAttackBar">
+                                12
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-bar"><span class="stat-label">방어력</span>
+                        <div class="stat-value">
+                            <div class="stat-fill defense-fill" id="villainDefenseBar">
+                                8
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-       </div>
-      </div>
-      <div class="stat-bar"><span class="stat-label">방어력</span>
-       <div class="stat-value">
-        <div class="stat-fill defense-fill" id="villainDefenseBar">
-         8
-        </div>
-       </div>
-      </div>
-     </div>
     </div>
-   </div>
    <div class="battle-log" id="battleLog">
     게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
    </div>
