@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.336</title>
+  <title>Prime Battle Academy1.337</title>
   <style>
         body {
             box-sizing: border-box;
@@ -956,7 +956,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.336</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.337</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 치트</button>
@@ -1067,6 +1067,7 @@
                     <img id="explosion" src="explosion.gif" alt="폭발 효과" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="fullpower" src="fullpower.gif" alt="강타 효과" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="meteor" src="meteo.gif" alt="메테오" class="hero-attack-gif">  <!-- 추가 -->
+                    <img id="berserk" src="berserk.gif" alt="버서커" class="berserk-attack-gif">  <!-- 추가 -->
 
 
 
@@ -1224,6 +1225,7 @@
   <audio id="fireball-sound" src="fireball-impact.mp3"></audio>
   <audio id="fullpower-sound" src="swordattack.mp3"></audio>
   <audio id="meteo-sound" src="meteo.mp3"></audio>
+  <audio id="berserk-sound" src="berserk.mp3"></audio>
 
 
 
@@ -1337,7 +1339,7 @@
                 icon: '💥',
                 cost: 80,
                 useCost: { type: 'hp', amount: 30 },
-                damage: 60
+                damage: 80
             },
             ultimate: {
                 id: 'ultimate',
@@ -2247,6 +2249,9 @@
             } else if (skillId === 'meteor') {
                 playmeteoSound();  // 또는 메테오 전용 효과음
                 triggerHitEffect('meteor');  // 또는 메테오 전용 이펙트
+            } else if (skillId === 'berserk') {
+                playmeteoSound();  // 또는 메테오 전용 효과음
+                triggerHitEffect('berserk');  // 또는 메테오 전용 이펙트    
             } else {
                 // 기타 스킬 (berserk, ultimate 등)
                 playHeroAttackSound();
@@ -2711,6 +2716,13 @@
         audio.currentTime = 0;
         audio.play();
       }
+
+        function playberserkSound() {
+        const audio = document.getElementById('berserk-sound');
+        audio.currentTime = 0;
+        audio.play();
+      }
+
 
 
       // 👇 여기에 추가
