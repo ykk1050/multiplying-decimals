@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.28</title>
+  <title>Prime Battle Academy1.29</title>
   <style>
         body {
             box-sizing: border-box;
@@ -885,7 +885,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.28</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.29</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
  
@@ -1172,6 +1172,10 @@
                 }
             }
         };
+
+        const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbymoRnI3Y4J1fu3x7-3WAIxnnk8u2lapWx6oZ8fQH8EozjFSm80ha0nCUfjB3iy67rUow/exec';
+
+
         // 게임 상태
         let gameState = {
             level: 1,
@@ -1269,6 +1273,8 @@
                 };
             }
         }
+
+
 
         // 데이터 저장을 위한 변수
         let allRecords = [];
@@ -1540,7 +1546,7 @@
             
             if (success) {
                 console.log('최고 기록 저장됨:', gameState.bestRecords);
-                uploadToRanking();  // 👈 이 줄 추가
+                await uploadToRanking();  // await 추가
 
             } else {
                 console.error('최고 기록 저장 실패');
@@ -2289,8 +2295,8 @@
             }
         }
 
-        // 사용자 이름 저장
-        function saveUsername() {
+        // 사용자 이름 저장 (수정)
+        async function saveUsername() {
             const username = document.getElementById('usernameInput').value.trim();
             
             if (!username) {
@@ -2307,56 +2313,60 @@
             localStorageHelper.save('username', username);
             document.getElementById('currentUsername').textContent = `현재 이름: ${username}`;
             
-            // 랭킹 업데이트
-            uploadToRanking();
+            // 랭킹 업데이트 (async)
+            await uploadToRanking();
             alert('이름이 저장되었습니다!');
+            
+            // 랭킹 다시 렌더링
+            await renderRanking();
         }
 
-        // 랭킹에 내 기록 업로드
-        function uploadToRanking() {
-            const rankings = localStorageHelper.load('globalRankings') || {
-                level: [],
-                problems: [],
-                damage: []
-            };
+        // 랭킹에 내 기록 업로드 (스프레드시트 버전)
+        async function uploadToRanking() {
+            if (!gameState.username || gameState.username === '익명') {
+                console.log('익명 사용자는 랭킹에 업로드되지 않습니다.');
+                return;
+            }
             
             const myRecord = {
                 username: gameState.username,
-                level: gameState.bestRecords.level,
-                problems: gameState.bestRecords.problemsSolved,
-                damage: gameState.bestRecords.totalDamage,
-                timestamp: Date.now()
+                level: gameState.bestRecords.level || 0,
+                problems: gameState.bestRecords.problemsSolved || 0,
+                damage: gameState.bestRecords.totalDamage || 0,
+                timestamp: new Date().toISOString()
             };
             
-            // 기존 내 기록 제거 (이름 기준)
-            rankings.level = rankings.level.filter(r => r.username !== gameState.username);
-            rankings.problems = rankings.problems.filter(r => r.username !== gameState.username);
-            rankings.damage = rankings.damage.filter(r => r.username !== gameState.username);
+            // 기록이 하나라도 0보다 크면 업로드
+            if (myRecord.level === 0 && myRecord.problems === 0 && myRecord.damage === 0) {
+                console.log('업로드할 기록이 없습니다.');
+                return;
+            }
             
-            // 새 기록 추가
-            if (myRecord.level > 0) rankings.level.push(myRecord);
-            if (myRecord.problems > 0) rankings.problems.push(myRecord);
-            if (myRecord.damage > 0) rankings.damage.push(myRecord);
-            
-            // 정렬 (내림차순)
-            rankings.level.sort((a, b) => b.level - a.level);
-            rankings.problems.sort((a, b) => b.problems - a.problems);
-            rankings.damage.sort((a, b) => b.damage - a.damage);
-            
-            // 상위 100명만 유지
-            rankings.level = rankings.level.slice(0, 100);
-            rankings.problems = rankings.problems.slice(0, 100);
-            rankings.damage = rankings.damage.slice(0, 100);
-            
-            localStorageHelper.save('globalRankings', rankings);
+            try {
+                const response = await fetch(SPREADSHEET_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // CORS 문제 회피
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(myRecord)
+                });
+                
+                console.log('랭킹 업로드 완료');
+                addBattleLog('🏆 랭킹이 업데이트되었습니다!');
+                
+            } catch (error) {
+                console.error('랭킹 업로드 실패:', error);
+                addBattleLog('⚠️ 랭킹 업로드에 실패했습니다.');
+            }
         }
 
-        // 랭킹 모달 열기
-        function openRanking() {
+        // 랭킹 모달 열기 (수정)
+        async function openRanking() {
             loadUsername();
-            uploadToRanking();
+            await uploadToRanking(); // await 추가
             document.getElementById('rankingModal').style.display = 'flex';
-            renderRanking();
+            await renderRanking(); // await 추가
         }
 
         // 랭킹 모달 닫기
@@ -2371,8 +2381,8 @@
             }
         }
 
-        // 랭킹 탭 전환
-        function switchRankingTab(tab) {
+        // 랭킹 탭 전환 (수정)
+        async function switchRankingTab(tab) {
             currentRankingTab = tab;
             
             // 탭 활성화 상태 변경
@@ -2381,78 +2391,77 @@
             });
             event.target.classList.add('active');
             
-            renderRanking();
+            await renderRanking(); // await 추가
         }
 
-        // 랭킹 렌더링
-        function renderRanking() {
-            const rankings = localStorageHelper.load('globalRankings') || {
-                level: [],
-                problems: [],
-                damage: []
-            };
-            
-            let data = [];
-            let label = '';
-            
-            switch(currentRankingTab) {
-                case 'level':
-                    data = rankings.level;
-                    label = '레벨';
-                    break;
-                case 'problems':
-                    data = rankings.problems;
-                    label = '문제 수';
-                    break;
-                case 'damage':
-                    data = rankings.damage;
-                    label = '피해량';
-                    break;
-            }
-            
+        // 랭킹 렌더링 (스프레드시트 버전)
+        async function renderRanking() {
             const tbody = document.getElementById('rankingTableBody');
+            tbody.innerHTML = '<tr><td colspan="3" class="no-data">랭킹 데이터를 불러오는 중...</td></tr>';
             
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="no-data">아직 랭킹 데이터가 없습니다.</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = '';
-            
-            data.forEach((record, index) => {
-                const rank = index + 1;
-                let medal = '';
+            try {
+                const response = await fetch(`${SPREADSHEET_URL}?type=${currentRankingTab}`);
+                const data = await response.json();
                 
-                if (rank === 1) medal = '🥇';
-                else if (rank === 2) medal = '🥈';
-                else if (rank === 3) medal = '🥉';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="no-data">아직 랭킹 데이터가 없습니다.</td></tr>';
+                    return;
+                }
                 
-                const isMyRecord = record.username === gameState.username;
-                
-                let value;
+                let label = '';
                 switch(currentRankingTab) {
                     case 'level':
-                        value = record.level;
+                        label = '레벨';
                         break;
                     case 'problems':
-                        value = record.problems;
+                        label = '문제 수';
                         break;
                     case 'damage':
-                        value = record.damage;
+                        label = '피해량';
                         break;
                 }
                 
-                const row = document.createElement('tr');
-                if (isMyRecord) row.classList.add('my-rank');
+                tbody.innerHTML = '';
                 
-                row.innerHTML = `
-                    <td><span class="rank-medal">${medal}</span>${rank}위</td>
-                    <td>${record.username}${isMyRecord ? ' (나)' : ''}</td>
-                    <td>${value} ${label}</td>
-                `;
+                data.forEach((record, index) => {
+                    const rank = index + 1;
+                    let medal = '';
+                    
+                    if (rank === 1) medal = '🥇';
+                    else if (rank === 2) medal = '🥈';
+                    else if (rank === 3) medal = '🥉';
+                    
+                    const isMyRecord = record.username === gameState.username;
+                    
+                    let value;
+                    switch(currentRankingTab) {
+                        case 'level':
+                            value = record.level;
+                            break;
+                        case 'problems':
+                            value = record.problems;
+                            break;
+                        case 'damage':
+                            value = record.damage;
+                            break;
+                    }
+                    
+                    const row = document.createElement('tr');
+                    if (isMyRecord) row.classList.add('my-rank');
+                    
+                    row.innerHTML = `
+                        <td><span class="rank-medal">${medal}</span>${rank}위</td>
+                        <td>${record.username}${isMyRecord ? ' (나)' : ''}</td>
+                        <td>${value} ${label}</td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
                 
-                tbody.appendChild(row);
-            });
+            } catch (error) {
+                console.error('랭킹 로드 실패:', error);
+                tbody.innerHTML = '<tr><td colspan="3" class="no-data">랭킹 데이터를 불러오는데 실패했습니다.</td></tr>';
+            }
         }
 
         // 이벤트 리스너
