@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.3371</title>
+  <title>Prime Battle Academy1.338</title>
   <style>
         body {
             box-sizing: border-box;
@@ -956,7 +956,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.3371</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.338</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 치트</button>
@@ -1068,6 +1068,8 @@
                     <img id="fullpower" src="fullpower.gif" alt="강타 효과" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="meteor" src="meteo.gif" alt="메테오" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="berserk" src="berserk.gif" alt="버서커" class="hero-attack-gif">  <!-- 추가 -->
+                    <img id="ultimate" src="ultimate.gif" alt="궁극기" class="hero-attack-gif">  <!-- 추가 -->
+
 
 
 
@@ -1226,6 +1228,7 @@
   <audio id="fullpower-sound" src="swordattack.mp3"></audio>
   <audio id="meteo-sound" src="meteo.mp3"></audio>
   <audio id="berserk-sound" src="berserk.mp3"></audio>
+  <audio id="ultimate-sound" src="ultimate.mp3"></audio>
 
 
 
@@ -2253,9 +2256,9 @@
                 playberserkSound();  // 또는 메테오 전용 효과음
                 triggerHitEffect('berserk');  // 또는 메테오 전용 이펙트    
             } else {
-                // 기타 스킬 (ultimate 등)
-                playHeroAttackSound();
-                triggerHitEffect('heroattack');
+                // 기타 스킬 (ultimate)
+                playultimateSound();
+                triggerHitEffect('ultimate');
             }
             
             if (gameState.villain.hp <= 0) {
@@ -2722,6 +2725,12 @@
         audio.currentTime = 0;
         audio.play();
       }
+        function playultimateSound() {
+        const audio = document.getElementById('ultemate-sound');
+        audio.currentTime = 0;
+        audio.play();
+      }
+
 
 
 
