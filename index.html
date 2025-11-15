@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.333</title>
+  <title>Prime Battle Academy1.334</title>
   <style>
         body {
             box-sizing: border-box;
@@ -956,7 +956,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.333</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.334</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 치트</button>
@@ -1062,10 +1062,13 @@
         <div class="character-content">
             <div class="character-left">
                 <div class="character-avatar villain-avatar">
+                    //gif추가위치
                     <img src="devilking.png" alt="수학 마왕" style="width: 100%; height: 100%; object-fit: cover;">
                     <img id="heroattack" src="heroattack.gif" alt="용사 타격 효과" class="hero-attack-gif">
                     <img id="explosion" src="explosion.gif" alt="폭발 효과" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="fullpower" src="fullpower.gif" alt="강타 효과" class="hero-attack-gif">  <!-- 추가 -->
+                    <img id="meteor" src="meteo.gif" alt="메테오" class="hero-attack-gif">  <!-- 추가 -->
+
 
 
                 </div>
@@ -1151,7 +1154,7 @@
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
         <button class="shop-close" onclick="closeShop()">×</button>
-        <h2 class="shop-title">🏪 훈련장 - 스킬 상점</h2>
+        <h2 class="shop-title">🏪 스킬 상점</h2>
         <div class="shop-coin-info">
             보유 코인: <span id="shopCoinAmount">0</span> 💰
         </div>
@@ -1221,6 +1224,8 @@
   <audio id="game-over" src="game-over-417465.mp3"></audio>
   <audio id="fireball-sound" src="fireball-impact.mp3"></audio>
   <audio id="fullpower-sound" src="swordattack.mp3"></audio>
+  <audio id="meteo-sound" src="meteo.mp3"></audio>
+
 
 
 
@@ -1297,7 +1302,7 @@
                 maxDefense: 0
             }
         };
-
+        //스킬
         const SKILLS = {
             fireball: {
                 id: 'fireball',
@@ -1324,7 +1329,7 @@
                 icon: '☄️',
                 cost: 100,
                 useCost: { type: 'mana', amount: 20 },
-                damage: 70
+                damage: 100
             },
             berserk: {
                 id: 'berserk',
@@ -1341,8 +1346,8 @@
                 description: '최강의 필살기!',
                 icon: '🌟',
                 cost: 150,
-                useCost: { type: 'both', hp: 20, mana: 15 },
-                damage: 100
+                useCost: { type: 'both', hp: 20, mana: 30 },
+                damage: 200
             }
         };
 
@@ -2239,10 +2244,10 @@
                 triggerHitEffect('explosion');
             } else if (skillId === 'fullpower') {
                 playfullpowerSound()
-                triggerHitEffect('fullpower');  // 또는 번개 전용 이펙트
+                triggerHitEffect('fullpower');  
             } else if (skillId === 'meteor') {
-                playHeroAttackSound();  // 또는 메테오 전용 효과음
-                triggerHitEffect('heroattack');  // 또는 메테오 전용 이펙트
+                playmeteoSound();  // 또는 메테오 전용 효과음
+                triggerHitEffect('meteor');  // 또는 메테오 전용 이펙트
             } else {
                 // 기타 스킬 (berserk, ultimate 등)
                 playHeroAttackSound();
@@ -2679,6 +2684,7 @@
         audio.currentTime = 0;
         audio.play();
       }
+      //사운드
         function playBossAttackSound() {
             const audio = document.getElementById('boss-hit');
             audio.currentTime = 0;
@@ -2700,6 +2706,13 @@
         audio.currentTime = 0;
         audio.play();
       }
+
+        function playmoteoSound() {
+        const audio = document.getElementById('meteor');
+        audio.currentTime = 0;
+        audio.play();
+      }
+
 
       // 👇 여기에 추가
         function playFireballSound() {
