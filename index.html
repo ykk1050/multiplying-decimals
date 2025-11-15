@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.34</title>
+  <title>Prime Battle Academy1.341</title>
   <style>
         body {
             box-sizing: border-box;
@@ -956,7 +956,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.34</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.341</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 치트</button>
@@ -2256,11 +2256,11 @@
                 playberserkSound();  
                 triggerHitEffect('berserk');  
             } else if (skillId === 'ultimate') {
-                playberserkSound();  
+                playultimateSound();  
                 triggerHitEffect('ultimate');        
             } else {
                 // 기타 스킬 (ultimate)
-                playultimateSound();
+                playHeroAttackSound();
                 triggerHitEffect('heroattack');
             }
             
