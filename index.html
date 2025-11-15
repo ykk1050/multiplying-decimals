@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.23</title>
+  <title>Prime Battle Academy1.24</title>
   <style>
         body {
             box-sizing: border-box;
@@ -405,9 +405,9 @@
         color: #e2e8f0;
         border-radius: 10px;
         padding: 20px;
-        height: 120px;
+        height: 400px;
         overflow-y: auto;
-        margin-bottom: 30px;
+        margin-bottom: 0px;
         font-family: monospace;
         font-size: 0.9rem;
         line-height: 1.4;
@@ -673,7 +673,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.23</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.24</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -808,9 +808,6 @@
         </div>
     </div>
    </div>
-   <div class="battle-log" id="battleLog">
-    게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
-   </div>
    <div class="game-content">
 
 
@@ -832,14 +829,13 @@
     <div style="text-align: center; margin-top: 20px;"><button class="upgrade-btn" id="recoveryBtn" onclick="useRecovery()" style="background: linear-gradient(135deg, #9f7aea, #805ad5); font-size: 1.1rem; padding: 12px 25px;" disabled> 🔮 리커버리 (마나 20) </button>
     </div>
    </div>
-   
+    
+   <!-- 오른쪽: 전투 로그 -->
    <div class="battle-log" id="battleLog">
     게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
    </div>
    
    </div>  <!-- 👇 game-content 닫기 -->
-   
-   <div class="victory" id="victorySection">
 
    <div class="victory" id="victorySection">
     <h2 style="color: #22543d; margin-bottom: 15px;">🎉 승리했습니다! 🎉</h2>
