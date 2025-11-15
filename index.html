@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.273</title>
+  <title>Prime Battle Academy1.28</title>
   <style>
         body {
             box-sizing: border-box;
@@ -61,6 +61,195 @@
             transform: translateY(-3px);
         }
 
+        /* 👇 여기부터 추가 */
+        /* 랭킹 버튼 */
+        .ranking-btn {
+            position: absolute;
+            top: 20px;
+            left: 180px;  /* 훈련장 버튼 오른쪽에 배치 */
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #f6ad55, #ed8936);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(246, 173, 85, 0.4);
+            z-index: 100;
+        }
+
+        .ranking-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        /* 랭킹 모달 */
+        .ranking-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ranking-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .ranking-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2.5rem;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+        }
+
+        .ranking-close:hover {
+            color: #333;
+        }
+
+        .ranking-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .ranking-subtitle {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            color: #718096;
+        }
+
+        /* 사용자 이름 입력 섹션 */
+        .username-section {
+            background: linear-gradient(145deg, #e6fffa, #b2f5ea);
+            border: 2px solid #38b2ac;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .username-input {
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #38b2ac;
+            border-radius: 10px;
+            text-align: center;
+            width: 200px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .username-save-btn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #38b2ac, #319795);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .username-save-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .current-username {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #2c7a7b;
+        }
+
+        /* 랭킹 탭 */
+        .ranking-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .ranking-tab {
+            padding: 10px 20px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ranking-tab.active {
+            background: linear-gradient(135deg, #805ad5, #6b46c1);
+            color: white;
+        }
+
+        .ranking-tab:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 랭킹 테이블 */
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .ranking-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .ranking-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .ranking-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .rank-medal {
+            font-size: 1.5rem;
+            margin-right: 5px;
+        }
+
+        .my-rank {
+            background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
+            font-weight: bold;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
         /* 훈련장 모달 (팝업창) */
         .shop-modal {
             display: none;
@@ -74,6 +263,8 @@
             justify-content: center;
             align-items: center;
         }
+
+
 
         /* 승리/패배 모달 스타일 */
         .result-modal {
@@ -694,9 +885,10 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.273</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.28</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
-
+   <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
+ 
     <!-- 코인 표시 -->
     <div class="coin-display">
         <span class="coin-icon">💰</span>
@@ -890,6 +1082,48 @@
     </div>
   </div>
 
+  <div class="ranking-modal" id="rankingModal" onclick="closeRankingOnBackdrop(event)">
+    <div class="ranking-content" onclick="event.stopPropagation()">
+        <button class="ranking-close" onclick="closeRanking()">×</button>
+        <h2 class="ranking-title">🏆 전체 랭킹</h2>
+        <p class="ranking-subtitle">다른 플레이어들과 경쟁하세요!</p>
+        
+        <!-- 사용자 이름 설정 -->
+        <div class="username-section">
+            <div>
+                <input type="text" class="username-input" id="usernameInput" placeholder="이름을 입력하세요" maxlength="10">
+                <button class="username-save-btn" onclick="saveUsername()">이름 저장</button>
+            </div>
+            <div class="current-username" id="currentUsername">현재 이름: 익명</div>
+        </div>
+        
+        <!-- 랭킹 탭 -->
+        <div class="ranking-tabs">
+            <button class="ranking-tab active" onclick="switchRankingTab('level')">최고 레벨</button>
+            <button class="ranking-tab" onclick="switchRankingTab('problems')">최다 문제 해결</button>
+            <button class="ranking-tab" onclick="switchRankingTab('damage')">최대 피해량</button>
+        </div>
+        
+        <!-- 랭킹 리스트 -->
+        <div id="rankingList">
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">순위</th>
+                        <th>이름</th>
+                        <th style="width: 120px;">기록</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingTableBody">
+                    <tr>
+                        <td colspan="3" class="no-data">랭킹 데이터를 불러오는 중...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 
   <audio id="hero-hit" src="quick-swing-sound-419581.mp3"></audio>
   <audio id="boss-hit" src="deadly-strike-352458.mp3"></audio>
@@ -943,6 +1177,8 @@
             level: 1,
             coins: 0, // 추가
             ownedSkills: [], // 추가
+            username: '익명',  // 👈 추가
+
             player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
             villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
             currentProblem: { num1: 0.5, num2: 2, answer: 1.0 },
@@ -1058,6 +1294,10 @@
             
             // 게임 진행 상황 로드
             loadGameProgress();
+
+            // 👇 여기에 추가
+            // 사용자 이름 로드
+            loadUsername();
             
             // Element SDK 초기화 (있으면)
             if (window.elementSdk) {
@@ -1300,6 +1540,8 @@
             
             if (success) {
                 console.log('최고 기록 저장됨:', gameState.bestRecords);
+                uploadToRanking();  // 👈 이 줄 추가
+
             } else {
                 console.error('최고 기록 저장 실패');
             }
@@ -2029,6 +2271,188 @@
             generateProblem();
             startBattle();
             startManaRegeneration();
+        }
+
+        // 👇 여기부터 추가
+
+        // ========== 랭킹 시스템 ==========
+
+        let currentRankingTab = 'level';
+
+        // 사용자 이름 로드
+        function loadUsername() {
+            const savedUsername = localStorageHelper.load('username');
+            if (savedUsername) {
+                gameState.username = savedUsername;
+                document.getElementById('currentUsername').textContent = `현재 이름: ${savedUsername}`;
+                document.getElementById('usernameInput').value = savedUsername;
+            }
+        }
+
+        // 사용자 이름 저장
+        function saveUsername() {
+            const username = document.getElementById('usernameInput').value.trim();
+            
+            if (!username) {
+                alert('이름을 입력해주세요!');
+                return;
+            }
+            
+            if (username.length > 10) {
+                alert('이름은 10자 이하로 입력해주세요!');
+                return;
+            }
+            
+            gameState.username = username;
+            localStorageHelper.save('username', username);
+            document.getElementById('currentUsername').textContent = `현재 이름: ${username}`;
+            
+            // 랭킹 업데이트
+            uploadToRanking();
+            alert('이름이 저장되었습니다!');
+        }
+
+        // 랭킹에 내 기록 업로드
+        function uploadToRanking() {
+            const rankings = localStorageHelper.load('globalRankings') || {
+                level: [],
+                problems: [],
+                damage: []
+            };
+            
+            const myRecord = {
+                username: gameState.username,
+                level: gameState.bestRecords.level,
+                problems: gameState.bestRecords.problemsSolved,
+                damage: gameState.bestRecords.totalDamage,
+                timestamp: Date.now()
+            };
+            
+            // 기존 내 기록 제거 (이름 기준)
+            rankings.level = rankings.level.filter(r => r.username !== gameState.username);
+            rankings.problems = rankings.problems.filter(r => r.username !== gameState.username);
+            rankings.damage = rankings.damage.filter(r => r.username !== gameState.username);
+            
+            // 새 기록 추가
+            if (myRecord.level > 0) rankings.level.push(myRecord);
+            if (myRecord.problems > 0) rankings.problems.push(myRecord);
+            if (myRecord.damage > 0) rankings.damage.push(myRecord);
+            
+            // 정렬 (내림차순)
+            rankings.level.sort((a, b) => b.level - a.level);
+            rankings.problems.sort((a, b) => b.problems - a.problems);
+            rankings.damage.sort((a, b) => b.damage - a.damage);
+            
+            // 상위 100명만 유지
+            rankings.level = rankings.level.slice(0, 100);
+            rankings.problems = rankings.problems.slice(0, 100);
+            rankings.damage = rankings.damage.slice(0, 100);
+            
+            localStorageHelper.save('globalRankings', rankings);
+        }
+
+        // 랭킹 모달 열기
+        function openRanking() {
+            loadUsername();
+            uploadToRanking();
+            document.getElementById('rankingModal').style.display = 'flex';
+            renderRanking();
+        }
+
+        // 랭킹 모달 닫기
+        function closeRanking() {
+            document.getElementById('rankingModal').style.display = 'none';
+        }
+
+        // 배경 클릭시 닫기
+        function closeRankingOnBackdrop(event) {
+            if (event.target.id === 'rankingModal') {
+                closeRanking();
+            }
+        }
+
+        // 랭킹 탭 전환
+        function switchRankingTab(tab) {
+            currentRankingTab = tab;
+            
+            // 탭 활성화 상태 변경
+            document.querySelectorAll('.ranking-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderRanking();
+        }
+
+        // 랭킹 렌더링
+        function renderRanking() {
+            const rankings = localStorageHelper.load('globalRankings') || {
+                level: [],
+                problems: [],
+                damage: []
+            };
+            
+            let data = [];
+            let label = '';
+            
+            switch(currentRankingTab) {
+                case 'level':
+                    data = rankings.level;
+                    label = '레벨';
+                    break;
+                case 'problems':
+                    data = rankings.problems;
+                    label = '문제 수';
+                    break;
+                case 'damage':
+                    data = rankings.damage;
+                    label = '피해량';
+                    break;
+            }
+            
+            const tbody = document.getElementById('rankingTableBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="no-data">아직 랭킹 데이터가 없습니다.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            data.forEach((record, index) => {
+                const rank = index + 1;
+                let medal = '';
+                
+                if (rank === 1) medal = '🥇';
+                else if (rank === 2) medal = '🥈';
+                else if (rank === 3) medal = '🥉';
+                
+                const isMyRecord = record.username === gameState.username;
+                
+                let value;
+                switch(currentRankingTab) {
+                    case 'level':
+                        value = record.level;
+                        break;
+                    case 'problems':
+                        value = record.problems;
+                        break;
+                    case 'damage':
+                        value = record.damage;
+                        break;
+                }
+                
+                const row = document.createElement('tr');
+                if (isMyRecord) row.classList.add('my-rank');
+                
+                row.innerHTML = `
+                    <td><span class="rank-medal">${medal}</span>${rank}위</td>
+                    <td>${record.username}${isMyRecord ? ' (나)' : ''}</td>
+                    <td>${value} ${label}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
         }
 
         // 이벤트 리스너
