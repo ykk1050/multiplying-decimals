@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.22</title>
+  <title>Prime Battle Academy1.23</title>
   <style>
         body {
             box-sizing: border-box;
@@ -392,6 +392,14 @@
         .defense-fill { background: linear-gradient(90deg, #4299e1, #3182ce); }
         .mana-fill { background: linear-gradient(90deg, #9f7aea, #805ad5); }
         
+        /* 👇 이 블록 추가 */
+        .game-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;  /* 왼쪽 2, 오른쪽 1 비율 */
+            gap: 20px;
+            margin-bottom: 30px;
+        }    
+
         .battle-log {
         background: #2d3748;
         color: #e2e8f0;
@@ -633,7 +641,13 @@
                 gap: 20px;
             } */
 
+            .game-content {
+                grid-template-columns: 1fr;  /* 모바일에서는 세로 배치 */
+            }
             
+            .battle-log {
+                height: 200px;  /* 모바일에서는 높이 축소 */
+            }
             
             .records-section {
                 grid-template-columns: 1fr;
@@ -659,7 +673,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.22</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.23</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
 
     <!-- 코인 표시 -->
@@ -797,6 +811,9 @@
    <div class="battle-log" id="battleLog">
     게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
    </div>
+   <div class="game-content">
+
+
    <div class="math-section">
     <div class="math-problem" id="mathProblem">
      2 × 3 = ?
@@ -815,6 +832,15 @@
     <div style="text-align: center; margin-top: 20px;"><button class="upgrade-btn" id="recoveryBtn" onclick="useRecovery()" style="background: linear-gradient(135deg, #9f7aea, #805ad5); font-size: 1.1rem; padding: 12px 25px;" disabled> 🔮 리커버리 (마나 20) </button>
     </div>
    </div>
+   
+   <div class="battle-log" id="battleLog">
+    게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
+   </div>
+   
+   </div>  <!-- 👇 game-content 닫기 -->
+   
+   <div class="victory" id="victorySection">
+
    <div class="victory" id="victorySection">
     <h2 style="color: #22543d; margin-bottom: 15px;">🎉 승리했습니다! 🎉</h2>
     <p style="color: #2f855a;">빌런을 물리쳤습니다! 더 강한 적이 나타났습니다.</p><button class="next-level-btn" onclick="nextLevel()">다음 레벨로</button>
@@ -891,7 +917,7 @@
             ownedSkills: [], // 추가
             player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
             villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
-            currentProblem: { num1: 2, num2: 3, answer: 6 },
+            currentProblem: { num1: 0.5, num2: 2, answer: 1.0 },
             battleInterval: null,
             manaInterval: null,
             gameActive: true,
@@ -1938,7 +1964,7 @@
                 ownedSkills: [], // 초기화
                 player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
                 villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
-                currentProblem: { num1: 2, num2: 3, answer: 6 },
+                currentProblem: { num1: 0.5, num2: 2, answer: 1.0 },
                 battleInterval: null,
                 manaInterval: null,
                 gameActive: true,
