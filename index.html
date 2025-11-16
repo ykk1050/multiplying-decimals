@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Prime Battle Academy1.354</title>
+  <title>Prime Battle Academy1.355</title>
   <style>
         * {
             box-sizing: border-box;
@@ -1012,7 +1012,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.354</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.355</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
@@ -1073,6 +1073,8 @@
                 <div class="character-avatar player-avatar">
                     <img src="hero.png" alt="용사" style="width: 100%; height: 100%; object-fit: cover;">
                     <img id="devilattack" src="devilattack.gif" alt="악마 타격 효과" class="devil-attack-gif">
+                    <img id="firebreak" src="firbreak.gif" alt="불꽃 공격" class="devil-attack-gif">  <!-- 추가 -->
+
                 </div>
             </div>
             <div class="character-right">
@@ -1125,6 +1127,7 @@
                     <img id="meteor" src="meteo.gif" alt="메테오" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="berserk" src="berserk.gif" alt="버서커" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="ultimate" src="ultimate.gif" alt="궁극기" class="hero-attack-gif">  <!-- 추가 -->
+
 
 
 
@@ -1285,6 +1288,8 @@
   <audio id="meteo-sound" src="meteo.mp3"></audio>
   <audio id="berserk-sound" src="berserk.mp3"></audio>
   <audio id="ultimate-sound" src="ultimate.mp3"></audio>
+  <audio id="fire-break-sound" src="firebreaksound.mp3"></audio>
+
 
 
 
@@ -1992,8 +1997,6 @@
                 updateRecordsDisplay();
                 addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${playerDamage}의 피해를 입혔습니다!`);
                 playHeroAttackSound(); 
-                
-                // ✨ [수정] 마왕에게는 용사 공격 효과(ID: 'heroattack')를 보여줍니다.
                 triggerHitEffect('heroattack'); 
 
                 if (gameState.villain.hp <= 0) {
@@ -2005,12 +2008,37 @@
                 setTimeout(() => {
                     if (!gameState.gameActive) return;
                     
-                    const villainDamage = Math.max(1, gameState.villain.attack - gameState.player.defense);
-                    gameState.player.hp = Math.max(0, gameState.player.hp - villainDamage);
-                    addBattleLog(`${document.getElementById('villainName').textContent}이(가) ${villainDamage}의 피해를 입혔습니다!`);
-                    playBossAttackSound(); 
+                    // 레벨별 관통 확률 함수
+                    const getPenetrationChance = (level) => {
+                        if (level <= 3) return 0.2;
+                        if (level <= 6) return 0.3;
+                        if (level <= 9) return 0.4;
+                        return 0.5;
+                    };
                     
-                    // ✨ [수정] 용사에게는 악마 공격 효과(ID: 'devilattack')를 보여줍니다.
+                    const penetrationChance = getPenetrationChance(gameState.level);
+                    const isPenetrationActive = Math.random() < penetrationChance;
+                    
+                    let villainDamage;
+                    
+                    if (isPenetrationActive) {
+                        // 부분 관통 발동
+                        const armorPenetration = Math.min(0.5, gameState.level * 0.04);
+                        const effectiveDefense = Math.floor(gameState.player.defense * (1 - armorPenetration));
+                        villainDamage = Math.max(2, gameState.villain.attack - effectiveDefense);
+                        playfirebreakSound();  // 불꽃 공격 전용 효과음
+                        triggerHitEffect('firebreak');  // 불꽃 공격
+                        
+                        const penetrationPercent = Math.round(armorPenetration * 100);
+                        addBattleLog(`⚡ ${document.getElementById('villainName').textContent}의 불꽃 공격(방어 일부 무시)! (방어력 ${penetrationPercent}% 무시) ${villainDamage}의 피해!`);
+                    } else {
+                        // 일반 공격
+                        villainDamage = Math.max(1, gameState.villain.attack - gameState.player.defense);
+                        addBattleLog(`${document.getElementById('villainName').textContent}이(가) ${villainDamage}의 피해를 입혔습니다!`);
+                    }
+                    
+                    gameState.player.hp = Math.max(0, gameState.player.hp - villainDamage);
+                    playBossAttackSound(); 
                     triggerHitEffect('devilattack'); 
                     
                     if (gameState.player.hp <= 0) {
@@ -2026,7 +2054,6 @@
                 saveGameProgress();
             }, 3000);
         }
-
         /* // 전투 시스템
         function startBattle() {
             if (gameState.battleInterval) {
@@ -2806,6 +2833,12 @@
         audio.currentTime = 0;
         audio.play();
       }
+
+      function playfirebreakSound() {
+            const audio = document.getElementById('fire-break-sound');
+            audio.currentTime = 0;
+            audio.play();
+        }
 
 
 
