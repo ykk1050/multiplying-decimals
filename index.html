@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Prime Battle Academy1.353</title>
+  <title>Prime Battle Academy1.354</title>
   <style>
         * {
             box-sizing: border-box;
@@ -1012,7 +1012,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.353</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.354</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
@@ -1168,7 +1168,7 @@
     </div>
     <div class="upgrade-section" id="upgradeSection">
      <h3 style="color: #744210; margin-bottom: 10px;">정답입니다! 💰5코인을 얻었습니다. 능력치를 선택하여 강화하세요:</h3>
-     <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" onclick="upgradePlayer('defense')">방어력 +2</button> <button class="upgrade-btn upgrade-mana" onclick="upgradePlayer('mana')">🔮 최대 마나 +5</button>
+     <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" onclick="upgradePlayer('defense')">방어력 +1</button> <button class="upgrade-btn upgrade-mana" onclick="upgradePlayer('mana')">🔮 최대 마나 +5</button>
      </div>
     </div>
     <div class="skills-container">
@@ -1928,8 +1928,8 @@
                     playupgradeSound()
                     break;
                 case 'defense':
-                    gameState.player.defense += 2;
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 방어력이 2 증가했습니다!`);
+                    gameState.player.defense += 1;
+                    addBattleLog(`${document.getElementById('playerName').textContent}의 방어력이 1 증가했습니다!`);
                     playupgradeSound()
                     break;
                 // 👇 이 부분 추가!
