@@ -2,16 +2,21 @@
 <html lang="ko">
  <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Battle Academy1.35</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Prime Battle Academy1.351</title>
   <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             box-sizing: border-box;
             margin: 0;
-            padding: 20px;
+            padding: 5px;
             font-family: 'Comic Sans MS', cursive, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;  /* 추가 */
+
             color: #333;
             
         }
@@ -19,8 +24,8 @@
         /* 코인 표시 영역 - game-container 상단 우측에 배치 */
         .coin-display {
             position: absolute;
-            top: 20px;
-            right: 30px;
+            top: 10px;
+            right: 10px;
             background: linear-gradient(135deg, #ffd700, #ffed4e);
             border: 3px solid #ff8c00;
             border-radius: 15px;
@@ -42,8 +47,8 @@
         /* 훈련장 버튼 - game-container 상단 좌측에 배치 */
         .shop-btn {
             position: absolute;
-            top: 20px;
-            left: 30px;
+            top: 10px;
+            left: 10px;
             padding: 12px 25px;
             background: linear-gradient(135deg, #9f7aea, #805ad5);
             color: white;
@@ -65,7 +70,7 @@
         /* 랭킹 버튼 */
         .ranking-btn {
             position: absolute;
-            top: 20px;
+            top: 10px;
             left: 180px;  /* 훈련장 버튼 오른쪽에 배치 */
             padding: 12px 25px;
             background: linear-gradient(135deg, #f6ad55, #ed8936);
@@ -539,11 +544,12 @@
         }
         
         .game-container {
+            width: 100%;  /* 추가 */
             max-width: 1200px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            padding: 30px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             position: relative; /* 이 줄 추가 */
 
@@ -560,8 +566,8 @@
         
         .battle-arena {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr;
+            gap: 15px;
             margin-bottom: 30px;
             position: relative; /* 추가 */
 
@@ -605,8 +611,8 @@
         }
         
         .character-avatar {
-            width: 200px;
-            height: 200px;
+            width: 120px;
+            height: 120px;
             margin: 0;
             border-radius: 0%;
             display: flex;
@@ -927,6 +933,8 @@
                 gap: 20px;
             }
 
+
+
             
             .battle-log {
                 height: 200px;  /* 모바일에서는 높이 축소 */
@@ -951,12 +959,47 @@
                 align-items: center;
             }
         }
+
+        /* 👇 여기에 추가! */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .game-container {
+                padding: 30px;
+            }
+            
+            .coin-display {
+                top: 20px;
+                right: 30px;
+            }
+            
+            .shop-btn {
+                top: 20px;
+                left: 30px;
+            }
+            
+            .ranking-btn {
+                top: 20px;
+            }
+            
+            .battle-arena {
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            
+            .character-avatar {
+                width: 200px;
+                height: 200px;
+            }
+        }
     </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.35</h1>  
+   <h1 class="game-title" id="gameTitle">Prime Battle Academy1.351</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 훈련장</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 치트</button>
