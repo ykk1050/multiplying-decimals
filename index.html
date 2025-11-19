@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.36</title>
+  <title>소수의 검: 수학 악마 전쟁1.361</title>
   <style>
         * {
             box-sizing: border-box;
@@ -1012,7 +1012,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.36</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.361</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
@@ -2652,6 +2652,10 @@
             const tbody = document.getElementById('rankingTableBody');
             tbody.innerHTML = '<tr><td colspan="3" class="no-data">랭킹 데이터를 불러오는 중...</td></tr>';
             
+            // 내 순위 박스 숨기기
+            const myRankBox = document.getElementById('myRankBox');
+            myRankBox.style.display = 'none';    
+
             try {
                 const url = `${SPREADSHEET_URL}?type=${currentRankingTab}`;
                 console.log('🔍 요청 URL:', url);
@@ -2723,6 +2727,16 @@
                         }
                     }
                 });
+
+                // 👇 여기에 추가
+                console.log('🎯 디버그 정보:');
+                console.log('내 닉네임:', gameState.username);
+                console.log('내 순위:', myRank);
+                console.log('내 값:', myValue);
+                console.log('100위 밖인가?', myRank > 100);    
+
+
+
                 
                 // 👇 내 순위가 100위 밖이면 상단에 표시
                 if (myRank > 100) {
