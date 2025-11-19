@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.356</title>
+  <title>소수의 검: 수학 악마 전쟁1.36</title>
   <style>
         * {
             box-sizing: border-box;
@@ -1012,7 +1012,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.356</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.36</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
@@ -1243,6 +1243,13 @@
             <button class="ranking-tab active" onclick="switchRankingTab('level')">최고 레벨</button>
             <button class="ranking-tab" onclick="switchRankingTab('problems')">최다 문제 해결</button>
             <button class="ranking-tab" onclick="switchRankingTab('damage')">최대 피해량</button>
+        </div>
+
+        <!-- 👇 여기에 추가 -->
+        <div id="myRankBox" style="display: none; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
+            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">내 순위</div>
+            <div style="font-size: 1.5rem; font-weight: bold;" id="myRankNumber">-</div>
+            <div style="font-size: 1rem; margin-top: 5px;" id="myRankValue">-</div>
         </div>
         
         <!-- 랭킹 리스트 -->
@@ -2696,10 +2703,41 @@
                         label = '피해량';
                         break;
                 }
+
+                // 👇 내 순위 찾기
+                let myRank = -1;
+                let myValue = 0;
+                data.forEach((record, index) => {
+                    if (record.username === gameState.username) {
+                        myRank = index + 1;
+                        switch(currentRankingTab) {
+                            case 'level':
+                                myValue = record.level;
+                                break;
+                            case 'problems':
+                                myValue = record.problems;
+                                break;
+                            case 'damage':
+                                myValue = record.damage;
+                                break;
+                        }
+                    }
+                });
+                
+                // 👇 내 순위가 100위 밖이면 상단에 표시
+                if (myRank > 100) {
+                    myRankBox.style.display = 'block';
+                    document.getElementById('myRankNumber').textContent = `${myRank}위`;
+                    document.getElementById('myRankValue').textContent = `${myValue} ${label}`;
+                }
+                
                 
                 tbody.innerHTML = '';
+
+                // 👇 상위 100명만 표시
+                const displayData = data.slice(0, 100);
                 
-                data.forEach((record, index) => {
+                displayData.forEach((record, index) => {
                     console.log(`렌더링 ${index + 1}번째:`, record);
                     
                     const rank = index + 1;
@@ -2735,6 +2773,23 @@
                     
                     tbody.appendChild(row);
                 });
+                
+                // 👇 100위 밖인 경우 구분선 추가
+                if (myRank > 100) {
+                    const separatorRow = document.createElement('tr');
+                    separatorRow.innerHTML = '<td colspan="3" style="text-align: center; padding: 10px; background: #e2e8f0; font-weight: bold;">⋯</td>';
+                    tbody.appendChild(separatorRow);
+                    
+                    // 내 순위 행 추가
+                    const myRow = document.createElement('tr');
+                    myRow.classList.add('my-rank');
+                    myRow.innerHTML = `
+                        <td><span class="rank-medal"></span>${myRank}위</td>
+                        <td>${gameState.username} (나)</td>
+                        <td>${myValue} ${label}</td>
+                    `;
+                    tbody.appendChild(myRow);
+                }
                 
                 console.log('✨ 렌더링 완료!');
                 
