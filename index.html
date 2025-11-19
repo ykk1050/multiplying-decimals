@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.363</title>
+  <title>소수의 검: 수학 악마 전쟁1.364</title>
   <style>
         * {
             box-sizing: border-box;
@@ -1012,7 +1012,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.363</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.364</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
@@ -2652,118 +2652,72 @@
             const tbody = document.getElementById('rankingTableBody');
             tbody.innerHTML = '<tr><td colspan="3" class="no-data">랭킹 데이터를 불러오는 중...</td></tr>';
             
-            // 내 순위 박스 숨기기
+            // 내 순위 박스 일단 숨기기
             const myRankBox = document.getElementById('myRankBox');
             myRankBox.style.display = 'none';    
 
             try {
-                const url = `${SPREADSHEET_URL}?type=${currentRankingTab}`;
+                // [수정 1] URL에 username 파라미터 추가!
+                const url = `${SPREADSHEET_URL}?type=${currentRankingTab}&username=${encodeURIComponent(gameState.username)}`;
                 console.log('🔍 요청 URL:', url);
                 
                 const response = await fetch(url);
-                console.log('📡 응답 상태:', response.status, response.statusText);
+                const data = await response.json(); // response.text() 후 parsing 하는 과정을 간소화
                 
-                const responseText = await response.text();
-                console.log('📄 응답 원본:', responseText);
-                
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                    console.log('✅ 파싱된 데이터:', data);
-                    console.log('📊 데이터 타입:', typeof data);
-                    console.log('📋 배열인가?:', Array.isArray(data));
-                    if (Array.isArray(data)) {
-                        console.log('📏 데이터 길이:', data.length);
-                    }
-                } catch (parseError) {
-                    console.error('❌ JSON 파싱 실패:', parseError);
-                    tbody.innerHTML = '<tr><td colspan="3" class="no-data">데이터 형식 오류</td></tr>';
-                    return;
-                }
-                
-                if (!Array.isArray(data)) {
-                    console.error('❌ 배열이 아닙니다:', data);
+                if (!Array.isArray(data) || data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="3" class="no-data">아직 랭킹 데이터가 없습니다.</td></tr>';
                     return;
                 }
-                
-                if (data.length === 0) {
-                    console.log('⚠️ 빈 배열입니다');
-                    tbody.innerHTML = '<tr><td colspan="3" class="no-data">아직 랭킹 데이터가 없습니다.</td></tr>';
-                    return;
-                }
-                
-                console.log('🎯 렌더링 시작, 데이터 개수:', data.length);
-                // 👇 여기에 추가
-                console.log('📊 전체 랭킹 데이터:', data);
-                console.log('📊 처음 5개 데이터:', data.slice(0, 5));
-                console.log('📊 데이터 개수:', data.length);
-                console.log('📊 첫 번째 데이터:', data[0]);
-                console.log('📊 username 필드들:', data.map(r => r.username));
 
-                
                 let label = '';
                 switch(currentRankingTab) {
-                    case 'level':
-                        label = '레벨';
-                        break;
-                    case 'problems':
-                        label = '문제 수';
-                        break;
-                    case 'damage':
-                        label = '피해량';
-                        break;
+                    case 'level': label = '레벨'; break;
+                    case 'problems': label = '문제 수'; break;
+                    case 'damage': label = '피해량'; break;
                 }
 
                 // 👇 내 순위 찾기
                 let myRank = -1;
                 let myValue = 0;
-                data.forEach((record, index) => {
-                    console.log(`[${index}] username: "${record.username}" (타입: ${typeof record.username})`);
-                    console.log(`비교: "${record.username}" vs "${gameState.username}"`);
 
+                // 데이터 전체를 순회하며 나를 찾음
+                data.forEach((record, index) => {
                     if (record.username === gameState.username) {
-                        myRank = index + 1;
+                        // [수정 2] 백엔드에서 rank를 줬으면(100위 밖) 그거 쓰고, 아니면 index + 1
+                        if (record.rank) {
+                            myRank = record.rank;
+                        } else {
+                            myRank = index + 1;
+                        }
+
                         switch(currentRankingTab) {
-                            case 'level':
-                                myValue = record.level;
-                                break;
-                            case 'problems':
-                                myValue = record.problems;
-                                break;
-                            case 'damage':
-                                myValue = record.damage;
-                                break;
+                            case 'level': myValue = record.level; break;
+                            case 'problems': myValue = record.problems; break;
+                            case 'damage': myValue = record.damage; break;
                         }
                     }
                 });
 
-                // 👇 여기에 추가
-                console.log('🎯 디버그 정보:');
-                console.log('내 닉네임:', gameState.username);
-                console.log('내 순위:', myRank);
-                console.log('내 값:', myValue);
-                console.log('100위 밖인가?', myRank > 100);    
-
-
-
-                
-                // 👇 내 순위가 100위 밖이면 상단에 표시
+                // 👇 내 순위가 100위 밖이면 상단 박스에 표시 (순위가 확인되었을 때만)
                 if (myRank > 100) {
                     myRankBox.style.display = 'block';
                     document.getElementById('myRankNumber').textContent = `${myRank}위`;
                     document.getElementById('myRankValue').textContent = `${myValue} ${label}`;
+                } else if (myRank !== -1) {
+                    // 100위 안이라면 상단 박스는 숨기고 테이블에서 강조됨
+                    myRankBox.style.display = 'none';
+                } else {
+                    // 랭킹에 없는 경우 (새로 시작한 경우 등)
+                    myRankBox.style.display = 'none';
                 }
                 
                 
                 tbody.innerHTML = '';
-
-                // 👇 상위 100명만 표시
+                
+                // 테이블에는 무조건 상위 100명만 표시
                 const displayData = data.slice(0, 100);
                 
                 displayData.forEach((record, index) => {
-                    console.log(`렌더링 ${index + 1}번째:`, record);
-                    
                     const rank = index + 1;
                     let medal = '';
                     
@@ -2775,18 +2729,13 @@
                     
                     let value;
                     switch(currentRankingTab) {
-                        case 'level':
-                            value = record.level;
-                            break;
-                        case 'problems':
-                            value = record.problems;
-                            break;
-                        case 'damage':
-                            value = record.damage;
-                            break;
+                        case 'level': value = record.level; break;
+                        case 'problems': value = record.problems; break;
+                        case 'damage': value = record.damage; break;
                     }
                     
                     const row = document.createElement('tr');
+                    // 100위 안일 경우 내 줄 강조
                     if (isMyRecord) row.classList.add('my-rank');
                     
                     row.innerHTML = `
@@ -2794,17 +2743,16 @@
                         <td>${record.username}${isMyRecord ? ' (나)' : ''}</td>
                         <td>${value} ${label}</td>
                     `;
-                    
                     tbody.appendChild(row);
                 });
                 
-                // 👇 100위 밖인 경우 구분선 추가
+                // [선택 사항] 100위 밖일 때 테이블 맨 아래에도 점선과 함께 표시하고 싶다면 아래 코드 유지
+                // 상단 박스(myRankBox)만 쓸 거면 이 부분은 지워도 됩니다.
                 if (myRank > 100) {
                     const separatorRow = document.createElement('tr');
                     separatorRow.innerHTML = '<td colspan="3" style="text-align: center; padding: 10px; background: #e2e8f0; font-weight: bold;">⋯</td>';
                     tbody.appendChild(separatorRow);
-                    
-                    // 내 순위 행 추가
+
                     const myRow = document.createElement('tr');
                     myRow.classList.add('my-rank');
                     myRow.innerHTML = `
@@ -2816,7 +2764,6 @@
                 }
                 
                 console.log('✨ 렌더링 완료!');
-                
             } catch (error) {
                 console.error('💥 랭킹 로드 실패:', error);
                 tbody.innerHTML = '<tr><td colspan="3" class="no-data">랭킹 데이터를 불러오는데 실패했습니다.</td></tr>';
