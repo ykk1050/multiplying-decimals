@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.361</title>
+  <title>소수의 검: 수학 악마 전쟁1.362</title>
   <style>
         * {
             box-sizing: border-box;
@@ -1012,7 +1012,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.361</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.362</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
@@ -2694,6 +2694,10 @@
                 }
                 
                 console.log('🎯 렌더링 시작, 데이터 개수:', data.length);
+                // 👇 여기에 추가
+                console.log('📊 전체 랭킹 데이터:', data);
+                console.log('📊 처음 5개 데이터:', data.slice(0, 5));
+
                 
                 let label = '';
                 switch(currentRankingTab) {
@@ -2712,6 +2716,8 @@
                 let myRank = -1;
                 let myValue = 0;
                 data.forEach((record, index) => {
+                    console.log(`비교: "${record.username}" vs "${gameState.username}"`);
+
                     if (record.username === gameState.username) {
                         myRank = index + 1;
                         switch(currentRankingTab) {
