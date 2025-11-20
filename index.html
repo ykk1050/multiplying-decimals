@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.366</title>
+  <title>소수의 검: 수학 악마 전쟁1.365</title>
   <style>
         * {
             box-sizing: border-box;
@@ -44,17 +44,13 @@
             font-size: 1.5rem;
         }
 
-        /* 버튼 컨테이너 - 전체 너비로 */
-        .button-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            width: 100%;  /* 추가 */
-        }
-
-        /* 버튼 스타일 수정 */
-        .shop-btn, .ranking-btn {
+        /* 훈련장 버튼 - game-container 상단 좌측에 배치 */
+        .shop-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
             padding: 12px 25px;
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
             color: white;
             border: none;
             border-radius: 10px;
@@ -62,20 +58,34 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            flex: 1;  /* 동일한 너비 */
-        }
-
-        .shop-btn {
-            background: linear-gradient(135deg, #9f7aea, #805ad5);
             box-shadow: 0 5px 15px rgba(159, 122, 234, 0.4);
+            z-index: 100;
         }
 
+        .shop-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        /* 👇 여기부터 추가 */
+        /* 랭킹 버튼 */
         .ranking-btn {
+            position: absolute;
+            top: 10px;
+            left: 180px;  /* 훈련장 버튼 오른쪽에 배치 */
+            padding: 12px 25px;
             background: linear-gradient(135deg, #f6ad55, #ed8936);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
             box-shadow: 0 5px 15px rgba(246, 173, 85, 0.4);
+            z-index: 100;
         }
 
-        .shop-btn:hover, .ranking-btn:hover {
+        .ranking-btn:hover {
             transform: translateY(-3px);
         }
 
@@ -1002,7 +1012,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.366</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.365</h1>  
    <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
@@ -1052,13 +1062,6 @@
          </button>
     </div>
    </div>
-
-
-    <div class="button-container">
-    <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
-    <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
-</div>       
-
    <div class="battle-arena">
     <!-- 용사 카드 -->
     <div class="character-card player-card">
