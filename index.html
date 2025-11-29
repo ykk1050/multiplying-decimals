@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.366</title>
+  <title>소수의 검: 수학 악마 전쟁1.365</title>
   <style>
         * {
             box-sizing: border-box;
@@ -46,9 +46,9 @@
 
         /* 훈련장 버튼 - game-container 상단 좌측에 배치 */
         .shop-btn {
-            /* position: absolute;
+            position: absolute;
             top: 10px;
-            left: 10px; */
+            left: 10px;
             padding: 12px 25px;
             background: linear-gradient(135deg, #9f7aea, #805ad5);
             color: white;
@@ -69,9 +69,9 @@
         /* 👇 여기부터 추가 */
         /* 랭킹 버튼 */
         .ranking-btn {
-            /* position: absolute;
+            position: absolute;
             top: 10px;
-            left: 180px;  훈련장 버튼 오른쪽에 배치 */
+            left: 180px;  /* 훈련장 버튼 오른쪽에 배치 */
             padding: 12px 25px;
             background: linear-gradient(135deg, #f6ad55, #ed8936);
             color: white;
@@ -87,15 +87,6 @@
 
         .ranking-btn:hover {
             transform: translateY(-3px);
-        }
-
-        /* ⭐ 새로 추가: 버튼들을 감쌀 컨테이너 스타일 */
-        .button-container {
-            display: flex;
-            justify-content: center; /* 가운데 정렬 */
-            gap: 15px;              /* 버튼 사이 간격 */
-            margin-bottom: 20px;    /* 아래쪽 여백 */
-            flex-wrap: wrap;        /* 모바일에서 줄바꿈 허용 */
         }
 
         /* 👇 여기에 추가 */
@@ -1021,9 +1012,9 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.366</h1>  
-   /* <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
-   <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button> */
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.365</h1>  
+   <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
+   <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
 
  
@@ -1071,12 +1062,6 @@
          </button>
     </div>
    </div>
-   <div class="button-container">
-   <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
-
-   <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
-   </div>
-
    <div class="battle-arena">
     <!-- 용사 카드 -->
     <div class="character-card player-card">
