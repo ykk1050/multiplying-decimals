@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.366</title>
+  <title>소수의 검: 수학 악마 전쟁1.367</title>
   <style>
         * {
             box-sizing: border-box;
@@ -990,9 +990,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.366</h1>  
-   <button class="shop-btn" onclick="openShop()">🏪 기술상점</button>
-   <button class="ranking-btn" onclick="openRanking()">🏆 랭킹</button>
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.367</h1>  
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
 
  
@@ -1032,19 +1030,20 @@
      <div class="record-item"><span class="record-label">최강 체력:</span> <span class="record-value" id="bestHp">-</span>
      </div>
      <div class="record-item"><span class="record-label">최강 공격력:</span> <span class="record-value" id="bestAttack">-</span>
+     </div>
      
-    <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <button class="shop-btn" onclick="openShop()" style="position: static; padding: 8px 20px;">
-            🏪 기술상점
-        </button>
-        <button class="ranking-btn" onclick="openRanking()" style="position: static; padding: 8px 20px;">
-            🏆 랭킹
-        </button>
+     <!-- 👇 버튼들 추가 -->
+     <div style="display: flex; gap: 10px; margin-top: 15px; justify-content: flex-start;">
+         <button class="shop-btn" onclick="openShop()" style="position: static;">
+             🏪 기술상점
+         </button>
+         <button class="ranking-btn" onclick="openRanking()" style="position: static;">
+             🏆 랭킹
+         </button>
     
-    </div>
+     </div>
 
      
-     </div>
      <!-- 👇 이 부분 추가 -->
      <div style="text-align: center; margin-top: 15px;">
          <button onclick="resetBestRecords()" style="padding: 8px 20px; background: linear-gradient(135deg, #f56565, #e53e3e); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
