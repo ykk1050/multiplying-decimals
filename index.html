@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.385</title>
+  <title>소수의 검: 수학 악마 전쟁1.386</title>
   <style>
         * {
             box-sizing: border-box;
@@ -990,7 +990,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.385</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.386</h1>  
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
 
  
@@ -2806,47 +2806,46 @@
         // 게임 재시작 (검증 강화)
         function restartGame() {
             // 최고 기록 검증 (의심스러운 기록이 있어도 초기화하지 않고 유지)
-            // 대신 랭킹 업로드 시에 필터링됨
             if (dataValidator.detectSuspiciousPatterns(gameState.bestRecords)) {
                 console.warn('게임 재시작: 의심스러운 최고 기록 감지됨 (삭제하지 않음)');
             }
 
-            gameState = {
-                level: 1,
-                coins: 0, 
-                ownedSkills: [], 
-                player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
-                villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
-                currentProblem: { num1: 0.5, num2: 2, answer: 1.0 },
-                battleInterval: null,
-                manaInterval: null,
-                gameActive: true,
-                
-                // 시간 관련 초기화
-                lastActionTime: Date.now(),
-                lastProblemSolvedTime: 0,
-
-                // 현재 플레이 기록 초기화
-                currentStats: {
-                    problemsSolved: 0,
-                    totalDamage: 0,
-                    startTime: Date.now(),
-                    dailyStats: {
-                        date: new Date().toDateString(),
-                        problemsSolved: 0,
-                        totalDamage: 0,
-                        playTime: 0
-                    }
-                },
-                // 최고 기록은 유지
-                bestRecords: gameState.bestRecords
-            };
+            // gameState는 Proxy 객체(const)이므로 직접 재할당이 불가능합니다.
+            // 대신 내부 속성들을 하나씩 초기화해야 합니다.
+            gameState.level = 1;
+            gameState.coins = 0;
+            gameState.ownedSkills = []; // 배열 초기화
+            gameState.ownedSkills.length = 0; // 배열 비우기 (Proxy 호환성)
+            
+            gameState.player.hp = 100;
+            gameState.player.maxHp = 100;
+            gameState.player.attack = 15;
+            gameState.player.defense = 10;
+            gameState.player.mana = 0;
+            gameState.player.maxMana = 20;
+            
+            gameState.villain.hp = 80;
+            gameState.villain.maxHp = 80;
+            gameState.villain.attack = 12;
+            gameState.villain.defense = 8;
+            
+            gameState.currentProblem = { num1: 0.5, num2: 2, answer: 1.0 };
+            gameState.battleInterval = null;
+            gameState.manaInterval = null;
+            gameState.gameActive = true;
+            
+            gameState.lastActionTime = Date.now();
+            gameState.lastProblemSolvedTime = 0;
+            
+            gameState.currentStats.problemsSolved = 0;
+            gameState.currentStats.totalDamage = 0;
+            gameState.currentStats.startTime = Date.now();
+            gameState.currentStats.accumulatedPlayTime = 0;
             
             // 모달 닫기
             document.getElementById('gameOverModal').style.display = 'none';
             document.getElementById('upgradeSection').style.display = 'none';
 
-            
             // 문제 풀이 재활성화
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('answerInput').disabled = false;
@@ -2855,7 +2854,7 @@
             
             document.getElementById('battleLog').innerHTML = '게임이 다시 시작되었습니다!<br>';
             
-            renderSkillButtons(); // 추가
+            renderSkillButtons(); 
 
             updateDisplay();
             saveGameProgress();
