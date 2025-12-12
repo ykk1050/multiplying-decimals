@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.384</title>
+  <title>소수의 검: 수학 악마 전쟁1.385</title>
   <style>
         * {
             box-sizing: border-box;
@@ -1294,6 +1294,48 @@
 
 
   <script>
+        // 콘솔 사용 방지 (디버깅 방지)
+        setInterval(function() {
+            if (window.console && (console.firebug || console.table && /firebug/i.test(console.table()))) {
+                alert('개발자 도구 사용이 감지되었습니다. 게임을 종료합니다.');
+                window.location.reload();
+            }
+        }, 1000);
+
+        // 콘솔 열림 감지 및 내용 삭제
+        (function() {
+            try {
+                var $_console$$ = console;
+                Object.defineProperty(window, 'console', {
+                    get: function() {
+                        if ($_console$$._commandLineAPI) {
+                            throw '콘솔 입력을 사용할 수 없습니다.';
+                        }
+                        return $_console$$;
+                    },
+                    set: function(val) {
+                        $_console$$ = val;
+                    }
+                });
+            } catch (e) {
+            }
+        })();
+
+        // 주요 콘솔 함수 무력화 (일반적인 log는 허용하되, 치명적인 기능 차단)
+        /*
+        const noop = () => {};
+        console.log = noop;
+        console.warn = noop;
+        console.error = noop;
+        */ 
+        
+        // 디버거 중단점 강제 실행 (콘솔 열면 멈춤)
+        /*
+        setInterval(function(){
+            debugger;
+        }, 100);
+        */
+
         // localStorage를 사용한 데이터 저장/로드 함수
         const localStorageHelper = {
             save: function(key, data) {
@@ -1416,11 +1458,16 @@
         // gameState를 Proxy로 감싸서 값 변경 감지 및 제한
         const gameState = new Proxy(_gameState, {
             set: function(target, prop, value) {
+                // 게임 데이터 로딩 중(`gameLoaded`가 false)일 때는 모든 값 변경 허용
+                // 저장된 게임을 불러올 때 레벨 1 -> 레벨 50으로 점프하는 것은 정상이므로
+                if (!gameLoaded && (prop === 'level' || prop === 'coins')) {
+                    target[prop] = value;
+                    return true;
+                }
+
                 // 코인 직접 수정 차단
                 if (prop === 'coins') {
                     const diff = value - target.coins;
-                    // 한 번에 너무 많은 코인이 증가하면 차단 (예: 10000 이상)
-                    // 정상적인 게임 플레이에서는 문제 풀이(5), 치트(1000) 외에 대량 획득 불가
                     if (diff > 2000) {
                         console.warn('⚠️ 비정상적인 코인 증가 감지되어 차단됨');
                         return false; 
@@ -1430,7 +1477,8 @@
                 // 레벨 직접 수정 차단
                 if (prop === 'level') {
                      const diff = value - target.level;
-                     if (diff > 1) { // 한 번에 2레벨 이상 상승 불가
+                     // 한 번에 2레벨 이상 상승 불가 (단, 초기화나 로딩 상황 제외)
+                     if (diff > 1) { 
                          console.warn('⚠️ 비정상적인 레벨 상승 감지되어 차단됨');
                          return false;
                      }
