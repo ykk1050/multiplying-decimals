@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.386</title>
+  <title>소수의 검: 수학 악마 전쟁1.387</title>
   <style>
         * {
             box-sizing: border-box;
@@ -990,7 +990,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.386</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.387</h1>  
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
 
  
@@ -1959,48 +1959,48 @@
             };
 
             // 의심스러운 패턴 검출 시 저장하되 경고 로그만 남김 (로컬 플레이 허용)
+            // * 중요: 로컬 저장은 무조건 수행해야 함 (새로고침 시 데이터 유지 위해)
             if (dataValidator.detectSuspiciousPatterns(currentRecords)) {
                 console.warn('의심스러운 기록 패턴 감지됨 - 랭킹 업로드만 제한됩니다');
-                // 로컬 저장은 허용하되 랭킹 업로드는 하지 않음
+                // 로컬 저장만 수행
                 localStorageHelper.save('bestRecords', gameState.bestRecords);
                 return;
             }
 
-            // 각 기록별 검증 및 업데이트
+            // 각 기록별 검증 및 업데이트 (검증 로직 완화)
             let hasNewRecord = false;
 
-            if (dataValidator.validateLevel(gameState.level) &&
-                gameState.level > gameState.bestRecords.level) {
+            // 레벨: 단순 비교 (검증 조건 제거 또는 완화)
+            if (gameState.level > gameState.bestRecords.level) {
                 gameState.bestRecords.level = gameState.level;
                 hasNewRecord = true;
             }
 
-            // ... (중략) ...
-
+            // 문제 수: 단순 비교
             if (gameState.currentStats.problemsSolved > gameState.bestRecords.problemsSolved) {
                 gameState.bestRecords.problemsSolved = gameState.currentStats.problemsSolved;
                 hasNewRecord = true;
             }
 
-            if (dataValidator.validateDamage(
-                    gameState.currentStats.totalDamage,
-                    gameState.level,
-                    gameState.player.attack) &&
-                gameState.currentStats.totalDamage > gameState.bestRecords.totalDamage) {
+            // 피해량: 단순 비교
+            if (gameState.currentStats.totalDamage > gameState.bestRecords.totalDamage) {
                 gameState.bestRecords.totalDamage = gameState.currentStats.totalDamage;
                 hasNewRecord = true;
             }
 
-            // 플레이어 스탯 기록도 검증
+            // 플레이어 스탯 기록 업데이트
             const playerStats = gameState.player;
             if (playerStats.maxHp > gameState.bestRecords.maxHp) {
                 gameState.bestRecords.maxHp = playerStats.maxHp;
+                hasNewRecord = true; // 스탯만 올라도 저장해야 함
             }
             if (playerStats.attack > gameState.bestRecords.maxAttack) {
                 gameState.bestRecords.maxAttack = playerStats.attack;
+                hasNewRecord = true;
             }
             if (playerStats.defense > gameState.bestRecords.maxDefense) {
                 gameState.bestRecords.maxDefense = playerStats.defense;
+                hasNewRecord = true;
             }
 
             if (hasNewRecord) {
