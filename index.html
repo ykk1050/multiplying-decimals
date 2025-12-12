@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.38</title>
+  <title>소수의 검: 수학 악마 전쟁1.381</title>
   <style>
         * {
             box-sizing: border-box;
@@ -990,7 +990,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.38</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.381</h1>  
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
 
  
@@ -1442,6 +1442,13 @@
                 return Number.isInteger(damage) &&
                        damage >= 0 &&
                        damage <= maxReasonableDamage * GAME_LIMITS.DAMAGE_TOLERANCE_MULTIPLIER;
+            },
+
+            // 문제 해결 수 검증 (일일 제한) - 기존 함수 복구
+            validateProblemsSolved: function(problems, dailyProblems) {
+                return Number.isInteger(problems) &&
+                       problems >= 0 &&
+                       dailyProblems <= GAME_LIMITS.MAX_PROBLEMS_PER_DAY;
             },
 
             // 의심스러운 데이터 패턴 검출 (삭제 대신 마킹용)
