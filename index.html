@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.381</title>
+  <title>소수의 검: 수학 악마 전쟁1.382</title>
   <style>
         * {
             box-sizing: border-box;
@@ -990,7 +990,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.381</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.382</h1>  
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
 
  
@@ -1394,6 +1394,7 @@
                 problemsSolved: 0,
                 totalDamage: 0,
                 startTime: Date.now(),
+                accumulatedPlayTime: 0, // 누적 플레이 시간 추가
                 dailyStats: {
                     date: new Date().toDateString(),
                     problemsSolved: 0,
@@ -1711,14 +1712,17 @@
 
                 const levelMultiplier = 1 + (gameState.level - 1) * 0.3;
                 gameState.villain = {
-                    hp: Math.floor(80 * levelMultiplier),
-                    maxHp: Math.floor(80 * levelMultiplier),
+                    hp: savedProgress.villain_hp || Math.floor(80 * levelMultiplier), // 저장된 체력 우선 사용
+                    maxHp: savedProgress.villain_max_hp || Math.floor(80 * levelMultiplier),
                     attack: Math.floor(12 * levelMultiplier),
                     defense: Math.floor(8 * levelMultiplier)
                 };
 
+                // 현재 기록 복원
                 gameState.currentStats.problemsSolved = savedProgress.problems_solved || 0;
                 gameState.currentStats.totalDamage = savedProgress.total_damage || 0;
+                gameState.currentStats.accumulatedPlayTime = savedProgress.play_time || 0; // 누적 시간 복원
+                gameState.currentStats.startTime = Date.now(); // 현재 세션 시작 시간 재설정
 
                 // 일일 통계 복원
                 if (savedProgress.daily_stats) {
@@ -1745,6 +1749,10 @@
             // 일일 통계 초기화 확인
             dataValidator.resetDailyStatsIfNeeded();
 
+            // 현재까지의 플레이 시간 계산 (누적 시간 + 현재 세션 시간)
+            const currentSessionTime = Math.floor((Date.now() - gameState.currentStats.startTime) / 1000);
+            const totalPlayTime = (gameState.currentStats.accumulatedPlayTime || 0) + currentSessionTime;
+
             // 저장할 데이터 검증
             const progressData = {
                 record_type: 'game_progress',
@@ -1753,14 +1761,15 @@
                 owned_skills: gameState.ownedSkills,
                 problems_solved: gameState.currentStats.problemsSolved,
                 total_damage: gameState.currentStats.totalDamage,
+                play_time: totalPlayTime, // 총 플레이 시간 저장
                 player_hp: gameState.player.hp,
                 player_max_hp: gameState.player.maxHp,
                 player_attack: gameState.player.attack,
                 player_defense: gameState.player.defense,
                 player_mana: gameState.player.mana,
                 player_max_mana: gameState.player.maxMana,
-                villain_hp: gameState.villain.hp,
-                villain_max_hp: gameState.villain.maxHp,
+                villain_hp: gameState.villain.hp, // 현재 빌런 체력 저장
+                villain_max_hp: gameState.villain.maxHp, // 빌런 최대 체력 저장
                 villain_attack: gameState.villain.attack,
                 villain_defense: gameState.villain.defense,
                 game_active: gameState.gameActive,
@@ -1768,12 +1777,8 @@
                 daily_stats: gameState.currentStats.dailyStats
             };
 
-            // 데이터 검증
-            if (!dataValidator.validateLevel(progressData.level) ||
-                !dataValidator.validateProblemsSolved(
-                    progressData.problems_solved,
-                    gameState.currentStats.dailyStats.problemsSolved) ||
-                !dataValidator.validateDamage(progressData.total_damage, progressData.level)) {
+            // 데이터 검증 (단순 오류 체크만)
+            if (!Number.isInteger(progressData.level) || progressData.level < 1) {
                 console.warn('비정상적인 게임 데이터 감지됨 - 저장을 건너뜁니다');
                 return;
             }
@@ -2052,9 +2057,11 @@
             document.getElementById('problemsSolved').textContent = gameState.currentStats.problemsSolved;
             document.getElementById('totalDamage').textContent = gameState.currentStats.totalDamage;
             
-            const playTime = Math.floor((Date.now() - gameState.currentStats.startTime) / 1000);
-            const minutes = Math.floor(playTime / 60);
-            const seconds = playTime % 60;
+            const currentSessionTime = Math.floor((Date.now() - gameState.currentStats.startTime) / 1000);
+            const totalPlayTime = (gameState.currentStats.accumulatedPlayTime || 0) + currentSessionTime;
+            
+            const minutes = Math.floor(totalPlayTime / 60);
+            const seconds = totalPlayTime % 60;
             document.getElementById('playTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             
             // 최고 기록 업데이트
