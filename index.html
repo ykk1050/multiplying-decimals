@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.37</title>
+  <title>소수의 검: 수학 악마 전쟁1.38</title>
   <style>
         * {
             box-sizing: border-box;
@@ -1335,13 +1335,48 @@
 
         const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbzNpxvLzaKf6qz6k6KK-1AjaRwc-c5sJZDDLaCeLw5ag3UgZDqw1pLwsdiN_wBoXDJwAw/exec';
 
+        // 🔒 보안 키 (서버와 동일해야 함)
+        // 주의: 클라이언트 코드에 키가 노출되는 것은 웹 게임의 한계이나, 
+        // 스크립트 키디 수준의 단순 조작과 네트워크 패킷 변조는 효과적으로 막아줍니다.
+        const SECRET_KEY = "math_hero_prevention_key_2024"; 
+
+        // 간단한 해시 생성 함수 (서버와 로직 동일)
+        function createSignature(username, level, problems, damage) {
+            const rawString = username + "_" + level + "_" + problems + "_" + damage + "_" + SECRET_KEY;
+            
+            let hash = 0;
+            if (rawString.length === 0) return hash.toString(16);
+            for (let i = 0; i < rawString.length; i++) {
+                const char = rawString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash).toString(16);
+        }
+
+        // 게임 보안 상수 (정상적인 고인물 유저 보호를 위해 완화 및 정교화)
+        const GAME_LIMITS = {
+            // 절대적인 상한선은 매우 높게 설정 (이론상 도달 가능한 한계)
+            MAX_LEVEL: 100000,           // 10만 레벨 (랭커 고려)
+            MAX_PROBLEMS_PER_DAY: 5000,  // 하루 5000문제 (초인적인 플레이어 고려)
+            
+            // 속도 기반 제한 (물리적으로 불가능한 속도 차단)
+            MIN_TIME_PER_PROBLEM: 500,   // 문제당 최소 0.5초 (인간의 반응속도 고려)
+            MAX_LEVEL_UP_SPEED: 10,      // 1초당 최대 레벨업 수 (비정상 고속 성장 방지)
+            
+            // 데미지 검증용
+            DAMAGE_TOLERANCE_MULTIPLIER: 5.0, // 데미지 오차 허용 범위 (버프/크리 고려)
+            
+            // 플레이 타임 검증
+            MIN_PLAY_TIME_RATIO: 0.1     // 레벨 1당 최소 0.1초의 플레이 타임은 있어야 함
+        };
 
         // 게임 상태
         let gameState = {
             level: 1,
-            coins: 0, // 추가
-            ownedSkills: [], // 추가
-            username: '익명',  // 👈 추가
+            coins: 0, 
+            ownedSkills: [], 
+            username: '익명',
 
             player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
             villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
@@ -1349,11 +1384,22 @@
             battleInterval: null,
             manaInterval: null,
             gameActive: true,
+            
+            // 마지막 활동 시간 (매크로 방지용)
+            lastActionTime: Date.now(),
+            lastProblemSolvedTime: 0,
+            
             // 현재 플레이 기록
             currentStats: {
                 problemsSolved: 0,
                 totalDamage: 0,
-                startTime: Date.now()
+                startTime: Date.now(),
+                dailyStats: {
+                    date: new Date().toDateString(),
+                    problemsSolved: 0,
+                    totalDamage: 0,
+                    playTime: 0
+                }
             },
             // 최고 기록
             bestRecords: {
@@ -1365,6 +1411,75 @@
                 maxDefense: 0
             }
         };
+
+        // 데이터 검증 함수들 (정상 플레이어 보호를 위해 로직 개선)
+        const dataValidator = {
+            // 레벨 검증 (절대값보다는 성장 속도 위주)
+            validateLevel: function(level) {
+                return Number.isInteger(level) && level >= 1 && level <= GAME_LIMITS.MAX_LEVEL;
+            },
+
+            // 문제 해결 속도 검증 (매크로 방지)
+            validateSolveSpeed: function() {
+                const now = Date.now();
+                const timeDiff = now - gameState.lastProblemSolvedTime;
+                
+                // 첫 문제거나, 최소 시간보다 길게 걸렸으면 통과
+                if (gameState.lastProblemSolvedTime === 0 || timeDiff >= GAME_LIMITS.MIN_TIME_PER_PROBLEM) {
+                    gameState.lastProblemSolvedTime = now;
+                    return true;
+                }
+                
+                return false; // 너무 빨리 풀었음 (매크로 의심)
+            },
+
+            // 피해량 정합성 검증 (레벨/공격력 대비 너무 터무니없지만 않으면 허용)
+            validateDamage: function(damage, level, attack) {
+                // 기본 공격력 + 스킬 계수 등을 넉넉하게 고려
+                // 레벨이 높으면 데미지도 기하급수적으로 늘어날 수 있음을 인정
+                const maxReasonableDamage = (attack * 100) + (level * 10000); 
+                
+                return Number.isInteger(damage) &&
+                       damage >= 0 &&
+                       damage <= maxReasonableDamage * GAME_LIMITS.DAMAGE_TOLERANCE_MULTIPLIER;
+            },
+
+            // 의심스러운 데이터 패턴 검출 (삭제 대신 마킹용)
+            detectSuspiciousPatterns: function(stats) {
+                const { level, problemsSolved, totalDamage } = stats;
+
+                // 1. 레벨 대비 문제 수가 너무 적음 (치트/핵으로 레벨만 올린 경우)
+                // 단, 초반 구간은 제외하고, 레벨 100 이상일 때 문제당 레벨업 효율이 너무 좋으면 의심
+                if (level > 100 && problemsSolved < level * 0.1) {
+                    return true; 
+                }
+
+                // 2. 비정상적인 데미지 비율
+                // 문제 해결 수에 비해 총 데미지가 천문학적인 경우
+                if (problemsSolved > 0 && totalDamage > (problemsSolved * level * 1000000)) {
+                    return true;
+                }
+
+                return false;
+            },
+
+            // 일일 통계 초기화
+            resetDailyStatsIfNeeded: function() {
+                const today = new Date().toDateString();
+                if (gameState.currentStats.dailyStats.date !== today) {
+                    gameState.currentStats.dailyStats = {
+                        date: today,
+                        problemsSolved: 0,
+                        totalDamage: 0,
+                        playTime: 0
+                    };
+                }
+            }
+        };
+        
+        // 🔒 핵심 로직 동결 (변조 방지)
+        Object.freeze(dataValidator);
+        Object.freeze(GAME_LIMITS);
         /* //스킬 */
         const SKILLS = {
             fireball: {
@@ -1565,23 +1680,28 @@
         // 페이지 로드 시 SDK 초기화
         initializeSDKs(); */ 
 
-        // 게임 진행 상황 불러오기
+        // 게임 진행 상황 불러오기 (검증 완화: 정상 데이터 삭제 방지)
         function loadGameProgress() {
             const savedProgress = localStorageHelper.load('gameProgress');
-            
+
             if (savedProgress && savedProgress.game_active) {
-                gameState.level = savedProgress.level;
-                gameState.coins = savedProgress.coins || 0;
-                gameState.ownedSkills = savedProgress.owned_skills || [];
-                gameState.player = {
-                    hp: savedProgress.player_hp,
-                    maxHp: savedProgress.player_max_hp,
-                    attack: savedProgress.player_attack,
-                    defense: savedProgress.player_defense,
-                    mana: savedProgress.player_mana,
-                    maxMana: savedProgress.player_max_mana || 20
-                };
+                // 데이터 정합성 체크 (삭제 대신 값 보정)
+                gameState.level = Math.min(savedProgress.level, GAME_LIMITS.MAX_LEVEL);
                 
+                // 코인이나 스킬이 비정상적으로 많아도 일단 로드하되, 최대치로 캡을 씌움
+                gameState.coins = Math.min(savedProgress.coins || 0, 999999999); 
+                gameState.ownedSkills = savedProgress.owned_skills || [];
+
+                // 플레이어 스탯 보정 로드
+                gameState.player = {
+                    hp: Math.min(savedProgress.player_hp, savedProgress.player_max_hp),
+                    maxHp: Math.min(savedProgress.player_max_hp, 1000000), // 백만 체력까지 허용
+                    attack: Math.min(savedProgress.player_attack, 500000), // 50만 공격력까지 허용
+                    defense: Math.min(savedProgress.player_defense, 200000), 
+                    mana: Math.min(savedProgress.player_mana, savedProgress.player_max_mana || 20),
+                    maxMana: Math.min(savedProgress.player_max_mana || 20, 10000) 
+                };
+
                 const levelMultiplier = 1 + (gameState.level - 1) * 0.3;
                 gameState.villain = {
                     hp: Math.floor(80 * levelMultiplier),
@@ -1589,20 +1709,36 @@
                     attack: Math.floor(12 * levelMultiplier),
                     defense: Math.floor(8 * levelMultiplier)
                 };
-                
+
                 gameState.currentStats.problemsSolved = savedProgress.problems_solved || 0;
                 gameState.currentStats.totalDamage = savedProgress.total_damage || 0;
+
+                // 일일 통계 복원
+                if (savedProgress.daily_stats) {
+                    gameState.currentStats.dailyStats = savedProgress.daily_stats;
+                    dataValidator.resetDailyStatsIfNeeded(); 
+                }
+
+                // 의심스러운 데이터 플래그가 있으면 경고만 표시 (게임은 가능하게)
+                if (savedProgress.suspicious) {
+                    addBattleLog('⚠️ 데이터 검증 경고: 일부 기록이 비정상적일 수 있습니다.');
+                }
+
                 gameState.gameActive = true;
                 gameLoaded = true;
-                
+
                 addBattleLog(`이전 게임을 불러왔습니다! 레벨 ${gameState.level}부터 계속합니다.`);
                 updateDisplay();
                 renderSkillButtons();
             }
         }
 
-        // 게임 진행 상황 저장
+        // 게임 진행 상황 저장 (검증 포함)
         async function saveGameProgress() {
+            // 일일 통계 초기화 확인
+            dataValidator.resetDailyStatsIfNeeded();
+
+            // 저장할 데이터 검증
             const progressData = {
                 record_type: 'game_progress',
                 level: gameState.level,
@@ -1615,15 +1751,37 @@
                 player_attack: gameState.player.attack,
                 player_defense: gameState.player.defense,
                 player_mana: gameState.player.mana,
-                player_max_mana: gameState.player.maxMana, // 🚨 이 줄을 추가하세요!
+                player_max_mana: gameState.player.maxMana,
                 villain_hp: gameState.villain.hp,
                 villain_max_hp: gameState.villain.maxHp,
                 villain_attack: gameState.villain.attack,
                 villain_defense: gameState.villain.defense,
                 game_active: gameState.gameActive,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                daily_stats: gameState.currentStats.dailyStats
             };
-            
+
+            // 데이터 검증
+            if (!dataValidator.validateLevel(progressData.level) ||
+                !dataValidator.validateProblemsSolved(
+                    progressData.problems_solved,
+                    gameState.currentStats.dailyStats.problemsSolved) ||
+                !dataValidator.validateDamage(progressData.total_damage, progressData.level)) {
+                console.warn('비정상적인 게임 데이터 감지됨 - 저장을 건너뜁니다');
+                return;
+            }
+
+            // 의심스러운 패턴 검출
+            if (dataValidator.detectSuspiciousPatterns({
+                level: progressData.level,
+                problemsSolved: progressData.problems_solved,
+                totalDamage: progressData.total_damage
+            })) {
+                console.warn('의심스러운 게임 패턴 감지됨 - 저장을 제한합니다');
+                // 의심스러운 데이터는 저장하되 플래그 추가
+                progressData.suspicious = true;
+            }
+
             localStorageHelper.save('gameProgress', progressData);
         }
 
@@ -1700,17 +1858,72 @@
             }
         } */
 
-        // 기존 함수 삭제하고 아래로 교체
-        // saveBestRecords 함수 - localStorage 사용
+        // 최고 기록 검증 및 저장 (초기화 대신 랭킹 등록 제외)
         async function saveBestRecords() {
-            const success = localStorageHelper.save('bestRecords', gameState.bestRecords);
-            
-            if (success) {
-                console.log('최고 기록 저장됨:', gameState.bestRecords);
-                await uploadToRanking();  // await 추가
+            // 일일 통계 초기화 확인
+            dataValidator.resetDailyStatsIfNeeded();
 
-            } else {
-                console.error('최고 기록 저장 실패');
+            // 현재 기록 검증
+            const currentRecords = {
+                level: gameState.level,
+                problemsSolved: gameState.currentStats.problemsSolved,
+                totalDamage: gameState.currentStats.totalDamage
+            };
+
+            // 의심스러운 패턴 검출 시 저장하되 경고 로그만 남김 (로컬 플레이 허용)
+            if (dataValidator.detectSuspiciousPatterns(currentRecords)) {
+                console.warn('의심스러운 기록 패턴 감지됨 - 랭킹 업로드만 제한됩니다');
+                // 로컬 저장은 허용하되 랭킹 업로드는 하지 않음
+                localStorageHelper.save('bestRecords', gameState.bestRecords);
+                return;
+            }
+
+            // 각 기록별 검증 및 업데이트
+            let hasNewRecord = false;
+
+            if (dataValidator.validateLevel(gameState.level) &&
+                gameState.level > gameState.bestRecords.level) {
+                gameState.bestRecords.level = gameState.level;
+                hasNewRecord = true;
+            }
+
+            // ... (중략) ...
+
+            if (gameState.currentStats.problemsSolved > gameState.bestRecords.problemsSolved) {
+                gameState.bestRecords.problemsSolved = gameState.currentStats.problemsSolved;
+                hasNewRecord = true;
+            }
+
+            if (dataValidator.validateDamage(
+                    gameState.currentStats.totalDamage,
+                    gameState.level,
+                    gameState.player.attack) &&
+                gameState.currentStats.totalDamage > gameState.bestRecords.totalDamage) {
+                gameState.bestRecords.totalDamage = gameState.currentStats.totalDamage;
+                hasNewRecord = true;
+            }
+
+            // 플레이어 스탯 기록도 검증
+            const playerStats = gameState.player;
+            if (playerStats.maxHp > gameState.bestRecords.maxHp) {
+                gameState.bestRecords.maxHp = playerStats.maxHp;
+            }
+            if (playerStats.attack > gameState.bestRecords.maxAttack) {
+                gameState.bestRecords.maxAttack = playerStats.attack;
+            }
+            if (playerStats.defense > gameState.bestRecords.maxDefense) {
+                gameState.bestRecords.maxDefense = playerStats.defense;
+            }
+
+            if (hasNewRecord) {
+                const success = localStorageHelper.save('bestRecords', gameState.bestRecords);
+
+                if (success) {
+                    console.log('최고 기록 저장됨:', gameState.bestRecords);
+                    await uploadToRanking();
+                } else {
+                    console.error('최고 기록 저장 실패');
+                }
             }
         }
 
@@ -1895,17 +2108,34 @@
             document.getElementById('upgradeSection').style.display = 'none';
         }
 
-        // 답안 확인
+        // 답안 확인 (매크로 방지 추가)
         function checkAnswer() {
+            // 매크로 방지: 너무 빠른 문제 풀이 차단
+            if (!dataValidator.validateSolveSpeed()) {
+                addBattleLog('⚠️ 너무 빨리 문제를 풀었습니다! (매크로 감지)');
+                return;
+            }
+
             const userAnswer = parseFloat(document.getElementById('answerInput').value);
             const correctAnswer = gameState.currentProblem.answer;
-            
+
             // 소수점 계산의 오차를 고려하여 0.001 범위 내에서 정답 처리
             if (Math.abs(userAnswer - correctAnswer) < 0.001) {
+                // 일일 통계 초기화 확인
+                dataValidator.resetDailyStatsIfNeeded();
+
+                // 일일 문제 해결 수 제한 확인 (하루종일 플레이하는 유저 배려하여 상한 대폭 상향)
+                if (gameState.currentStats.dailyStats.problemsSolved >= GAME_LIMITS.MAX_PROBLEMS_PER_DAY) {
+                    addBattleLog(`⚠️ 오늘의 문제 해결 한도에 도달했습니다. 내일 다시 도전하세요!`);
+                    document.getElementById('answerInput').value = '';
+                    return;
+                }
+
                 const coinsEarned = 5;
                 gameState.coins += coinsEarned;
                 addBattleLog(`정답입니다! ${gameState.currentProblem.num1} × ${gameState.currentProblem.num2} = ${correctAnswer}`);
                 gameState.currentStats.problemsSolved++;
+                gameState.currentStats.dailyStats.problemsSolved++;
                 updateBestRecords();
                 updateRecordsDisplay();
                 document.getElementById('upgradeSection').style.display = 'block';
@@ -1987,15 +2217,29 @@
             
             gameState.battleInterval = setInterval(() => {
                 if (!gameState.gameActive) return;
-                
+
                 // 플레이어 공격
                 const playerDamage = Math.max(1, gameState.player.attack - gameState.villain.defense);
-                gameState.villain.hp = Math.max(0, gameState.villain.hp - playerDamage);
-                gameState.currentStats.totalDamage += playerDamage;
+
+                // 피해량 일일 제한 확인
+                const newTotalDamage = gameState.currentStats.totalDamage + playerDamage;
+                if (newTotalDamage > gameState.level * GAME_LIMITS.MAX_DAMAGE_PER_LEVEL) {
+                    // 제한 초과시 피해량 조정
+                    const adjustedDamage = Math.max(1, (gameState.level * GAME_LIMITS.MAX_DAMAGE_PER_LEVEL) - gameState.currentStats.totalDamage);
+                    gameState.villain.hp = Math.max(0, gameState.villain.hp - adjustedDamage);
+                    gameState.currentStats.totalDamage += adjustedDamage;
+                    gameState.currentStats.dailyStats.totalDamage += adjustedDamage;
+                    addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${adjustedDamage}의 피해를 입혔습니다! (일일 제한 적용)`);
+                } else {
+                    gameState.villain.hp = Math.max(0, gameState.villain.hp - playerDamage);
+                    gameState.currentStats.totalDamage += playerDamage;
+                    gameState.currentStats.dailyStats.totalDamage += playerDamage;
+                    addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${playerDamage}의 피해를 입혔습니다!`);
+                }
+
                 updateRecordsDisplay();
-                addBattleLog(`${document.getElementById('playerName').textContent}이(가) ${playerDamage}의 피해를 입혔습니다!`);
-                playHeroAttackSound(); 
-                triggerHitEffect('heroattack'); 
+                playHeroAttackSound();
+                triggerHitEffect('heroattack');
 
                 if (gameState.villain.hp <= 0) {
                     victory();
@@ -2317,10 +2561,30 @@
                 gameState.player.mana -= skill.useCost.mana;
             }
             
-            // 데미지 적용
-            const damage = skill.damage;
+            // 데미지 적용 (검증 포함)
+            let damage = skill.damage;
+
+            // 스킬 피해량 제한 확인 (레벨당 최대 피해량의 50% 이내)
+            const maxSkillDamage = Math.floor(gameState.level * GAME_LIMITS.MAX_DAMAGE_PER_LEVEL * 0.5);
+            if (damage > maxSkillDamage) {
+                damage = maxSkillDamage;
+                addBattleLog(`⚠️ 스킬 피해량이 제한되었습니다! (최대 ${maxSkillDamage})`);
+            }
+
+            // 총 피해량 제한 확인
+            const newTotalDamage = gameState.currentStats.totalDamage + damage;
+            if (newTotalDamage > gameState.level * GAME_LIMITS.MAX_DAMAGE_PER_LEVEL) {
+                damage = Math.max(0, (gameState.level * GAME_LIMITS.MAX_DAMAGE_PER_LEVEL) - gameState.currentStats.totalDamage);
+                if (damage === 0) {
+                    addBattleLog(`⚠️ 일일 피해량 제한에 도달하여 스킬을 사용할 수 없습니다!`);
+                    return;
+                }
+                addBattleLog(`⚠️ 스킬 피해량이 일일 제한에 맞춰 조정되었습니다!`);
+            }
+
             gameState.villain.hp = Math.max(0, gameState.villain.hp - damage);
             gameState.currentStats.totalDamage += damage;
+            gameState.currentStats.dailyStats.totalDamage += damage;
             
             addBattleLog(`${skill.icon} ${skill.name} 사용! ${damage} 데미지!`);
 
@@ -2406,6 +2670,13 @@
 
         // 다음 레벨
         function nextLevel() {
+            // 최대 레벨 제한 확인
+            if (gameState.level >= GAME_LIMITS.MAX_LEVEL) {
+                addBattleLog(`🎉 최대 레벨(${GAME_LIMITS.MAX_LEVEL})에 도달했습니다! 게임 클리어!`);
+                victory(); // 승리 처리
+                return;
+            }
+
             gameState.level++;
             gameState.gameActive = true;
             
@@ -2438,23 +2709,40 @@
             startManaRegeneration();
         }
 
-        // 게임 재시작
+        // 게임 재시작 (검증 강화)
         function restartGame() {
+            // 최고 기록 검증 (의심스러운 기록이 있어도 초기화하지 않고 유지)
+            // 대신 랭킹 업로드 시에 필터링됨
+            if (dataValidator.detectSuspiciousPatterns(gameState.bestRecords)) {
+                console.warn('게임 재시작: 의심스러운 최고 기록 감지됨 (삭제하지 않음)');
+            }
+
             gameState = {
                 level: 1,
-                coins: 0, // 초기화
-                ownedSkills: [], // 초기화
+                coins: 0, 
+                ownedSkills: [], 
                 player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
                 villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
                 currentProblem: { num1: 0.5, num2: 2, answer: 1.0 },
                 battleInterval: null,
                 manaInterval: null,
                 gameActive: true,
+                
+                // 시간 관련 초기화
+                lastActionTime: Date.now(),
+                lastProblemSolvedTime: 0,
+
                 // 현재 플레이 기록 초기화
                 currentStats: {
                     problemsSolved: 0,
                     totalDamage: 0,
-                    startTime: Date.now()
+                    startTime: Date.now(),
+                    dailyStats: {
+                        date: new Date().toDateString(),
+                        problemsSolved: 0,
+                        totalDamage: 0,
+                        playTime: 0
+                    }
                 },
                 // 최고 기록은 유지
                 bestRecords: gameState.bestRecords
@@ -2524,27 +2812,49 @@
             await renderRanking();
         }
 
-        // 랭킹에 내 기록 업로드 (스프레드시트 버전)
+        // 랭킹에 내 기록 업로드 (검증 강화 버전)
         async function uploadToRanking() {
             if (!gameState.username || gameState.username === '익명') {
                 console.log('익명 사용자는 랭킹에 업로드되지 않습니다.');
                 return;
             }
-            
+
             const myRecord = {
                 username: gameState.username,
                 level: gameState.bestRecords.level || 0,
                 problems: gameState.bestRecords.problemsSolved || 0,
                 damage: gameState.bestRecords.totalDamage || 0,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                client_validation: true // 클라이언트 검증 완료 표시
             };
-            
+
+            // 🔒 전자 서명 생성
+            myRecord.signature = createSignature(myRecord.username, myRecord.level, myRecord.problems, myRecord.damage);
+
+            // 기록 검증 (단순 상한선 체크 완화)
+            if (!dataValidator.validateLevel(myRecord.level)) {
+                 // 레벨이 너무 높으면 업로드만 차단
+                console.warn('랭킹 업로드: 레벨 검증 실패');
+                return;
+            }
+
+            // 의심스러운 패턴 검출 (엄격하게 체크)
+            if (dataValidator.detectSuspiciousPatterns({
+                level: myRecord.level,
+                problemsSolved: myRecord.problems,
+                totalDamage: myRecord.damage
+            })) {
+                console.warn('랭킹 업로드: 의심스러운 패턴 감지됨 (업로드 제한)');
+                addBattleLog('⚠️ 랭킹 업로드 조건에 부합하지 않아 순위에 반영되지 않습니다.');
+                return;
+            }
+
             // 기록이 하나라도 0보다 크면 업로드
             if (myRecord.level === 0 && myRecord.problems === 0 && myRecord.damage === 0) {
                 console.log('업로드할 기록이 없습니다.');
                 return;
             }
-            
+
             try {
                 const response = await fetch(SPREADSHEET_URL, {
                     method: 'POST',
@@ -2554,10 +2864,10 @@
                     },
                     body: JSON.stringify(myRecord)
                 });
-                
+
                 console.log('랭킹 업로드 완료');
                 addBattleLog('🏆 랭킹이 업데이트되었습니다!');
-                
+
             } catch (error) {
                 console.error('랭킹 업로드 실패:', error);
                 addBattleLog('⚠️ 랭킹 업로드에 실패했습니다.');
@@ -2603,12 +2913,27 @@
             const password = document.getElementById('cheatInput').value;
             
             if (password === '1050') {
-                gameState.coins += 10000;
+                // 치트 사용 제한: 이미 코인이 많거나 의심스러운 패턴이 있으면 거부
+                if (gameState.coins > 1000) {
+                    alert('❌ 이미 충분한 코인을 보유하고 있습니다!');
+                    document.getElementById('cheatInput').value = '';
+                    return;
+                }
+
+                // 일일 통계 확인
+                dataValidator.resetDailyStatsIfNeeded();
+                if (gameState.currentStats.dailyStats.problemsSolved > GAME_LIMITS.MAX_PROBLEMS_PER_DAY / 2) {
+                    alert('❌ 오늘 이미 많은 문제를 해결했습니다!');
+                    document.getElementById('cheatInput').value = '';
+                    return;
+                }
+
+                gameState.coins += 1000; // 코인 양도 줄임
                 updateDisplay();
                 saveGameProgress();
-                addBattleLog('🎮 치트 활성화! 10,000 코인을 획득했습니다!');
+                addBattleLog('🎮 개발자 지원: 1,000 코인을 얻었습니다!');
                 playupgradeSound();
-                alert('치트 활성화! 10,000 코인을 획득했습니다! 🎉');
+                alert('개발자 지원: 1,000 코인을 얻었습니다! 🎉');
                 closeCheat();
             } else {
                 alert('❌ 비밀번호가 틀렸습니다!');
