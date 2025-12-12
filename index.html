@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.382</title>
+  <title>소수의 검: 수학 악마 전쟁1.383</title>
   <style>
         * {
             box-sizing: border-box;
@@ -990,7 +990,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.382</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.383</h1>  
    <button class="ranking-btn" onclick="openCheat()" style="left: 330px;">🎮 개발자 기능</button>
 
  
@@ -1371,8 +1371,8 @@
             MIN_PLAY_TIME_RATIO: 0.1     // 레벨 1당 최소 0.1초의 플레이 타임은 있어야 함
         };
 
-        // 게임 상태
-        let gameState = {
+        // 게임 상태 (변조 방지 적용)
+        let _gameState = {
             level: 1,
             coins: 0, 
             ownedSkills: [], 
@@ -1394,7 +1394,7 @@
                 problemsSolved: 0,
                 totalDamage: 0,
                 startTime: Date.now(),
-                accumulatedPlayTime: 0, // 누적 플레이 시간 추가
+                accumulatedPlayTime: 0,
                 dailyStats: {
                     date: new Date().toDateString(),
                     problemsSolved: 0,
@@ -1412,6 +1412,34 @@
                 maxDefense: 0
             }
         };
+
+        // gameState를 Proxy로 감싸서 값 변경 감지 및 제한
+        const gameState = new Proxy(_gameState, {
+            set: function(target, prop, value) {
+                // 코인 직접 수정 차단
+                if (prop === 'coins') {
+                    const diff = value - target.coins;
+                    // 한 번에 너무 많은 코인이 증가하면 차단 (예: 10000 이상)
+                    // 정상적인 게임 플레이에서는 문제 풀이(5), 치트(1000) 외에 대량 획득 불가
+                    if (diff > 2000) {
+                        console.warn('⚠️ 비정상적인 코인 증가 감지되어 차단됨');
+                        return false; 
+                    }
+                }
+                
+                // 레벨 직접 수정 차단
+                if (prop === 'level') {
+                     const diff = value - target.level;
+                     if (diff > 1) { // 한 번에 2레벨 이상 상승 불가
+                         console.warn('⚠️ 비정상적인 레벨 상승 감지되어 차단됨');
+                         return false;
+                     }
+                }
+
+                target[prop] = value;
+                return true;
+            }
+        });
 
         // 데이터 검증 함수들 (정상 플레이어 보호를 위해 로직 개선)
         const dataValidator = {
@@ -2036,6 +2064,8 @@
             
             if (newRecord) {
                 console.log('새 최고 기록 달성, 저장 시작...'); // 디버깅용
+                // 저장 시 화면 업데이트가 먼저 이루어지도록 순서 변경
+                updateRecordsDisplay(); 
                 saveBestRecords();
                 addBattleLog('🎉 새로운 최고 기록을 달성했습니다!');
             }
@@ -2064,12 +2094,14 @@
             const seconds = totalPlayTime % 60;
             document.getElementById('playTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             
-            // 최고 기록 업데이트
-            document.getElementById('bestLevel').textContent = gameState.bestRecords.level || '-';
-            document.getElementById('bestProblems').textContent = gameState.bestRecords.problemsSolved || '-';
-            document.getElementById('bestDamage').textContent = gameState.bestRecords.totalDamage || '-';
-            document.getElementById('bestHp').textContent = gameState.bestRecords.maxHp || '-';
-            document.getElementById('bestAttack').textContent = gameState.bestRecords.maxAttack || '-';
+            // 최고 기록 업데이트 (표시 즉시 갱신)
+            if (gameState.bestRecords) {
+                document.getElementById('bestLevel').textContent = Math.max(gameState.level, gameState.bestRecords.level || 0);
+                document.getElementById('bestProblems').textContent = Math.max(gameState.currentStats.problemsSolved, gameState.bestRecords.problemsSolved || 0);
+                document.getElementById('bestDamage').textContent = Math.max(gameState.currentStats.totalDamage, gameState.bestRecords.totalDamage || 0);
+                document.getElementById('bestHp').textContent = Math.max(gameState.player.maxHp, gameState.bestRecords.maxHp || 0);
+                document.getElementById('bestAttack').textContent = Math.max(gameState.player.attack, gameState.bestRecords.maxAttack || 0);
+            }
         }
 
         // 새로운 소수 곱셈 문제 생성
