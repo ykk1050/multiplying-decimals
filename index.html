@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.389</title>
+  <title>소수의 검: 수학 악마 전쟁1.39</title>
   <style>
         * {
             box-sizing: border-box;
@@ -990,7 +990,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.389</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.39</h1>  
    <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
        <button class="ranking-btn" onclick="openCheat()" style="position: static;">🎮 개발자 기능</button>
        <span style="font-size: 0.9rem; color: #e53e3e; font-weight: bold; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; border: 1px solid #e53e3e;">
@@ -1619,22 +1619,31 @@
         };
 
         // 5. loadBestRecords 함수 (반드시 여기!)
+        // 최고 기록 로드
         function loadBestRecords() {
             const savedRecords = localStorageHelper.load('bestRecords');
             
             if (savedRecords) {
-                gameState.bestRecords = savedRecords;
+                // gameState는 Proxy 객체이므로 내부 속성을 하나씩 업데이트해야 함
+                gameState.bestRecords.level = savedRecords.level || 0;
+                gameState.bestRecords.problemsSolved = savedRecords.problemsSolved || 0;
+                gameState.bestRecords.totalDamage = savedRecords.totalDamage || 0;
+                gameState.bestRecords.maxHp = savedRecords.maxHp || 0;
+                gameState.bestRecords.maxAttack = savedRecords.maxAttack || 0;
+                gameState.bestRecords.maxDefense = savedRecords.maxDefense || 0;
+                
+                // 화면 업데이트 즉시 반영
+                updateRecordsDisplay();
                 console.log('최고 기록 로드됨:', gameState.bestRecords);
             } else {
                 console.log('저장된 최고 기록이 없습니다.');
-                gameState.bestRecords = {
-                    level: 0,
-                    problemsSolved: 0,
-                    totalDamage: 0,
-                    maxHp: 0,
-                    maxAttack: 0,
-                    maxDefense: 0
-                };
+                // 초기값 설정
+                gameState.bestRecords.level = 0;
+                gameState.bestRecords.problemsSolved = 0;
+                gameState.bestRecords.totalDamage = 0;
+                gameState.bestRecords.maxHp = 0;
+                gameState.bestRecords.maxAttack = 0;
+                gameState.bestRecords.maxDefense = 0;
             }
         }
 
@@ -1963,31 +1972,33 @@
                 totalDamage: gameState.currentStats.totalDamage
             };
 
-            // 의심스러운 패턴 검출 시 저장하되 경고 로그만 남김 (로컬 플레이 허용)
-            // * 중요: 로컬 저장은 무조건 수행해야 함 (새로고침 시 데이터 유지 위해)
-            if (dataValidator.detectSuspiciousPatterns(currentRecords)) {
-                console.warn('의심스러운 기록 패턴 감지됨 - 랭킹 업로드만 제한됩니다');
-                // 로컬 저장만 수행
-                localStorageHelper.save('bestRecords', gameState.bestRecords);
-                return;
-            }
-
-            // 각 기록별 검증 및 업데이트 (검증 로직 완화)
             let hasNewRecord = false;
 
-            // 레벨: 단순 비교 (검증 조건 제거 또는 완화)
+            // 로컬에 저장된 최고 기록을 먼저 불러와서 최신화
+            // (게임 도중 다른 탭에서 플레이했을 수도 있으므로)
+            const savedRecords = localStorageHelper.load('bestRecords') || {
+                level: 0, problemsSolved: 0, totalDamage: 0, maxHp: 0, maxAttack: 0, maxDefense: 0
+            };
+
+            // 비교 기준을 gameState.bestRecords(메모리)와 savedRecords(저장소) 중 더 높은 것으로 설정
+            gameState.bestRecords.level = Math.max(gameState.bestRecords.level, savedRecords.level);
+            gameState.bestRecords.problemsSolved = Math.max(gameState.bestRecords.problemsSolved, savedRecords.problemsSolved);
+            gameState.bestRecords.totalDamage = Math.max(gameState.bestRecords.totalDamage, savedRecords.totalDamage);
+            gameState.bestRecords.maxHp = Math.max(gameState.bestRecords.maxHp, savedRecords.maxHp);
+            gameState.bestRecords.maxAttack = Math.max(gameState.bestRecords.maxAttack, savedRecords.maxAttack);
+            gameState.bestRecords.maxDefense = Math.max(gameState.bestRecords.maxDefense, savedRecords.maxDefense);
+
+            // 각 기록별 검증 및 업데이트 (단순 비교)
             if (gameState.level > gameState.bestRecords.level) {
                 gameState.bestRecords.level = gameState.level;
                 hasNewRecord = true;
             }
 
-            // 문제 수: 단순 비교
             if (gameState.currentStats.problemsSolved > gameState.bestRecords.problemsSolved) {
                 gameState.bestRecords.problemsSolved = gameState.currentStats.problemsSolved;
                 hasNewRecord = true;
             }
 
-            // 피해량: 단순 비교
             if (gameState.currentStats.totalDamage > gameState.bestRecords.totalDamage) {
                 gameState.bestRecords.totalDamage = gameState.currentStats.totalDamage;
                 hasNewRecord = true;
@@ -1997,7 +2008,7 @@
             const playerStats = gameState.player;
             if (playerStats.maxHp > gameState.bestRecords.maxHp) {
                 gameState.bestRecords.maxHp = playerStats.maxHp;
-                hasNewRecord = true; // 스탯만 올라도 저장해야 함
+                hasNewRecord = true;
             }
             if (playerStats.attack > gameState.bestRecords.maxAttack) {
                 gameState.bestRecords.maxAttack = playerStats.attack;
@@ -2009,13 +2020,20 @@
             }
 
             if (hasNewRecord) {
+                // 1. 로컬 저장 (무조건 수행)
                 const success = localStorageHelper.save('bestRecords', gameState.bestRecords);
-
                 if (success) {
-                    console.log('최고 기록 저장됨:', gameState.bestRecords);
+                    console.log('최고 기록 로컬 저장 성공:', gameState.bestRecords);
+                } else {
+                    console.error('최고 기록 로컬 저장 실패');
+                }
+
+                // 2. 랭킹 업로드 (조건부 수행)
+                // 의심스러운 패턴이 아닐 때만 업로드
+                if (!dataValidator.detectSuspiciousPatterns(currentRecords)) {
                     await uploadToRanking();
                 } else {
-                    console.error('최고 기록 저장 실패');
+                    console.warn('의심스러운 패턴 감지 - 랭킹 업로드 생략');
                 }
             }
         }
