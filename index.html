@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.39</title>
+  <title>소수의 검: 수학 악마 전쟁1.391</title>
   <style>
         * {
             box-sizing: border-box;
@@ -990,7 +990,7 @@
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.39</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.391</h1>  
    <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
        <button class="ranking-btn" onclick="openCheat()" style="position: static;">🎮 개발자 기능</button>
        <span style="font-size: 0.9rem; color: #e53e3e; font-weight: bold; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; border: 1px solid #e53e3e;">
@@ -1972,58 +1972,38 @@
                 totalDamage: gameState.currentStats.totalDamage
             };
 
-            let hasNewRecord = false;
-
-            // 로컬에 저장된 최고 기록을 먼저 불러와서 최신화
-            // (게임 도중 다른 탭에서 플레이했을 수도 있으므로)
+            // 중요: 먼저 최신 데이터를 로컬 스토리지에서 로드합니다.
+            // (다른 탭이나 이전 세션에서 저장된 더 높은 기록이 있을 수 있음)
             const savedRecords = localStorageHelper.load('bestRecords') || {
                 level: 0, problemsSolved: 0, totalDamage: 0, maxHp: 0, maxAttack: 0, maxDefense: 0
             };
 
-            // 비교 기준을 gameState.bestRecords(메모리)와 savedRecords(저장소) 중 더 높은 것으로 설정
-            gameState.bestRecords.level = Math.max(gameState.bestRecords.level, savedRecords.level);
-            gameState.bestRecords.problemsSolved = Math.max(gameState.bestRecords.problemsSolved, savedRecords.problemsSolved);
-            gameState.bestRecords.totalDamage = Math.max(gameState.bestRecords.totalDamage, savedRecords.totalDamage);
-            gameState.bestRecords.maxHp = Math.max(gameState.bestRecords.maxHp, savedRecords.maxHp);
-            gameState.bestRecords.maxAttack = Math.max(gameState.bestRecords.maxAttack, savedRecords.maxAttack);
-            gameState.bestRecords.maxDefense = Math.max(gameState.bestRecords.maxDefense, savedRecords.maxDefense);
+            let hasNewRecord = false;
 
-            // 각 기록별 검증 및 업데이트 (단순 비교)
-            if (gameState.level > gameState.bestRecords.level) {
-                gameState.bestRecords.level = gameState.level;
-                hasNewRecord = true;
-            }
+            // 로컬 스토리지의 값과 현재 메모리 값 중 더 큰 것을 '메모리(gameState)'에 반영
+            // 이렇게 해야 이번 세션의 최고 기록이 누적됩니다.
+            gameState.bestRecords.level = Math.max(gameState.bestRecords.level, savedRecords.level, gameState.level);
+            gameState.bestRecords.problemsSolved = Math.max(gameState.bestRecords.problemsSolved, savedRecords.problemsSolved, gameState.currentStats.problemsSolved);
+            gameState.bestRecords.totalDamage = Math.max(gameState.bestRecords.totalDamage, savedRecords.totalDamage, gameState.currentStats.totalDamage);
+            gameState.bestRecords.maxHp = Math.max(gameState.bestRecords.maxHp, savedRecords.maxHp, gameState.player.maxHp);
+            gameState.bestRecords.maxAttack = Math.max(gameState.bestRecords.maxAttack, savedRecords.maxAttack, gameState.player.attack);
+            gameState.bestRecords.maxDefense = Math.max(gameState.bestRecords.maxDefense, savedRecords.maxDefense, gameState.player.defense);
 
-            if (gameState.currentStats.problemsSolved > gameState.bestRecords.problemsSolved) {
-                gameState.bestRecords.problemsSolved = gameState.currentStats.problemsSolved;
-                hasNewRecord = true;
-            }
+            // 값이 갱신되었는지 확인 (단순 비교가 아니라 저장된 값보다 커졌는지 확인)
+            if (gameState.bestRecords.level > savedRecords.level) hasNewRecord = true;
+            if (gameState.bestRecords.problemsSolved > savedRecords.problemsSolved) hasNewRecord = true;
+            if (gameState.bestRecords.totalDamage > savedRecords.totalDamage) hasNewRecord = true;
+            if (gameState.bestRecords.maxHp > savedRecords.maxHp) hasNewRecord = true;
+            if (gameState.bestRecords.maxAttack > savedRecords.maxAttack) hasNewRecord = true;
+            if (gameState.bestRecords.maxDefense > savedRecords.maxDefense) hasNewRecord = true;
 
-            if (gameState.currentStats.totalDamage > gameState.bestRecords.totalDamage) {
-                gameState.bestRecords.totalDamage = gameState.currentStats.totalDamage;
-                hasNewRecord = true;
-            }
-
-            // 플레이어 스탯 기록 업데이트
-            const playerStats = gameState.player;
-            if (playerStats.maxHp > gameState.bestRecords.maxHp) {
-                gameState.bestRecords.maxHp = playerStats.maxHp;
-                hasNewRecord = true;
-            }
-            if (playerStats.attack > gameState.bestRecords.maxAttack) {
-                gameState.bestRecords.maxAttack = playerStats.attack;
-                hasNewRecord = true;
-            }
-            if (playerStats.defense > gameState.bestRecords.maxDefense) {
-                gameState.bestRecords.maxDefense = playerStats.defense;
-                hasNewRecord = true;
-            }
-
+            // 변경사항이 있을 때만 저장 및 업로드 수행
             if (hasNewRecord) {
-                // 1. 로컬 저장 (무조건 수행)
+                // 1. 로컬 저장 (무조건 수행 - 여기가 핵심)
                 const success = localStorageHelper.save('bestRecords', gameState.bestRecords);
                 if (success) {
                     console.log('최고 기록 로컬 저장 성공:', gameState.bestRecords);
+                    updateRecordsDisplay(); // 저장 후 즉시 화면 갱신
                 } else {
                     console.error('최고 기록 로컬 저장 실패');
                 }
