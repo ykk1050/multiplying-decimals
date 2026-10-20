@@ -470,6 +470,39 @@
             margin: 8px 0 2px;
         }
 
+        .hero-card-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 6px;
+            font-size: 0.75rem;
+            color: #4a5568;
+            margin-bottom: 6px;
+            text-align: left;
+        }
+
+        .hero-card-skill {
+            font-size: 0.75rem;
+            color: #805ad5;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .skill-card.exclusive {
+            border-color: #ed8936;
+            background: linear-gradient(145deg, #fffaf0, #feebc8);
+        }
+
+        .exclusive-badge {
+            display: inline-block;
+            background: #ed8936;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+
         .hero-card-desc {
             font-size: 0.8rem;
             color: #718096;
@@ -1294,7 +1327,7 @@
     </div>
     <div class="upgrade-section" id="upgradeSection">
      <h3 style="color: #744210; margin-bottom: 10px;">정답입니다! 💰5코인을 얻었습니다. 능력치를 선택하여 강화하세요:</h3>
-     <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" onclick="upgradePlayer('defense')">방어력 +1</button> <button class="upgrade-btn upgrade-mana" onclick="upgradePlayer('mana')">🔮 최대 마나 +5</button>
+     <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" id="upgradeHpBtn" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" id="upgradeAttackBtn" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" id="upgradeDefenseBtn" onclick="upgradePlayer('defense')">방어력 +1</button> <button class="upgrade-btn upgrade-mana" id="upgradeManaBtn" onclick="upgradePlayer('mana')">🔮 최대 마나 +5</button>
      </div>
     </div>
     <div class="skills-container">
@@ -1334,7 +1367,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.396</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.397</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -1560,7 +1593,7 @@
             ownedSkills: [], 
             username: '익명',
 
-            player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20 },
+            player: { hp: 100, maxHp: 100, attack: 15, defense: 10, mana: 0, maxMana: 20, upgrades: { hp: 0, attack: 0, defense: 0, mana: 0 } },
             villain: { hp: 80, maxHp: 80, attack: 12, defense: 8 },
             currentProblem: { num1: 0.5, num2: 2, answer: 1.0 },
             battleInterval: null,
@@ -1738,14 +1771,80 @@
         }
 
         // 용사 캐릭터: 상점에서 구매 후 선택 (구매 기록은 게임오버 후에도 유지)
+        // stats: 기본 능력치 / growth: 강화 1회당 오르는 양 / skill: 전용기
         const HEROES = [
-            { id: 'knight', name: '용사', description: '룬 검을 든 기본 용사', image: 'hero.png', cost: 0 },
-            { id: 'mage', name: '마법사', description: '별빛 지팡이의 마법사', image: 'images/hero_mage.webp', cost: 100 },
-            { id: 'archer', name: '궁수', description: '숲의 요정 궁수', image: 'images/hero_archer.webp', cost: 150 },
-            { id: 'paladin', name: '성기사', description: '빛의 방패를 든 성기사', image: 'images/hero_paladin.webp', cost: 200 },
-            { id: 'ninja', name: '닌자', description: '그림자 속의 쌍검 닌자', image: 'images/hero_ninja.webp', cost: 250 },
-            { id: 'dragon', name: '용기사', description: '용의 힘을 깨운 기사', image: 'images/hero_dragon.webp', cost: 300 }
+            { id: 'knight', name: '용사', description: '모든 능력이 고른 기본 용사', image: 'hero.png', cost: 0,
+              stats: { hp: 100, attack: 15, defense: 10, mana: 20 }, growth: { hp: 20, attack: 5, defense: 1, mana: 5 }, skill: 'rune_slash' },
+            { id: 'mage', name: '마법사', description: '마나가 많고 몸이 약한 마법사', image: 'images/hero_mage.webp', cost: 100,
+              stats: { hp: 80, attack: 12, defense: 7, mana: 40 }, growth: { hp: 15, attack: 4, defense: 1, mana: 10 }, skill: 'star_storm' },
+            { id: 'archer', name: '궁수', description: '빠르고 정확한 요정 궁수', image: 'images/hero_archer.webp', cost: 150,
+              stats: { hp: 90, attack: 18, defense: 8, mana: 25 }, growth: { hp: 18, attack: 6, defense: 1, mana: 6 }, skill: 'arrow_rain' },
+            { id: 'paladin', name: '성기사', description: '튼튼한 방패의 수호자', image: 'images/hero_paladin.webp', cost: 200,
+              stats: { hp: 130, attack: 13, defense: 14, mana: 25 }, growth: { hp: 26, attack: 4, defense: 2, mana: 6 }, skill: 'holy_judgment' },
+            { id: 'ninja', name: '닌자', description: '공격력이 가장 날카로운 닌자', image: 'images/hero_ninja.webp', cost: 250,
+              stats: { hp: 85, attack: 21, defense: 8, mana: 20 }, growth: { hp: 16, attack: 7, defense: 1, mana: 5 }, skill: 'shadow_raid' },
+            { id: 'dragon', name: '용기사', description: '힘과 체력을 모두 갖춘 기사', image: 'images/hero_dragon.webp', cost: 300,
+              stats: { hp: 115, attack: 18, defense: 11, mana: 30 }, growth: { hp: 22, attack: 6, defense: 1, mana: 7 }, skill: 'dragon_breath' }
         ];
+
+        function getSelectedHero() {
+            return HEROES.find(h => h.id === getHeroData().selected) || HEROES[0];
+        }
+
+        function emptyUpgrades() {
+            return { hp: 0, attack: 0, defense: 0, mana: 0 };
+        }
+
+        // 기본 능력치 + (강화 횟수 × 캐릭터별 성장량)
+        function computeHeroStats(hero, upgrades) {
+            return {
+                maxHp: hero.stats.hp + upgrades.hp * hero.growth.hp,
+                attack: hero.stats.attack + upgrades.attack * hero.growth.attack,
+                defense: hero.stats.defense + upgrades.defense * hero.growth.defense,
+                maxMana: hero.stats.mana + upgrades.mana * hero.growth.mana
+            };
+        }
+
+        // 캐릭터 기준으로 능력치를 다시 계산 (현재 체력/마나 비율은 유지)
+        function applyHeroStats() {
+            const player = gameState.player;
+            if (!player.upgrades) player.upgrades = emptyUpgrades();
+            const next = computeHeroStats(getSelectedHero(), player.upgrades);
+            const hpRatio = player.maxHp > 0 ? player.hp / player.maxHp : 1;
+            const manaRatio = player.maxMana > 0 ? player.mana / player.maxMana : 0;
+            player.maxHp = next.maxHp;
+            player.attack = next.attack;
+            player.defense = next.defense;
+            player.maxMana = next.maxMana;
+            player.hp = Math.max(player.hp > 0 ? 1 : 0, Math.min(next.maxHp, Math.round(next.maxHp * hpRatio)));
+            player.mana = Math.min(next.maxMana, Math.round(next.maxMana * manaRatio));
+            updateUpgradeButtons();
+        }
+
+        function updateUpgradeButtons() {
+            const g = getSelectedHero().growth;
+            document.getElementById('upgradeHpBtn').textContent = `체력 +${g.hp}`;
+            document.getElementById('upgradeAttackBtn').textContent = `공격력 +${g.attack}`;
+            document.getElementById('upgradeDefenseBtn').textContent = `방어력 +${g.defense}`;
+            document.getElementById('upgradeManaBtn').textContent = `🔮 최대 마나 +${g.mana}`;
+        }
+
+        // 전용기는 해당 캐릭터를 선택했을 때만 구매/사용 가능
+        function isSkillAvailable(skill) {
+            return !skill.hero || skill.hero === getSelectedHero().id;
+        }
+
+        function getSkillDamage(skill) {
+            const base = skill.damage + Math.floor(gameState.player.attack * (skill.attackScale || 0));
+            return base * (skill.hits || 1);
+        }
+
+        function getSkillDamageText(skill) {
+            let text = `${skill.damage}`;
+            if (skill.attackScale) text += ` + 공격력${skill.attackScale === 1 ? '' : '×' + skill.attackScale}`;
+            if (skill.hits) text = `(${text}) × ${skill.hits}회`;
+            return text;
+        }
 
         function getHeroData() {
             const saved = localStorageHelper.load('heroData');
@@ -1756,11 +1855,14 @@
         }
 
         function applyHero() {
-            const hero = HEROES.find(h => h.id === getHeroData().selected) || HEROES[0];
+            const hero = getSelectedHero();
             const img = document.getElementById('heroImage');
             img.src = hero.image;
             img.alt = hero.name;
             document.getElementById('playerName').textContent = hero.name;
+            applyHeroStats();
+            renderSkillButtons();
+            updateDisplay();
         }
 
         function renderHeroShop() {
@@ -1787,6 +1889,11 @@
                     <img src="${hero.image}" alt="${hero.name}">
                     <div class="hero-card-name">${hero.name}</div>
                     <div class="hero-card-desc">${hero.description}</div>
+                    <div class="hero-card-stats">
+                        <span>❤️ 체력 ${hero.stats.hp}</span><span>⚔️ 공격 ${hero.stats.attack}</span>
+                        <span>🛡️ 방어 ${hero.stats.defense}</span><span>🔮 마나 ${hero.stats.mana}</span>
+                    </div>
+                    <div class="hero-card-skill">전용기: ${SKILLS[hero.skill].name}</div>
                     ${action}
                 `;
                 container.appendChild(card);
@@ -1808,11 +1915,10 @@
             data.selected = heroId;
             localStorageHelper.save('heroData', data);
 
-            addBattleLog(`🦸 ${hero.name}(으)로 변신했습니다!`);
+            addBattleLog(`🦸 ${hero.name}(으)로 변신했습니다! 능력치가 ${hero.name}에 맞게 바뀌었습니다.`);
             playupgradeSound();
             applyHero();
             renderShop();
-            updateDisplay();
             saveGameProgress();
         }
 
@@ -1822,7 +1928,9 @@
             data.selected = heroId;
             localStorageHelper.save('heroData', data);
             applyHero();
+            addBattleLog(`🦸 ${getSelectedHero().name}(으)로 변신했습니다! 능력치가 ${getSelectedHero().name}에 맞게 바뀌었습니다.`);
             renderShop();
+            saveGameProgress();
         }
 
         const SKILLS = {
@@ -1870,6 +1978,67 @@
                 cost: 150,
                 useCost: { type: 'both', hp: 20, mana: 30 },
                 damage: 200
+            },
+            // ===== 캐릭터 전용기 (damage + 공격력 × attackScale, hits번 공격) =====
+            rune_slash: {
+                id: 'rune_slash', hero: 'knight',
+                name: '🗡️ 룬 검 일섬',
+                description: '룬 검에 힘을 모아 베기',
+                icon: '🗡️',
+                cost: 90,
+                useCost: { type: 'mana', amount: 20 },
+                damage: 70, attackScale: 1,
+                effect: 'fullpower'
+            },
+            star_storm: {
+                id: 'star_storm', hero: 'mage',
+                name: '✨ 별빛 폭풍',
+                description: '하늘의 별을 쏟아붓는 대마법',
+                icon: '✨',
+                cost: 110,
+                useCost: { type: 'mana', amount: 35 },
+                damage: 130, attackScale: 1,
+                effect: 'meteor'
+            },
+            arrow_rain: {
+                id: 'arrow_rain', hero: 'archer',
+                name: '🏹 천공의 화살비',
+                description: '마법 화살 3발 연속 발사',
+                icon: '🏹',
+                cost: 120,
+                useCost: { type: 'mana', amount: 20 },
+                damage: 25, attackScale: 0.5, hits: 3,
+                effect: 'heroattack'
+            },
+            holy_judgment: {
+                id: 'holy_judgment', hero: 'paladin',
+                name: '☀️ 성스러운 심판',
+                description: '빛으로 공격하고 체력 30% 회복',
+                icon: '☀️',
+                cost: 130,
+                useCost: { type: 'mana', amount: 25 },
+                damage: 50, attackScale: 1, healRatio: 0.3,
+                effect: 'ultimate'
+            },
+            shadow_raid: {
+                id: 'shadow_raid', hero: 'ninja',
+                name: '🌑 그림자 습격',
+                description: '그림자 속에서 급소를 노리는 일격',
+                icon: '🌑',
+                cost: 140,
+                useCost: { type: 'hp', amount: 15 },
+                damage: 60, attackScale: 1.5,
+                effect: 'berserk'
+            },
+            dragon_breath: {
+                id: 'dragon_breath', hero: 'dragon',
+                name: '🐉 용의 숨결',
+                description: '아기 용과 함께 뿜는 거대한 불길',
+                icon: '🐉',
+                cost: 160,
+                useCost: { type: 'both', hp: 15, mana: 25 },
+                damage: 150, attackScale: 1.5,
+                effect: 'explosion'
             }
         };
 
@@ -2036,6 +2205,17 @@
         // 페이지 로드 시 SDK 초기화
         initializeSDKs(); */ 
 
+        // 이전 버전 저장 데이터: 기본 용사 기준 능력치에서 강화 횟수를 계산
+        function estimateUpgrades(saved) {
+            const count = (value, base, step) => Math.max(0, Math.round(((Number(value) || base) - base) / step));
+            return {
+                hp: count(saved.player_max_hp, 100, 20),
+                attack: count(saved.player_attack, 15, 5),
+                defense: count(saved.player_defense, 10, 1),
+                mana: count(saved.player_max_mana, 20, 5)
+            };
+        }
+
         // 게임 진행 상황 불러오기 (검증 완화: 정상 데이터 삭제 방지)
         function loadGameProgress() {
             const savedProgress = localStorageHelper.load('gameProgress');
@@ -2055,7 +2235,8 @@
                     attack: Math.min(savedProgress.player_attack, 500000), // 50만 공격력까지 허용
                     defense: Math.min(savedProgress.player_defense, 200000), 
                     mana: Math.min(savedProgress.player_mana, savedProgress.player_max_mana || 20),
-                    maxMana: Math.min(savedProgress.player_max_mana || 20, 10000) 
+                    maxMana: Math.min(savedProgress.player_max_mana || 20, 10000),
+                    upgrades: savedProgress.player_upgrades || estimateUpgrades(savedProgress)
                 };
 
                 const levelMultiplier = 1 + (gameState.level - 1) * 0.3;
@@ -2116,6 +2297,7 @@
                 player_defense: gameState.player.defense,
                 player_mana: gameState.player.mana,
                 player_max_mana: gameState.player.maxMana,
+                player_upgrades: gameState.player.upgrades,
                 villain_hp: gameState.villain.hp, // 현재 빌런 체력 저장
                 villain_max_hp: gameState.villain.maxHp, // 빌런 최대 체력 저장
                 villain_attack: gameState.villain.attack,
@@ -2503,31 +2685,25 @@
 
         // 플레이어 강화
         function upgradePlayer(stat) {
-            switch(stat) {
-                case 'hp':
-                    gameState.player.maxHp += 20;
-                    gameState.player.hp += 20;
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 체력이 20 증가했습니다!`);
-                    playupgradeSound()
-                    break;
-                case 'attack':
-                    gameState.player.attack += 5;
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 공격력이 5 증가했습니다!`);
-                    playupgradeSound()
-                    break;
-                case 'defense':
-                    gameState.player.defense += 1;
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 방어력이 1 증가했습니다!`);
-                    playupgradeSound()
-                    break;
-                // 👇 이 부분 추가!
-                case 'mana':
-                    gameState.player.maxMana += 5;
-                    gameState.player.mana += 5;  // 최대 마나 증가와 함께 현재 마나도 5 증가
-                    addBattleLog(`${document.getElementById('playerName').textContent}의 최대 마나가 5 증가했습니다!`);
-                    playupgradeSound();
-                    break;    
-            }
+            const hero = getSelectedHero();
+            const g = hero.growth;
+            const player = gameState.player;
+            if (!player.upgrades) player.upgrades = emptyUpgrades();
+            if (!(stat in player.upgrades)) return;
+
+            // 강화 횟수를 기록하고, 캐릭터별 성장량만큼 능력치 증가
+            player.upgrades[stat]++;
+            const next = computeHeroStats(hero, player.upgrades);
+            player.maxHp = next.maxHp;
+            player.attack = next.attack;
+            player.defense = next.defense;
+            player.maxMana = next.maxMana;
+
+            const labels = { hp: ['체력', g.hp], attack: ['공격력', g.attack], defense: ['방어력', g.defense], mana: ['최대 마나', g.mana] };
+            if (stat === 'hp') player.hp = Math.min(player.maxHp, player.hp + g.hp);
+            if (stat === 'mana') player.mana = Math.min(player.maxMana, player.mana + g.mana);
+            addBattleLog(`${hero.name}의 ${labels[stat][0]}이(가) ${labels[stat][1]} 증가했습니다!`);
+            playupgradeSound();
             
             updateDisplay();
             saveGameProgress();
@@ -2765,12 +2941,13 @@
             const shopElement = document.getElementById('skillShop');
             shopElement.innerHTML = '';
             
-            Object.values(SKILLS).forEach(skill => {
+            const skillList = Object.values(SKILLS).filter(isSkillAvailable).sort((a, b) => (b.hero ? 1 : 0) - (a.hero ? 1 : 0));
+            skillList.forEach(skill => {
                 const owned = gameState.ownedSkills.includes(skill.id);
                 const canBuy = gameState.coins >= skill.cost && !owned;
-                
+
                 const card = document.createElement('div');
-                card.className = 'skill-card';
+                card.className = 'skill-card' + (skill.hero ? ' exclusive' : '');
                 
                 let useCostText = '';
                 if (skill.useCost.type === 'mana') {
@@ -2782,12 +2959,13 @@
                 }
                 
                 card.innerHTML = `
+                    ${skill.hero ? `<div class="exclusive-badge">${getSelectedHero().name} 전용기</div>` : ''}
                     <div class="skill-icon">${skill.icon}</div>
                     <div class="skill-name">${skill.name}</div>
                     <div class="skill-description">${skill.description}</div>
                     <div class="skill-cost">💰 ${skill.cost} 코인</div>
                     <div class="skill-use-cost">사용: ${useCostText}</div>
-                    <div class="skill-use-cost">데미지: ${skill.damage}</div>
+                    <div class="skill-use-cost">데미지: ${getSkillDamageText(skill)}</div>
                     ${owned ? 
                         '<div class="owned-badge">✅ 보유중</div>' :
                         `<button class="buy-skill-btn" onclick="buySkill('${skill.id}')" ${!canBuy ? 'disabled' : ''}>
@@ -2802,7 +2980,7 @@
         // 스킬 구매
         function buySkill(skillId) {
             const skill = SKILLS[skillId];
-            if (!skill) return;
+            if (!skill || !isSkillAvailable(skill)) return;
             
             if (gameState.coins < skill.cost) {
                 addBattleLog('❌ 코인이 부족합니다!');
@@ -2833,8 +3011,8 @@
             
             gameState.ownedSkills.forEach(skillId => {
                 const skill = SKILLS[skillId];
-                if (!skill) return;
-                
+                if (!skill || !isSkillAvailable(skill)) return;
+
                 const btn = document.createElement('button');
                 btn.id = `skill-${skillId}`;
                 btn.className = 'skill-use-btn';
@@ -2887,8 +3065,8 @@
             if (!gameState.gameActive) return;
             
             const skill = SKILLS[skillId];
-            if (!skill) return;
-            
+            if (!skill || !isSkillAvailable(skill)) return;
+
             // 비용 체크
             if (skill.useCost.type === 'mana' && gameState.player.mana < skill.useCost.amount) {
                 addBattleLog(`❌ 마나가 부족합니다! (필요: ${skill.useCost.amount})`);
@@ -2916,7 +3094,7 @@
             }
             
             // 데미지 적용 (검증 포함)
-            let damage = skill.damage;
+            let damage = getSkillDamage(skill);
 
             // 스킬 피해량 제한 확인 (레벨당 최대 피해량의 50% 이내)
             const maxSkillDamage = Math.floor(gameState.level * GAME_LIMITS.MAX_DAMAGE_PER_LEVEL * 0.5);
@@ -2942,8 +3120,24 @@
             
             addBattleLog(`${skill.icon} ${skill.name} 사용! ${damage} 데미지!`);
 
+            if (skill.healRatio) {
+                const heal = Math.floor(gameState.player.maxHp * skill.healRatio);
+                gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + heal);
+                addBattleLog(`💖 빛의 힘으로 체력을 ${heal} 회복했습니다!`);
+            }
+
             // 스킬별 효과음 및 이펙트
-            if (skillId === 'fireball') {
+            if (skill.hero) {
+                const sounds = { fullpower: playfullpowerSound, meteor: playmeteoSound, heroattack: playHeroAttackSound,
+                                 ultimate: playhealingSound, berserk: playberserkSound, explosion: playFireballSound };
+                (sounds[skill.effect] || playHeroAttackSound)();
+                triggerHitEffect(skill.effect);
+                if (skill.hits > 1) {
+                    for (let i = 1; i < skill.hits; i++) {
+                        setTimeout(() => { playHeroAttackSound(); triggerHitEffect(skill.effect); }, i * 350);
+                    }
+                }
+            } else if (skillId === 'fireball') {
                 playFireballSound();
                 triggerHitEffect('explosion');
             } else if (skillId === 'fullpower') {
@@ -3084,12 +3278,14 @@
             gameState.ownedSkills = []; // 배열 초기화
             gameState.ownedSkills.length = 0; // 배열 비우기 (Proxy 호환성)
             
-            gameState.player.hp = 100;
-            gameState.player.maxHp = 100;
-            gameState.player.attack = 15;
-            gameState.player.defense = 10;
+            gameState.player.upgrades = emptyUpgrades();
+            const startStats = computeHeroStats(getSelectedHero(), gameState.player.upgrades);
+            gameState.player.maxHp = startStats.maxHp;
+            gameState.player.hp = startStats.maxHp;
+            gameState.player.attack = startStats.attack;
+            gameState.player.defense = startStats.defense;
             gameState.player.mana = 0;
-            gameState.player.maxMana = 20;
+            gameState.player.maxMana = startStats.maxMana;
             
             gameState.villain.hp = 80;
             gameState.villain.maxHp = 80;
