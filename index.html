@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>소수의 검: 수학 악마 전쟁1.392</title>
+  <title>소수의 검: 수학 악마 전쟁</title>
   <style>
         * {
             box-sizing: border-box;
@@ -985,12 +985,20 @@
             }
         }
 
+        .app-footer {
+            text-align: center;
+            margin: 24px 0 8px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.02em;
+        }
+
     </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
  <body>
   <div class="game-container">
-   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁1.392</h1>  
+   <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁</h1>  
    <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
        <button class="ranking-btn" onclick="openCheat()" style="position: static;">🎮 개발자 기능</button>
        <span style="font-size: 0.9rem; color: #e53e3e; font-weight: bold; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; border: 1px solid #e53e3e;">
@@ -1207,6 +1215,7 @@
         </div>
     </div>
   </div>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.392</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
