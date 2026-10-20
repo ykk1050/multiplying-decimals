@@ -235,7 +235,7 @@
             align-items: flex-start;
             justify-content: center;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-top: 12px;
             font-size: 0.95rem;
             font-weight: bold;
             color: #c53030;
@@ -251,7 +251,15 @@
             cursor: pointer;
         }
 
-        .username-input:disabled,
+        .privacy-check.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .privacy-check.disabled input {
+            cursor: not-allowed;
+        }
+
         .username-save-btn:disabled {
             opacity: 0.45;
             cursor: not-allowed;
@@ -1243,7 +1251,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.394</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.395</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -1264,14 +1272,14 @@
         
         <!-- 사용자 이름 설정 -->
         <div class="username-section">
-            <label class="privacy-check">
-                <input type="checkbox" id="privacyCheck" onchange="updatePrivacyCheck()">
-                <span>⚠️ 닉네임에 이름, 학교, 학년·반·번호, 전화번호 등 개인정보가 들어가지 않았는지 확인했습니다.</span>
-            </label>
             <div>
-                <input type="text" class="username-input" id="usernameInput" placeholder="먼저 위 내용을 체크하세요" maxlength="10" disabled>
+                <input type="text" class="username-input" id="usernameInput" placeholder="닉네임을 입력하세요" maxlength="10" oninput="onUsernameInput()">
                 <button class="username-save-btn" id="usernameSaveBtn" onclick="saveUsername()" disabled>닉네임 저장</button>
             </div>
+            <label class="privacy-check" id="privacyCheckLabel">
+                <input type="checkbox" id="privacyCheck" onchange="updatePrivacyCheck()" disabled>
+                <span>⚠️ 닉네임에 이름, 학교, 학년·반·번호, 전화번호 등 개인정보가 들어가지 않았는지 확인했습니다.</span>
+            </label>
             <div class="current-username" id="currentUsername">현재 닉네임: 익명</div>
         </div>
         
@@ -2946,13 +2954,20 @@
             }
         }
 
-        // 개인정보 확인 체크박스: 체크해야 닉네임 입력/저장 가능
+        // 개인정보 확인 체크박스: 닉네임 입력 후 체크해야 저장 가능
         function updatePrivacyCheck() {
-            const checked = document.getElementById('privacyCheck').checked;
-            const input = document.getElementById('usernameInput');
-            input.disabled = !checked;
-            input.placeholder = checked ? '닉네임을 입력하세요' : '먼저 위 내용을 체크하세요';
-            document.getElementById('usernameSaveBtn').disabled = !checked;
+            const hasName = document.getElementById('usernameInput').value.trim() !== '';
+            const check = document.getElementById('privacyCheck');
+            check.disabled = !hasName;
+            if (!hasName) check.checked = false;
+            document.getElementById('privacyCheckLabel').classList.toggle('disabled', !hasName);
+            document.getElementById('usernameSaveBtn').disabled = !(hasName && check.checked);
+        }
+
+        // 닉네임을 고치면 다시 확인하도록 체크 해제
+        function onUsernameInput() {
+            document.getElementById('privacyCheck').checked = false;
+            updatePrivacyCheck();
         }
 
         function resetPrivacyCheck() {
