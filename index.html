@@ -425,6 +425,89 @@
             text-align: center;
         }
 
+        /* 용사 선택 */
+        .shop-section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin: 20px 0 10px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 14px;
+        }
+
+        .hero-card {
+            background: linear-gradient(145deg, #f7fafc, #edf2f7);
+            border: 3px solid #cbd5e0;
+            border-radius: 15px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .hero-card.selected {
+            border-color: #ed8936;
+            box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.3);
+        }
+
+        .hero-card img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .hero-card.locked img {
+            filter: grayscale(0.7) brightness(0.8);
+        }
+
+        .hero-card-name {
+            font-weight: bold;
+            color: #2d3748;
+            margin: 8px 0 2px;
+        }
+
+        .hero-card-desc {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-bottom: 8px;
+            min-height: 2.2em;
+        }
+
+        .hero-card button {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .hero-card button.select-btn {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+        }
+
+        .hero-card button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        /* 마왕 변신 연출 */
+        .villain-transform {
+            animation: villainTransform 1s ease-out;
+        }
+
+        @keyframes villainTransform {
+            0% { filter: brightness(3) saturate(0); transform: scale(0.8); }
+            60% { filter: brightness(1.5); transform: scale(1.08); }
+            100% { filter: none; transform: scale(1); }
+        }
+
         .shop-coin-info {
             text-align: center;
             margin-bottom: 25px;
@@ -1111,7 +1194,7 @@
         <div class="character-content">
             <div class="character-left">
                 <div class="character-avatar player-avatar">
-                    <img src="hero.png" alt="용사" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img id="heroImage" src="hero.png" alt="용사" style="width: 100%; height: 100%; object-fit: cover;">
                     <img id="devilattack" src="devilattack.gif" alt="악마 타격 효과" class="devil-attack-gif">
                     <img id="firebreak" src="firbreak.gif" alt="불꽃 공격" class="devil-attack-gif">  <!-- 추가 -->
 
@@ -1160,7 +1243,7 @@
         <div class="character-content">
             <div class="character-left">
                 <div class="character-avatar villain-avatar">
-                    <img src="devilking.png" alt="수학 마왕" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img id="villainImage" src="devilking.png" alt="수학 마왕" style="width: 100%; height: 100%; object-fit: cover;">
                     <img id="heroattack" src="heroattack.gif" alt="용사 타격 효과" class="hero-attack-gif">
                     <img id="explosion" src="explosion.gif" alt="폭발 효과" class="hero-attack-gif">  <!-- 추가 -->
                     <img id="fullpower" src="fullpower.gif" alt="강타 효과" class="hero-attack-gif">  <!-- 추가 -->
@@ -1251,7 +1334,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.395</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.396</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -1260,6 +1343,9 @@
         <div class="shop-coin-info">
             보유 코인: <span id="shopCoinAmount">0</span> 💰
         </div>
+        <div class="shop-section-title">🦸 용사 선택 <span style="font-size: 0.85rem; font-weight: normal; color: #718096;">(한 번 구매하면 계속 사용할 수 있어요)</span></div>
+        <div class="hero-grid" id="heroShop"></div>
+        <div class="shop-section-title">✨ 기술</div>
         <div class="skill-grid" id="skillShop"></div>
     </div>
   </div>
@@ -1619,6 +1705,126 @@
         Object.freeze(dataValidator);
         Object.freeze(GAME_LIMITS);
         /* //스킬 */
+        // 마왕 단계: 레벨 10마다 다른 마왕으로 변신 (91레벨부터는 최종 마왕)
+        const VILLAIN_STAGES = [
+            { name: '수학 마왕', image: 'devilking.png' },
+            { name: '화염 마왕', image: 'images/devil2.webp' },
+            { name: '빙결 마왕', image: 'images/devil3.webp' },
+            { name: '독안개 마왕', image: 'images/devil4.webp' },
+            { name: '번개 마왕', image: 'images/devil5.webp' },
+            { name: '대지 마왕', image: 'images/devil6.webp' },
+            { name: '그림자 마왕', image: 'images/devil7.webp' },
+            { name: '시계태엽 마왕', image: 'images/devil8.webp' },
+            { name: '혼돈의 숫자 마왕', image: 'images/devil9.webp' },
+            { name: '최종 마왕', image: 'images/devil10.webp' }
+        ];
+
+        function getVillainStage(level) {
+            return Math.min(VILLAIN_STAGES.length, Math.floor((Math.max(1, level) - 1) / 10) + 1);
+        }
+
+        function applyVillainStage(animate) {
+            const stage = VILLAIN_STAGES[getVillainStage(gameState.level) - 1];
+            const img = document.getElementById('villainImage');
+            if (img.getAttribute('src') !== stage.image) {
+                img.src = stage.image;
+                img.alt = stage.name;
+            }
+            if (animate) {
+                img.classList.remove('villain-transform');
+                void img.offsetWidth;
+                img.classList.add('villain-transform');
+            }
+        }
+
+        // 용사 캐릭터: 상점에서 구매 후 선택 (구매 기록은 게임오버 후에도 유지)
+        const HEROES = [
+            { id: 'knight', name: '용사', description: '룬 검을 든 기본 용사', image: 'hero.png', cost: 0 },
+            { id: 'mage', name: '마법사', description: '별빛 지팡이의 마법사', image: 'images/hero_mage.webp', cost: 100 },
+            { id: 'archer', name: '궁수', description: '숲의 요정 궁수', image: 'images/hero_archer.webp', cost: 150 },
+            { id: 'paladin', name: '성기사', description: '빛의 방패를 든 성기사', image: 'images/hero_paladin.webp', cost: 200 },
+            { id: 'ninja', name: '닌자', description: '그림자 속의 쌍검 닌자', image: 'images/hero_ninja.webp', cost: 250 },
+            { id: 'dragon', name: '용기사', description: '용의 힘을 깨운 기사', image: 'images/hero_dragon.webp', cost: 300 }
+        ];
+
+        function getHeroData() {
+            const saved = localStorageHelper.load('heroData');
+            const owned = (saved && Array.isArray(saved.owned)) ? saved.owned.filter(id => HEROES.some(h => h.id === id)) : [];
+            if (!owned.includes('knight')) owned.unshift('knight');
+            const selected = (saved && owned.includes(saved.selected)) ? saved.selected : 'knight';
+            return { owned, selected };
+        }
+
+        function applyHero() {
+            const hero = HEROES.find(h => h.id === getHeroData().selected) || HEROES[0];
+            const img = document.getElementById('heroImage');
+            img.src = hero.image;
+            img.alt = hero.name;
+            document.getElementById('playerName').textContent = hero.name;
+        }
+
+        function renderHeroShop() {
+            const container = document.getElementById('heroShop');
+            const data = getHeroData();
+            container.innerHTML = '';
+
+            HEROES.forEach(hero => {
+                const owned = data.owned.includes(hero.id);
+                const selected = data.selected === hero.id;
+                const card = document.createElement('div');
+                card.className = 'hero-card' + (selected ? ' selected' : '') + (owned ? '' : ' locked');
+
+                let action;
+                if (selected) {
+                    action = '<button disabled>✅ 사용중</button>';
+                } else if (owned) {
+                    action = `<button class="select-btn" onclick="selectHero('${hero.id}')">선택하기</button>`;
+                } else {
+                    action = `<button onclick="buyHero('${hero.id}')" ${gameState.coins < hero.cost ? 'disabled' : ''}>💰 ${hero.cost} 코인</button>`;
+                }
+
+                card.innerHTML = `
+                    <img src="${hero.image}" alt="${hero.name}">
+                    <div class="hero-card-name">${hero.name}</div>
+                    <div class="hero-card-desc">${hero.description}</div>
+                    ${action}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function buyHero(heroId) {
+            const hero = HEROES.find(h => h.id === heroId);
+            const data = getHeroData();
+            if (!hero || data.owned.includes(heroId)) return;
+
+            if (gameState.coins < hero.cost) {
+                addBattleLog('❌ 코인이 부족합니다!');
+                return;
+            }
+
+            gameState.coins -= hero.cost;
+            data.owned.push(heroId);
+            data.selected = heroId;
+            localStorageHelper.save('heroData', data);
+
+            addBattleLog(`🦸 ${hero.name}(으)로 변신했습니다!`);
+            playupgradeSound();
+            applyHero();
+            renderShop();
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        function selectHero(heroId) {
+            const data = getHeroData();
+            if (!data.owned.includes(heroId)) return;
+            data.selected = heroId;
+            localStorageHelper.save('heroData', data);
+            applyHero();
+            renderShop();
+        }
+
         const SKILLS = {
             fireball: {
                 id: 'fireball',
@@ -1726,6 +1932,9 @@
             // 👇 여기에 추가
             // 사용자 이름 로드
             loadUsername();
+
+            // 선택한 용사 모습 적용
+            applyHero();
             
             // Element SDK 초기화 (있으면)
             if (window.elementSdk) {
@@ -2527,11 +2736,9 @@
             document.getElementById('levelIndicator').textContent = `레벨 ${gameState.level}`;
 
             // ✨ [추가] 마왕 이름에 레벨 표시
-            let baseVillainName = defaultConfig.villain_name;
-            if (window.elementSdk && window.elementSdk.config && window.elementSdk.config.villain_name) {
-                baseVillainName = window.elementSdk.config.villain_name;
-            }
+            const baseVillainName = VILLAIN_STAGES[getVillainStage(gameState.level) - 1].name;
             document.getElementById('villainName').textContent = `Lv${gameState.level} ${baseVillainName}`;
+            applyVillainStage(false);
         }
 
         // 훈련장 열기
@@ -2554,6 +2761,7 @@
 
         // 상점 렌더링
         function renderShop() {
+            renderHeroShop();
             const shopElement = document.getElementById('skillShop');
             shopElement.innerHTML = '';
             
@@ -2846,7 +3054,14 @@
             document.getElementById('answerInput').style.opacity = '1';
             document.getElementById('submitBtn').style.opacity = '1';
             
+            updateDisplay();
+
+            if (getVillainStage(gameState.level) !== getVillainStage(gameState.level - 1)) {
+                applyVillainStage(true);
+                addBattleLog(`😈 마왕이 ${VILLAIN_STAGES[getVillainStage(gameState.level) - 1].name}(으)로 변신했습니다!`);
+            }
             addBattleLog(`레벨 ${gameState.level} 시작! 더 강한 ${document.getElementById('villainName').textContent}이(가) 나타났습니다!`);
+
             
             updateDisplay();
             saveGameProgress();
