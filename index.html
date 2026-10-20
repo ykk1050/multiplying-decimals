@@ -275,6 +275,7 @@
         /* 랭킹 탭 */
         .ranking-tabs {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 20px;
             justify-content: center;
@@ -539,6 +540,190 @@
             0% { filter: brightness(3) saturate(0); transform: scale(0.8); }
             60% { filter: brightness(1.5); transform: scale(1.08); }
             100% { filter: none; transform: scale(1); }
+        }
+
+        /* 약점/내성 표시 */
+        .villain-element, .mastery-badge {
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin: -4px 0 8px;
+        }
+
+        .villain-element { color: #c53030; }
+        .mastery-badge { color: #2f855a; }
+
+        .battle-popup {
+            position: absolute;
+            left: 50%;
+            top: 30%;
+            transform: translateX(-50%);
+            z-index: 20;
+            font-weight: bold;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+            pointer-events: none;
+            animation: popupRise 1.4s ease-out forwards;
+        }
+
+        .battle-popup.weak { color: #ffd700; font-size: 1.3rem; }
+        .battle-popup.resist { color: #cbd5e0; }
+        .battle-popup.fever { color: #ff7a45; font-size: 1.4rem; }
+
+        @keyframes popupRise {
+            0% { opacity: 0; transform: translate(-50%, 10px) scale(0.8); }
+            15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
+            100% { opacity: 0; transform: translate(-50%, -40px) scale(1); }
+        }
+
+        .skill-use-btn.effective {
+            position: relative;
+            box-shadow: 0 0 0 3px #f6e05e, 0 0 14px #f6e05e;
+        }
+
+        .skill-use-btn.effective::before {
+            content: '약점!';
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            background: #e53e3e;
+            color: white;
+            font-size: 0.7rem;
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+
+        .skill-use-btn.resisted { opacity: 0.75; }
+
+        /* 콤보 / 피버 */
+        .combo-display {
+            text-align: center;
+            font-weight: bold;
+            min-height: 1.5em;
+            color: #dd6b20;
+            margin: 6px 0;
+        }
+
+        body.fever-mode .game-container {
+            animation: feverGlow 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes feverGlow {
+            from { box-shadow: 0 0 12px 3px rgba(255, 140, 0, 0.6); }
+            to { box-shadow: 0 0 28px 8px rgba(255, 60, 0, 0.9); }
+        }
+
+        /* 동료 펫 */
+        .pet-float {
+            position: absolute;
+            width: 50%;
+            height: auto;
+            right: -22%;
+            bottom: -12%;
+            z-index: 6;
+            display: none;
+            pointer-events: none;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
+            animation: petBob 2.4s ease-in-out infinite;
+        }
+
+        .pet-float.pet-act { animation: petAct 0.5s ease-out; }
+
+        @keyframes petBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes petAct {
+            0% { transform: translateX(0) scale(1); }
+            50% { transform: translateX(14px) scale(1.15); }
+            100% { transform: translateX(0) scale(1); }
+        }
+
+        .hero-card.pet-card img {
+            object-fit: contain;
+            background: radial-gradient(circle, #ffffff 0%, #e2e8f0 100%);
+        }
+
+        /* 무한의 탑 */
+        .tower-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .tower-content {
+            background: linear-gradient(145deg, #ebf8ff, #bee3f8);
+            border: 3px solid #3182ce;
+            border-radius: 20px;
+            padding: 30px 24px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            color: #2a4365;
+        }
+
+        .tower-title {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .tower-content p { margin: 10px 0; line-height: 1.5; }
+
+        .tower-btn {
+            padding: 12px 28px;
+            margin: 6px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+        }
+
+        .tower-btn.secondary { background: linear-gradient(135deg, #a0aec0, #718096); }
+
+        .tower-status {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .tower-timer {
+            height: 14px;
+            background: #cbd5e0;
+            border-radius: 7px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .tower-timer-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #48bb78, #ecc94b, #e53e3e);
+            transition: width 0.1s linear;
+        }
+
+        .tower-problem {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 14px 0;
+        }
+
+        .tower-feedback {
+            min-height: 1.5em;
+            font-weight: bold;
+            margin-top: 8px;
         }
 
         .shop-coin-info {
@@ -1192,6 +1377,9 @@
          <button class="ranking-btn" onclick="openRanking()" style="position: static; flex: 1;">
              🏆 랭킹
          </button>
+         <button class="ranking-btn" onclick="openTower()" style="position: static; flex: 1; background: linear-gradient(135deg, #4299e1, #3182ce);">
+             🗼 무한의 탑
+         </button>
      </div>
     
 
@@ -1224,10 +1412,12 @@
         <div class="character-name" id="playerName">
             용사
         </div>
+        <div class="mastery-badge" id="heroMasteryBadge"></div>
         <div class="character-content">
             <div class="character-left">
                 <div class="character-avatar player-avatar">
                     <img id="heroImage" src="hero.png" alt="용사" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img id="petImage" class="pet-float" alt="동료 펫">
                     <img id="devilattack" src="devilattack.gif" alt="악마 타격 효과" class="devil-attack-gif">
                     <img id="firebreak" src="firbreak.gif" alt="불꽃 공격" class="devil-attack-gif">  <!-- 추가 -->
 
@@ -1273,6 +1463,7 @@
         <div class="character-name" id="villainName">
             수학 마왕
         </div>
+        <div class="villain-element" id="villainElement"></div>
         <div class="character-content">
             <div class="character-left">
                 <div class="character-avatar villain-avatar">
@@ -1323,10 +1514,11 @@
     <div class="math-problem" id="mathProblem">
          문제 로딩 중...
     </div>
+    <div class="combo-display" id="comboDisplay"></div>
     <div class="answer-section"><input type="number" step="0.001" class="answer-input" id="answerInput" placeholder="답을 입력하세요"> <button class="submit-btn" id="submitBtn">제출</button>
     </div>
     <div class="upgrade-section" id="upgradeSection">
-     <h3 style="color: #744210; margin-bottom: 10px;">정답입니다! 💰5코인을 얻었습니다. 능력치를 선택하여 강화하세요:</h3>
+     <h3 id="upgradeTitle" style="color: #744210; margin-bottom: 10px;">정답입니다! 💰5코인을 얻었습니다. 능력치를 선택하여 강화하세요:</h3>
      <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" id="upgradeHpBtn" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" id="upgradeAttackBtn" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" id="upgradeDefenseBtn" onclick="upgradePlayer('defense')">방어력 +1</button> <button class="upgrade-btn upgrade-mana" id="upgradeManaBtn" onclick="upgradePlayer('mana')">🔮 최대 마나 +5</button>
      </div>
     </div>
@@ -1367,7 +1559,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.397</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.398</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -1378,6 +1570,8 @@
         </div>
         <div class="shop-section-title">🦸 용사 선택 <span style="font-size: 0.85rem; font-weight: normal; color: #718096;">(한 번 구매하면 계속 사용할 수 있어요)</span></div>
         <div class="hero-grid" id="heroShop"></div>
+        <div class="shop-section-title">🐾 동료 펫 <span style="font-size: 0.85rem; font-weight: normal; color: #718096;">(한 번 구매하면 계속 함께해요)</span></div>
+        <div class="hero-grid" id="petShop"></div>
         <div class="shop-section-title">✨ 기술</div>
         <div class="skill-grid" id="skillShop"></div>
     </div>
@@ -1407,6 +1601,8 @@
             <button class="ranking-tab active" onclick="switchRankingTab('level')">최고 레벨</button>
             <button class="ranking-tab" onclick="switchRankingTab('problems')">최다 문제 해결</button>
             <button class="ranking-tab" onclick="switchRankingTab('damage')">최대 피해량</button>
+            <button class="ranking-tab" onclick="switchRankingTab('tower')">무한의 탑</button>
+            <button class="ranking-tab" onclick="switchRankingTab('combo')">최대 콤보</button>
         </div>
 
         <!-- 👇 여기에 추가 -->
@@ -1437,6 +1633,33 @@
 </div>
 
 <!-- 👇 여기에 치트 모달 HTML 추가 -->
+<div class="tower-modal" id="towerModal">
+    <div class="tower-content">
+        <button class="shop-close" onclick="closeTower()">×</button>
+        <h2 class="tower-title">🗼 무한의 탑</h2>
+        <div id="towerIntro">
+            <p>제한 시간 안에 소수 곱셈을 풀고 한 층씩 올라가세요!<br>❤️ 기회는 3번! 높이 올라갈수록 문제가 어려워지고 시간이 짧아져요.</p>
+            <p>보상: 1층마다 💰1코인, 10층마다 💰10코인 보너스</p>
+            <p>내 최고 기록: <b id="towerBest">0</b>층</p>
+            <button class="tower-btn" onclick="startTower()">도전 시작!</button>
+        </div>
+        <div id="towerPlay" style="display: none;">
+            <div class="tower-status"><span id="towerFloor">1층</span><span id="towerLives">❤️❤️❤️</span></div>
+            <div class="tower-timer"><div class="tower-timer-fill" id="towerTimerFill"></div></div>
+            <div class="tower-problem" id="towerProblem"></div>
+            <input type="number" step="any" class="answer-input" id="towerAnswer" placeholder="답을 입력하세요" onkeydown="if (event.key === 'Enter') submitTowerAnswer()">
+            <div><button class="tower-btn" onclick="submitTowerAnswer()">제출</button></div>
+            <div class="tower-feedback" id="towerFeedback"></div>
+        </div>
+        <div id="towerResult" style="display: none;">
+            <p style="font-size: 1.4rem; font-weight: bold;">🏁 <span id="towerResultFloor">0</span>층까지 올랐어요!</p>
+            <p id="towerResultReward"></p>
+            <button class="tower-btn" onclick="startTower()">다시 도전</button>
+            <button class="tower-btn secondary" onclick="closeTower()">돌아가기</button>
+        </div>
+    </div>
+</div>
+
 <div class="cheat-modal" id="cheatModal" onclick="closeCheatOnBackdrop(event)">
     <div class="cheat-content" onclick="event.stopPropagation()">
         <button class="cheat-close" onclick="closeCheat()">×</button>
@@ -1587,7 +1810,11 @@
         };
 
         // 게임 상태 (변조 방지 적용)
-        let _gameState = {
+        let lockGameState = function () {};
+        const gameState = (function () {
+        let stateUnlocked = true;   // 저장 데이터 불러오는 동안만 큰 변화 허용
+        lockGameState = function () { stateUnlocked = false; };
+        const _gameState = {
             level: 1,
             coins: 0, 
             ownedSkills: [], 
@@ -1629,11 +1856,11 @@
         };
 
         // gameState를 Proxy로 감싸서 값 변경 감지 및 제한
-        const gameState = new Proxy(_gameState, {
+        return new Proxy(_gameState, {
             set: function(target, prop, value) {
                 // 게임 데이터 로딩 중(`gameLoaded`가 false)일 때는 모든 값 변경 허용
                 // 저장된 게임을 불러올 때 레벨 1 -> 레벨 50으로 점프하는 것은 정상이므로
-                if (!gameLoaded && (prop === 'level' || prop === 'coins')) {
+                if (stateUnlocked && (prop === 'level' || prop === 'coins')) {
                     target[prop] = value;
                     return true;
                 }
@@ -1661,6 +1888,7 @@
                 return true;
             }
         });
+        })();
 
         // 데이터 검증 함수들 (정상 플레이어 보호를 위해 로직 개선)
         const dataValidator = {
@@ -1740,16 +1968,16 @@
         /* //스킬 */
         // 마왕 단계: 레벨 10마다 다른 마왕으로 변신 (91레벨부터는 최종 마왕)
         const VILLAIN_STAGES = [
-            { name: '수학 마왕', image: 'devilking.png' },
-            { name: '화염 마왕', image: 'images/devil2.webp' },
-            { name: '빙결 마왕', image: 'images/devil3.webp' },
-            { name: '독안개 마왕', image: 'images/devil4.webp' },
-            { name: '번개 마왕', image: 'images/devil5.webp' },
-            { name: '대지 마왕', image: 'images/devil6.webp' },
-            { name: '그림자 마왕', image: 'images/devil7.webp' },
-            { name: '시계태엽 마왕', image: 'images/devil8.webp' },
-            { name: '혼돈의 숫자 마왕', image: 'images/devil9.webp' },
-            { name: '최종 마왕', image: 'images/devil10.webp' }
+            { name: '수학 마왕', image: 'devilking.png', weak: 'light', resist: 'dark' },
+            { name: '화염 마왕', image: 'images/devil2.webp', weak: 'ice', resist: 'fire' },
+            { name: '빙결 마왕', image: 'images/devil3.webp', weak: 'fire', resist: 'ice' },
+            { name: '독안개 마왕', image: 'images/devil4.webp', weak: 'light', resist: 'dark' },
+            { name: '번개 마왕', image: 'images/devil5.webp', weak: 'physical', resist: 'lightning' },
+            { name: '대지 마왕', image: 'images/devil6.webp', weak: 'ice', resist: 'lightning' },
+            { name: '그림자 마왕', image: 'images/devil7.webp', weak: 'light', resist: 'dark' },
+            { name: '시계태엽 마왕', image: 'images/devil8.webp', weak: 'lightning', resist: 'physical' },
+            { name: '혼돈의 숫자 마왕', image: 'images/devil9.webp', weak: 'dark', resist: 'light' },
+            { name: '최종 마왕', image: 'images/devil10.webp', weak: 'lightning', resist: 'fire' }
         ];
 
         function getVillainStage(level) {
@@ -1768,7 +1996,628 @@
                 void img.offsetWidth;
                 img.classList.add('villain-transform');
             }
+            updateVillainElementInfo();
+            markEffectiveSkills();
         }
+
+        // ===== 추가 콘텐츠 모듈 =====
+        // 콤보·피버·탑·펫·숙련도 상태는 이 안에만 있어 F12 콘솔에서 직접 바꿀 수 없음
+        const GameContent = (function () {
+
+        // ----- 변조 검사 저장소: 저장값에 확인 코드를 붙이고, 손으로 고치면 무효 처리 -----
+        const STORE_SALT = 'mh-content-2026';
+        const storeCache = {};
+
+        function hashText(text) {
+            let h = 2166136261;
+            for (let i = 0; i < text.length; i++) {
+                h ^= text.charCodeAt(i);
+                h = Math.imul(h, 16777619);
+            }
+            return (h >>> 0).toString(36);
+        }
+
+        function secureSave(key, data) {
+            storeCache[key] = { data: JSON.parse(JSON.stringify(data)), raw: null };
+            localStorageHelper.save(key, { d: data, h: hashText(key + JSON.stringify(data) + STORE_SALT) });
+        }
+
+        function secureLoad(key) {
+            if (key in storeCache) return storeCache[key];
+            const raw = localStorageHelper.load(key);
+            let result = { data: null, raw: null };
+            if (raw && typeof raw === 'object' && 'd' in raw) {
+                if (raw.h === hashText(key + JSON.stringify(raw.d) + STORE_SALT)) {
+                    result = { data: raw.d, raw: null };
+                } else {
+                    localStorageHelper.remove(key);
+                    setTimeout(() => addBattleLog('⚠️ 저장 데이터를 임의로 고친 흔적이 있어 해당 정보가 초기화되었습니다.'), 800);
+                }
+            } else if (raw) {
+                result = { data: null, raw };   // 이전 버전 형식
+            }
+            storeCache[key] = result;
+            return result;
+        }
+
+        // ----- 용사 보유/선택 -----
+        function getHeroData() {
+            const stored = secureLoad('heroData');
+            let saved = stored.data;
+            // 1.397 이전 형식(확인 코드 없음)은 한 번만 옮겨 저장
+            if (!saved && stored.raw && Array.isArray(stored.raw.owned) && !localStorageHelper.load('heroDataSecured')) {
+                saved = stored.raw;
+                secureSave('heroData', saved);
+            }
+            if (!localStorageHelper.load('heroDataSecured')) localStorageHelper.save('heroDataSecured', true);
+            const owned = (saved && Array.isArray(saved.owned)) ? saved.owned.filter(id => HEROES.some(h => h.id === id)) : [];
+            if (!owned.includes('knight')) owned.unshift('knight');
+            const selected = (saved && owned.includes(saved.selected)) ? saved.selected : 'knight';
+            return { owned, selected };
+        }
+
+        function buyHero(heroId) {
+            const hero = HEROES.find(h => h.id === heroId);
+            const data = getHeroData();
+            if (!hero || data.owned.includes(heroId)) return;
+
+            if (gameState.coins < hero.cost) {
+                addBattleLog('❌ 코인이 부족합니다!');
+                return;
+            }
+
+            gameState.coins -= hero.cost;
+            data.owned.push(heroId);
+            data.selected = heroId;
+            secureSave('heroData', data);
+
+            addBattleLog(`🦸 ${hero.name}(으)로 변신했습니다! 능력치가 ${hero.name}에 맞게 바뀌었습니다.`);
+            playupgradeSound();
+            applyHero();
+            renderShop();
+            saveGameProgress();
+        }
+
+        function selectHero(heroId) {
+            const data = getHeroData();
+            if (!data.owned.includes(heroId)) return;
+            data.selected = heroId;
+            secureSave('heroData', data);
+            applyHero();
+            addBattleLog(`🦸 ${getSelectedHero().name}(으)로 변신했습니다! 능력치가 ${getSelectedHero().name}에 맞게 바뀌었습니다.`);
+            renderShop();
+            saveGameProgress();
+        }
+
+        // ===== 속성과 약점 =====
+        const ELEMENTS = {
+            fire: { icon: '🔥', name: '불' },
+            ice: { icon: '❄️', name: '얼음' },
+            lightning: { icon: '⚡', name: '번개' },
+            light: { icon: '☀️', name: '빛' },
+            dark: { icon: '🌑', name: '어둠' },
+            physical: { icon: '⚔️', name: '물리' }
+        };
+
+        function elementLabel(id) {
+            const e = ELEMENTS[id];
+            return e ? `${e.icon}${e.name}` : '';
+        }
+
+        function getCurrentStage() {
+            return VILLAIN_STAGES[getVillainStage(gameState.level) - 1];
+        }
+
+        // 약점 속성이면 2배, 내성 속성이면 절반
+        function applyElement(damage, element) {
+            const stage = getCurrentStage();
+            if (element && element === stage.weak) return { damage: damage * 2, result: 'weak' };
+            if (element && element === stage.resist) return { damage: Math.max(1, Math.floor(damage / 2)), result: 'resist' };
+            return { damage, result: null };
+        }
+
+        function showBattlePopup(text, type) {
+            const avatar = document.querySelector('.villain-avatar');
+            const el = document.createElement('div');
+            el.className = 'battle-popup ' + (type || '');
+            el.textContent = text;
+            avatar.appendChild(el);
+            setTimeout(() => el.remove(), 1400);
+        }
+
+        function announceElement(result) {
+            if (result === 'weak') {
+                addBattleLog('💥 효과가 굉장했다! (약점 공격 ×2)');
+                showBattlePopup('효과가 굉장했다!', 'weak');
+            } else if (result === 'resist') {
+                addBattleLog('🛡️ 효과가 별로인 듯하다... (내성 ×0.5)');
+                showBattlePopup('효과가 별로...', 'resist');
+            }
+        }
+
+        function updateVillainElementInfo() {
+            const stage = getCurrentStage();
+            document.getElementById('villainElement').textContent = `약점 ${elementLabel(stage.weak)} · 내성 ${elementLabel(stage.resist)}`;
+        }
+
+        // 현재 마왕의 약점 기술 버튼 강조
+        function markEffectiveSkills() {
+            const stage = getCurrentStage();
+            gameState.ownedSkills.forEach(id => {
+                const btn = document.getElementById(`skill-${id}`);
+                const skill = SKILLS[id];
+                if (!btn || !skill) return;
+                btn.classList.toggle('effective', skill.element === stage.weak);
+                btn.classList.toggle('resisted', skill.element === stage.resist);
+            });
+        }
+
+        // ===== 기록 (무한의 탑 최고층, 최대 콤보) =====
+        function getExtraRecords() {
+            const r = secureLoad('extraRecords').data;
+            return { tower: (r && r.tower) || 0, combo: (r && r.combo) || 0 };
+        }
+
+        function saveExtraRecord(key, value) {
+            const r = getExtraRecords();
+            if (value <= r[key]) return false;
+            r[key] = value;
+            secureSave('extraRecords', r);
+            return true;
+        }
+
+        // 새 시즌이 시작되면 탑/콤보 기록 초기화
+        function clearSeasonRecords() {
+            secureSave('extraRecords', { tower: 0, combo: 0 });
+        }
+
+        // ===== 콤보 / 피버 타임 =====
+        const COMBO_BONUS_AT = 5;      // 5콤보부터 정답 코인 +1
+        const FEVER_AT = 10;           // 10콤보마다 피버 타임
+        const FEVER_DURATION = 30000;  // 30초
+        let combo = 0;
+        let feverUntil = 0;
+        let feverAttackInterval = null;
+        let feverTickInterval = null;
+        let feverTimers = [];
+
+        function isFever() {
+            return Date.now() < feverUntil;
+        }
+
+        let lastRewardedProblem = null;
+        let lastRewardAt = 0;
+
+        function getCorrectAnswerCoins() {
+            let coins = 5;
+            if (combo >= COMBO_BONUS_AT) coins += 1;
+            if (isFever()) coins *= 2;
+            return coins;
+        }
+
+        // 정답 처리: 콤보·피버·숙련도를 올리고 받을 코인을 돌려줌
+        // 같은 문제로 두 번 보상받거나 0.5초 안에 연속으로 받을 수 없음
+        function rewardCorrectAnswer() {
+            const problem = gameState.currentProblem;
+            const now = Date.now();
+            if (problem === lastRewardedProblem || now - lastRewardAt < 500) return 5;
+            lastRewardedProblem = problem;
+            lastRewardAt = now;
+
+            combo++;
+            saveExtraRecord('combo', combo);
+            if (combo % FEVER_AT === 0 && !isFever()) {
+                startFever();
+            } else if (combo === COMBO_BONUS_AT) {
+                addBattleLog(`🔥 ${COMBO_BONUS_AT}콤보! 지금부터 정답마다 코인 +1`);
+            }
+            addMasteryXp(getSelectedHero().id, 1);
+            updateComboDisplay();
+            return getCorrectAnswerCoins();
+        }
+
+        function onWrongAnswer() {
+            if (combo >= 3) addBattleLog(`💔 콤보가 끊겼습니다... (${combo}콤보)`);
+            combo = 0;
+            updateComboDisplay();
+        }
+
+        function resetCombo() {
+            combo = 0;
+            stopFever();
+            updateComboDisplay();
+        }
+
+        function startFever() {
+            stopFever();
+            feverUntil = Date.now() + FEVER_DURATION;
+            document.body.classList.add('fever-mode');
+            addBattleLog('🔥🔥 피버 타임! 30초 동안 코인 2배 + 용사 추가 공격! 🔥🔥');
+            showBattlePopup('FEVER TIME!', 'fever');
+            playupgradeSound();
+            // 기본 공격 사이사이에 추가 공격 (마왕 공격 속도는 그대로)
+            feverTimers.push(setTimeout(() => {
+                if (isFever()) feverAttackInterval = setInterval(feverAttack, 3000);
+            }, 1500));
+            feverTimers.push(setTimeout(endFever, FEVER_DURATION));
+            feverTickInterval = setInterval(updateComboDisplay, 1000);
+            updateComboDisplay();
+        }
+
+        function stopFever() {
+            clearInterval(feverAttackInterval);
+            clearInterval(feverTickInterval);
+            feverTimers.forEach(clearTimeout);
+            feverTimers = [];
+            feverAttackInterval = null;
+            feverTickInterval = null;
+            feverUntil = 0;
+            document.body.classList.remove('fever-mode');
+        }
+
+        function endFever() {
+            if (!feverUntil) return;
+            stopFever();
+            addBattleLog('⏰ 피버 타임이 끝났습니다.');
+            updateComboDisplay();
+        }
+
+        function feverAttack() {
+            if (!gameState.gameActive || !isFever()) return;
+            const damage = Math.max(1, gameState.player.attack - gameState.villain.defense);
+            gameState.villain.hp = Math.max(0, gameState.villain.hp - damage);
+            gameState.currentStats.totalDamage += damage;
+            gameState.currentStats.dailyStats.totalDamage += damage;
+            addBattleLog(`⚡ 피버 추가 공격! ${damage}의 피해!`);
+            playHeroAttackSound();
+            triggerHitEffect('heroattack');
+            updateRecordsDisplay();
+            updateDisplay();
+            if (gameState.villain.hp <= 0) victory();
+        }
+
+        function updateComboDisplay() {
+            const el = document.getElementById('comboDisplay');
+            if (isFever()) {
+                const left = Math.ceil((feverUntil - Date.now()) / 1000);
+                el.textContent = `🔥 피버 타임! ${left}초 남음 · ${combo}콤보 (코인 2배)`;
+            } else if (combo >= 2) {
+                const toFever = FEVER_AT - (combo % FEVER_AT);
+                el.textContent = `${combo}콤보${combo >= COMBO_BONUS_AT ? ' 🔥 코인 +1' : ''} · 피버까지 ${toFever}문제`;
+            } else {
+                el.textContent = `최고 콤보 ${getExtraRecords().combo}`;
+            }
+        }
+
+        // ===== 용사 숙련도 =====
+        const MASTERY_XP = [0, 20, 50, 90, 140, 200, 270, 350, 440, 540]; // Lv1~Lv10에 필요한 누적 경험치
+
+        function getMasteryData() {
+            const d = secureLoad('heroMastery').data;
+            return (d && typeof d === 'object') ? { ...d } : {};
+        }
+
+        function getMasteryLevel(heroId) {
+            const xp = getMasteryData()[heroId] || 0;
+            let level = 1;
+            MASTERY_XP.forEach((need, i) => { if (xp >= need) level = i + 1; });
+            return level;
+        }
+
+        // 숙련도 1레벨마다 전용기 위력 +10% (최대 +90%)
+        function getMasteryMultiplier(heroId) {
+            return 1 + 0.1 * (getMasteryLevel(heroId) - 1);
+        }
+
+        function getMasteryText(heroId) {
+            const xp = getMasteryData()[heroId] || 0;
+            const level = getMasteryLevel(heroId);
+            return level >= MASTERY_XP.length ? '숙련도 Lv10 (MAX)' : `숙련도 Lv${level} (${xp}/${MASTERY_XP[level]})`;
+        }
+
+        function addMasteryXp(heroId, amount) {
+            const data = getMasteryData();
+            const before = getMasteryLevel(heroId);
+            data[heroId] = (data[heroId] || 0) + amount;
+            secureSave('heroMastery', data);
+            const after = getMasteryLevel(heroId);
+            if (after > before) {
+                const hero = HEROES.find(h => h.id === heroId);
+                addBattleLog(`🎖️ ${hero.name} 숙련도 Lv${after}! 전용기 위력 +${(after - 1) * 10}%`);
+                playupgradeSound();
+            }
+            updateMasteryBadge();
+        }
+
+        // 전용기 사용 숙련도: 전투 중, 선택한 용사의 전용기일 때만, 2초에 한 번까지
+        let lastSkillXpAt = 0;
+        function onExclusiveSkillUsed(heroId) {
+            const now = Date.now();
+            if (!gameState.gameActive || heroId !== getSelectedHero().id || now - lastSkillXpAt < 2000) return;
+            lastSkillXpAt = now;
+            addMasteryXp(heroId, 3);
+        }
+
+        function updateMasteryBadge() {
+            const hero = getSelectedHero();
+            const level = getMasteryLevel(hero.id);
+            document.getElementById('heroMasteryBadge').textContent = `🎖️ ${getMasteryText(hero.id)} · 전용기 +${(level - 1) * 10}%`;
+        }
+
+        // ===== 동료 펫 =====
+        const PETS = [
+            { id: 'fire_dragon', name: '아기 불꽃용', description: '6초마다 🔥불 속성 공격', image: 'images/pet_dragon.webp', cost: 150, type: 'attack', element: 'fire', interval: 6 },
+            { id: 'frost_wolf', name: '서리 늑대', description: '6초마다 ❄️얼음 속성 공격', image: 'images/pet_wolf.webp', cost: 150, type: 'attack', element: 'ice', interval: 6 },
+            { id: 'owl', name: '지혜의 부엉이', description: '8초마다 마나 +4', image: 'images/pet_owl.webp', cost: 200, type: 'mana', amount: 4, interval: 8 },
+            { id: 'fairy', name: '빛의 요정', description: '10초마다 체력 6% 회복', image: 'images/pet_fairy.webp', cost: 250, type: 'heal', ratio: 0.06, interval: 10 }
+        ];
+        let petTimer = 0;
+
+        function getPetData() {
+            const saved = secureLoad('petData').data;
+            const owned = (saved && Array.isArray(saved.owned)) ? saved.owned.filter(id => PETS.some(pet => pet.id === id)) : [];
+            const selected = (saved && owned.includes(saved.selected)) ? saved.selected : null;
+            return { owned, selected };
+        }
+
+        function getSelectedPet() {
+            return PETS.find(pet => pet.id === getPetData().selected) || null;
+        }
+
+        function applyPet() {
+            const pet = getSelectedPet();
+            const img = document.getElementById('petImage');
+            if (pet) {
+                img.src = pet.image;
+                img.alt = pet.name;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+            petTimer = 0;
+        }
+
+        function petAction() {
+            const img = document.getElementById('petImage');
+            img.classList.remove('pet-act');
+            void img.offsetWidth;
+            img.classList.add('pet-act');
+            setTimeout(() => img.classList.remove('pet-act'), 500);
+        }
+
+        // 1초마다 호출: 펫마다 정해진 간격으로 행동
+        function petTick() {
+            const pet = getSelectedPet();
+            if (!pet || !gameState.gameActive) return;
+            petTimer++;
+            if (petTimer < pet.interval) return;
+            petTimer = 0;
+
+            const player = gameState.player;
+            if (pet.type === 'attack') {
+                // 공격력의 30% + 5, 마왕 방어력 무시, 속성 적용
+                const result = applyElement(5 + Math.floor(player.attack * 0.3), pet.element);
+                gameState.villain.hp = Math.max(0, gameState.villain.hp - result.damage);
+                gameState.currentStats.totalDamage += result.damage;
+                gameState.currentStats.dailyStats.totalDamage += result.damage;
+                addBattleLog(`🐾 ${pet.name}의 ${elementLabel(pet.element)} 공격! ${result.damage}의 피해!`);
+                announceElement(result.result);
+                triggerHitEffect(pet.element === 'fire' ? 'explosion' : 'heroattack');
+                petAction();
+                updateRecordsDisplay();
+                updateDisplay();
+                if (gameState.villain.hp <= 0) victory();
+            } else if (pet.type === 'mana' && player.mana < player.maxMana) {
+                player.mana = Math.min(player.maxMana, player.mana + pet.amount);
+                addBattleLog(`🐾 ${pet.name}가 마나를 ${pet.amount} 채워 주었습니다!`);
+                petAction();
+                updateDisplay();
+            } else if (pet.type === 'heal' && player.hp > 0 && player.hp < player.maxHp) {
+                const heal = Math.max(1, Math.floor(player.maxHp * pet.ratio));
+                player.hp = Math.min(player.maxHp, player.hp + heal);
+                addBattleLog(`🐾 ${pet.name}가 체력을 ${heal} 회복시켜 주었습니다!`);
+                petAction();
+                updateDisplay();
+            }
+        }
+
+        function renderPetShop() {
+            const container = document.getElementById('petShop');
+            const data = getPetData();
+            container.innerHTML = '';
+
+            PETS.forEach(pet => {
+                const owned = data.owned.includes(pet.id);
+                const selected = data.selected === pet.id;
+                const card = document.createElement('div');
+                card.className = 'hero-card pet-card' + (selected ? ' selected' : '') + (owned ? '' : ' locked');
+
+                let action;
+                if (selected) {
+                    action = `<button class="select-btn" onclick="selectPet(null)">✅ 함께하는 중 (해제)</button>`;
+                } else if (owned) {
+                    action = `<button class="select-btn" onclick="selectPet('${pet.id}')">함께하기</button>`;
+                } else {
+                    action = `<button onclick="buyPet('${pet.id}')" ${gameState.coins < pet.cost ? 'disabled' : ''}>💰 ${pet.cost} 코인</button>`;
+                }
+
+                card.innerHTML = `
+                    <img src="${pet.image}" alt="${pet.name}">
+                    <div class="hero-card-name">${pet.name}</div>
+                    <div class="hero-card-desc">${pet.description}</div>
+                    ${action}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function buyPet(petId) {
+            const pet = PETS.find(p => p.id === petId);
+            const data = getPetData();
+            if (!pet || data.owned.includes(petId)) return;
+            if (gameState.coins < pet.cost) {
+                addBattleLog('❌ 코인이 부족합니다!');
+                return;
+            }
+            gameState.coins -= pet.cost;
+            data.owned.push(petId);
+            data.selected = petId;
+            secureSave('petData', data);
+            addBattleLog(`🐾 ${pet.name}이(가) 동료가 되었습니다!`);
+            playupgradeSound();
+            applyPet();
+            renderShop();
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        function selectPet(petId) {
+            const data = getPetData();
+            if (petId && !data.owned.includes(petId)) return;
+            data.selected = petId;
+            secureSave('petData', data);
+            applyPet();
+            renderShop();
+        }
+
+        // ===== 무한의 탑 =====
+        const TOWER_LIVES = 3;
+        let tower = null;
+        let towerResumeActive = false;
+
+        function openTower() {
+            towerResumeActive = gameState.gameActive;
+            gameState.gameActive = false;   // 탑에 있는 동안 전투 일시정지
+            document.getElementById('towerBest').textContent = getExtraRecords().tower;
+            document.getElementById('towerIntro').style.display = 'block';
+            document.getElementById('towerPlay').style.display = 'none';
+            document.getElementById('towerResult').style.display = 'none';
+            document.getElementById('towerModal').style.display = 'flex';
+        }
+
+        function closeTower() {
+            if (tower && tower.running) finishTower();
+            document.getElementById('towerModal').style.display = 'none';
+            gameState.gameActive = towerResumeActive;
+        }
+
+        function getTowerTimeLimit(floor) {
+            return Math.max(8, 25 - Math.floor((floor - 1) / 5) * 2);  // 25초에서 5층마다 2초씩, 최소 8초
+        }
+
+        // 층이 높을수록 어려운 문제
+        function makeTowerProblem(floor) {
+            const rnd = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+            let a, b;
+            if (floor <= 10) { a = rnd(2, 9); b = rnd(1, 9) / 10; }           // 자연수 × 소수 한 자리
+            else if (floor <= 20) { a = rnd(2, 20); b = rnd(11, 99) / 100; }  // 자연수 × 소수 두 자리
+            else if (floor <= 35) { a = rnd(1, 9) / 10; b = rnd(11, 99) / 10; } // 소수 × 소수
+            else { a = rnd(11, 99) / 10; b = rnd(11, 99) / 100; }             // 더 어려운 소수 × 소수
+            if (Math.random() < 0.5) [a, b] = [b, a];
+            return { text: `${a} × ${b} = ?`, answer: Math.round(a * b * 10000) / 10000 };
+        }
+
+        function startTower() {
+            tower = { floor: 1, lives: TOWER_LIVES, running: true, problem: null, deadline: 0, startedAt: 0, timer: null };
+            document.getElementById('towerIntro').style.display = 'none';
+            document.getElementById('towerResult').style.display = 'none';
+            document.getElementById('towerPlay').style.display = 'block';
+            document.getElementById('towerFeedback').textContent = '';
+            nextTowerProblem();
+        }
+
+        function nextTowerProblem() {
+            tower.problem = makeTowerProblem(tower.floor);
+            tower.startedAt = Date.now();
+            tower.deadline = tower.startedAt + getTowerTimeLimit(tower.floor) * 1000;
+            document.getElementById('towerFloor').textContent = `${tower.floor}층`;
+            document.getElementById('towerLives').textContent = '❤️'.repeat(tower.lives) + '🤍'.repeat(TOWER_LIVES - tower.lives);
+            document.getElementById('towerProblem').textContent = tower.problem.text;
+            const input = document.getElementById('towerAnswer');
+            input.value = '';
+            input.focus();
+            clearInterval(tower.timer);
+            tower.timer = setInterval(updateTowerTimer, 100);
+            updateTowerTimer();
+        }
+
+        function updateTowerTimer() {
+            if (!tower || !tower.running) return;
+            const total = getTowerTimeLimit(tower.floor) * 1000;
+            const left = tower.deadline - Date.now();
+            document.getElementById('towerTimerFill').style.width = `${Math.max(0, left / total * 100)}%`;
+            if (left <= 0) loseTowerLife('⏰ 시간 초과!');
+        }
+
+        function submitTowerAnswer() {
+            if (!tower || !tower.running) return;
+            if (Date.now() - tower.startedAt < 500) return;  // 매크로 방지
+            const value = parseFloat(document.getElementById('towerAnswer').value);
+            if (isNaN(value)) return;
+            if (Math.abs(value - tower.problem.answer) < 0.001) {
+                document.getElementById('towerFeedback').textContent = `⭕ 정답! ${tower.floor}층 통과`;
+                tower.floor++;
+                if ((tower.floor - 1) % 10 === 0) playupgradeSound();
+                nextTowerProblem();
+            } else {
+                loseTowerLife(`❌ 틀렸어요! 정답은 ${tower.problem.answer}`);
+            }
+        }
+
+        function loseTowerLife(message) {
+            tower.lives--;
+            document.getElementById('towerFeedback').textContent = message;
+            if (tower.lives <= 0) {
+                finishTower();
+            } else {
+                nextTowerProblem();
+            }
+        }
+
+        function finishTower() {
+            clearInterval(tower.timer);
+            tower.running = false;
+            const cleared = tower.floor - 1;
+            const reward = cleared + Math.floor(cleared / 10) * 10;
+            gameState.coins += reward;
+            const isNewRecord = saveExtraRecord('tower', cleared);
+            document.getElementById('towerResultFloor').textContent = cleared;
+            document.getElementById('towerResultReward').textContent = `💰 ${reward}코인을 얻었어요!${isNewRecord ? ' 🎉 최고 기록!' : ''}`;
+            document.getElementById('towerPlay').style.display = 'none';
+            document.getElementById('towerResult').style.display = 'block';
+            addBattleLog(`🗼 무한의 탑 ${cleared}층 도달! 💰${reward}코인 획득`);
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        let petLoopStarted = false;
+        function startPetLoop() {
+            if (petLoopStarted) return;
+            petLoopStarted = true;
+            setInterval(petTick, 1000);
+        }
+
+        // 밖에서 쓸 함수만 공개 (상태 변수는 공개하지 않음)
+        return {
+            elementLabel, applyElement, announceElement, updateVillainElementInfo, markEffectiveSkills,
+            getExtraRecords, clearSeasonRecords,
+            rewardCorrectAnswer, onWrongAnswer, resetCombo, updateComboDisplay,
+            getMasteryLevel, getMasteryMultiplier, getMasteryText, onExclusiveSkillUsed, updateMasteryBadge,
+            getHeroData, buyHero, selectHero,
+            applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
+            openTower, closeTower, startTower, submitTowerAnswer
+        };
+        })();
+
+        const {
+            elementLabel, applyElement, announceElement, updateVillainElementInfo, markEffectiveSkills,
+            getExtraRecords, clearSeasonRecords,
+            rewardCorrectAnswer, onWrongAnswer, resetCombo, updateComboDisplay,
+            getMasteryLevel, getMasteryMultiplier, getMasteryText, onExclusiveSkillUsed, updateMasteryBadge,
+            getHeroData, buyHero, selectHero,
+            applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
+            openTower, closeTower, startTower, submitTowerAnswer
+        } = GameContent;
 
         // 용사 캐릭터: 상점에서 구매 후 선택 (구매 기록은 게임오버 후에도 유지)
         // stats: 기본 능력치 / growth: 강화 1회당 오르는 양 / skill: 전용기
@@ -1846,14 +2695,6 @@
             return text;
         }
 
-        function getHeroData() {
-            const saved = localStorageHelper.load('heroData');
-            const owned = (saved && Array.isArray(saved.owned)) ? saved.owned.filter(id => HEROES.some(h => h.id === id)) : [];
-            if (!owned.includes('knight')) owned.unshift('knight');
-            const selected = (saved && owned.includes(saved.selected)) ? saved.selected : 'knight';
-            return { owned, selected };
-        }
-
         function applyHero() {
             const hero = getSelectedHero();
             const img = document.getElementById('heroImage');
@@ -1862,6 +2703,7 @@
             document.getElementById('playerName').textContent = hero.name;
             applyHeroStats();
             renderSkillButtons();
+            updateMasteryBadge();
             updateDisplay();
         }
 
@@ -1894,48 +2736,17 @@
                         <span>🛡️ 방어 ${hero.stats.defense}</span><span>🔮 마나 ${hero.stats.mana}</span>
                     </div>
                     <div class="hero-card-skill">전용기: ${SKILLS[hero.skill].name}</div>
+                    ${owned ? `<div class="hero-card-skill" style="color: #2f855a;">🎖️ ${getMasteryText(hero.id)}</div>` : ''}
                     ${action}
                 `;
                 container.appendChild(card);
             });
         }
 
-        function buyHero(heroId) {
-            const hero = HEROES.find(h => h.id === heroId);
-            const data = getHeroData();
-            if (!hero || data.owned.includes(heroId)) return;
-
-            if (gameState.coins < hero.cost) {
-                addBattleLog('❌ 코인이 부족합니다!');
-                return;
-            }
-
-            gameState.coins -= hero.cost;
-            data.owned.push(heroId);
-            data.selected = heroId;
-            localStorageHelper.save('heroData', data);
-
-            addBattleLog(`🦸 ${hero.name}(으)로 변신했습니다! 능력치가 ${hero.name}에 맞게 바뀌었습니다.`);
-            playupgradeSound();
-            applyHero();
-            renderShop();
-            saveGameProgress();
-        }
-
-        function selectHero(heroId) {
-            const data = getHeroData();
-            if (!data.owned.includes(heroId)) return;
-            data.selected = heroId;
-            localStorageHelper.save('heroData', data);
-            applyHero();
-            addBattleLog(`🦸 ${getSelectedHero().name}(으)로 변신했습니다! 능력치가 ${getSelectedHero().name}에 맞게 바뀌었습니다.`);
-            renderShop();
-            saveGameProgress();
-        }
 
         const SKILLS = {
             fireball: {
-                id: 'fireball',
+                id: 'fireball', element: 'fire',
                 name: '🔥 화염구',
                 description: '강력한 화염구를 발사',
                 icon: '🔥',
@@ -1944,7 +2755,7 @@
                 damage: 40
             },
             fullpower: {
-                id: 'fullpower',
+                id: 'fullpower', element: 'physical',
                 name: '💪 혼신의 힘',
                 description: '기의 힘을 실은 공격',
                 icon: '💪',
@@ -1953,7 +2764,7 @@
                 damage: 50
             },
             meteor: {
-                id: 'meteor',
+                id: 'meteor', element: 'fire',
                 name: '☄️ 메테오',
                 description: '거대한 운석 낙하',
                 icon: '☄️',
@@ -1962,7 +2773,7 @@
                 damage: 100
             },
             berserk: {
-                id: 'berserk',
+                id: 'berserk', element: 'physical',
                 name: '💥 광폭화',
                 description: '체력을 소모해 강타',
                 icon: '💥',
@@ -1971,7 +2782,7 @@
                 damage: 80
             },
             ultimate: {
-                id: 'ultimate',
+                id: 'ultimate', element: 'light',
                 name: '🌟 궁극기',
                 description: '최강의 필살기!',
                 icon: '🌟',
@@ -1981,7 +2792,7 @@
             },
             // ===== 캐릭터 전용기 (damage + 공격력 × attackScale, hits번 공격) =====
             rune_slash: {
-                id: 'rune_slash', hero: 'knight',
+                id: 'rune_slash', hero: 'knight', element: 'physical',
                 name: '🗡️ 룬 검 일섬',
                 description: '룬 검에 힘을 모아 베기',
                 icon: '🗡️',
@@ -1991,19 +2802,19 @@
                 effect: 'fullpower'
             },
             star_storm: {
-                id: 'star_storm', hero: 'mage',
-                name: '✨ 별빛 폭풍',
-                description: '하늘의 별을 쏟아붓는 대마법',
-                icon: '✨',
+                id: 'star_storm', hero: 'mage', element: 'ice',
+                name: '❄️ 서리별 폭풍',
+                description: '얼어붙은 별을 쏟아붓는 대마법',
+                icon: '❄️',
                 cost: 110,
                 useCost: { type: 'mana', amount: 35 },
                 damage: 130, attackScale: 1,
                 effect: 'meteor'
             },
             arrow_rain: {
-                id: 'arrow_rain', hero: 'archer',
+                id: 'arrow_rain', hero: 'archer', element: 'lightning',
                 name: '🏹 천공의 화살비',
-                description: '마법 화살 3발 연속 발사',
+                description: '번개를 두른 화살 3발 연속 발사',
                 icon: '🏹',
                 cost: 120,
                 useCost: { type: 'mana', amount: 20 },
@@ -2011,7 +2822,7 @@
                 effect: 'heroattack'
             },
             holy_judgment: {
-                id: 'holy_judgment', hero: 'paladin',
+                id: 'holy_judgment', hero: 'paladin', element: 'light',
                 name: '☀️ 성스러운 심판',
                 description: '빛으로 공격하고 체력 30% 회복',
                 icon: '☀️',
@@ -2021,7 +2832,7 @@
                 effect: 'ultimate'
             },
             shadow_raid: {
-                id: 'shadow_raid', hero: 'ninja',
+                id: 'shadow_raid', hero: 'ninja', element: 'dark',
                 name: '🌑 그림자 습격',
                 description: '그림자 속에서 급소를 노리는 일격',
                 icon: '🌑',
@@ -2031,7 +2842,7 @@
                 effect: 'berserk'
             },
             dragon_breath: {
-                id: 'dragon_breath', hero: 'dragon',
+                id: 'dragon_breath', hero: 'dragon', element: 'fire',
                 name: '🐉 용의 숨결',
                 description: '아기 용과 함께 뿜는 거대한 불길',
                 icon: '🐉',
@@ -2097,6 +2908,7 @@
             
             // 게임 진행 상황 로드
             loadGameProgress();
+            lockGameState();
 
             // 👇 여기에 추가
             // 사용자 이름 로드
@@ -2104,6 +2916,9 @@
 
             // 선택한 용사 모습 적용
             applyHero();
+            applyPet();
+            startPetLoop();
+            updateComboDisplay();
             
             // Element SDK 초기화 (있으면)
             if (window.elementSdk) {
@@ -2668,8 +3483,9 @@
                     return;
                 }
 
-                const coinsEarned = 5;
+                const coinsEarned = rewardCorrectAnswer();
                 gameState.coins += coinsEarned;
+                document.getElementById('upgradeTitle').textContent = `정답입니다! 💰${coinsEarned}코인을 얻었습니다. 능력치를 선택하여 강화하세요:`;
                 addBattleLog(`정답입니다! ${gameState.currentProblem.num1} × ${gameState.currentProblem.num2} = ${correctAnswer}`);
                 gameState.currentStats.problemsSolved++;
                 gameState.currentStats.dailyStats.problemsSolved++;
@@ -2679,6 +3495,7 @@
                 document.getElementById('submitBtn').disabled = true;
             } else {
                 addBattleLog(`틀렸습니다. 다시 시도하세요!`);
+                onWrongAnswer();
                 document.getElementById('answerInput').value = '';
             }
         }
@@ -2937,7 +3754,9 @@
 
         // 상점 렌더링
         function renderShop() {
+            document.getElementById('shopCoinAmount').textContent = gameState.coins;
             renderHeroShop();
+            renderPetShop();
             const shopElement = document.getElementById('skillShop');
             shopElement.innerHTML = '';
             
@@ -2965,7 +3784,8 @@
                     <div class="skill-description">${skill.description}</div>
                     <div class="skill-cost">💰 ${skill.cost} 코인</div>
                     <div class="skill-use-cost">사용: ${useCostText}</div>
-                    <div class="skill-use-cost">데미지: ${getSkillDamageText(skill)}</div>
+                    <div class="skill-use-cost">속성: ${elementLabel(skill.element)}</div>
+                    <div class="skill-use-cost">데미지: ${getSkillDamageText(skill)}${skill.hero && getMasteryLevel(skill.hero) > 1 ? ` (숙련 +${(getMasteryLevel(skill.hero) - 1) * 10}%)` : ''}</div>
                     ${owned ? 
                         '<div class="owned-badge">✅ 보유중</div>' :
                         `<button class="buy-skill-btn" onclick="buySkill('${skill.id}')" ${!canBuy ? 'disabled' : ''}>
@@ -3028,12 +3848,13 @@
                 }
                 
                 btn.innerHTML = `
-                    <span>${skill.icon} ${skill.name}</span>
-                    <span class="skill-cost-badge">${costText}</span>
+                    <span>${skill.name}</span>
+                    <span class="skill-cost-badge">${elementLabel(skill.element)} · ${costText}</span>
                 `;
-                
+
                 container.appendChild(btn);
             });
+            markEffectiveSkills();
         }
 
         // 스킬 버튼 상태 업데이트
@@ -3095,6 +3916,9 @@
             
             // 데미지 적용 (검증 포함)
             let damage = getSkillDamage(skill);
+            if (skill.hero) damage = Math.floor(damage * getMasteryMultiplier(skill.hero));
+            const elementResult = applyElement(damage, skill.element);
+            damage = elementResult.damage;
 
             // 스킬 피해량 제한 확인 (레벨당 최대 피해량의 50% 이내)
             const maxSkillDamage = Math.floor(gameState.level * GAME_LIMITS.MAX_DAMAGE_PER_LEVEL * 0.5);
@@ -3118,7 +3942,9 @@
             gameState.currentStats.totalDamage += damage;
             gameState.currentStats.dailyStats.totalDamage += damage;
             
-            addBattleLog(`${skill.icon} ${skill.name} 사용! ${damage} 데미지!`);
+            addBattleLog(`${skill.name} 사용! ${damage} 데미지!`);
+            announceElement(elementResult.result);
+            if (skill.hero) onExclusiveSkillUsed(skill.hero);
 
             if (skill.healRatio) {
                 const heal = Math.floor(gameState.player.maxHp * skill.healRatio);
@@ -3278,6 +4104,7 @@
             gameState.ownedSkills = []; // 배열 초기화
             gameState.ownedSkills.length = 0; // 배열 비우기 (Proxy 호환성)
             
+            resetCombo();
             gameState.player.upgrades = emptyUpgrades();
             const startStats = computeHeroStats(getSelectedHero(), gameState.player.upgrades);
             gameState.player.maxHp = startStats.maxHp;
@@ -3353,6 +4180,7 @@
                 // localStorageHelper.remove('gameProgress');
                 
                 // 3. 시즌 버전 업데이트 (이제 다시 초기화되지 않음)
+                clearSeasonRecords();
                 localStorageHelper.save('seasonVersion', SEASON_VERSION);
                 
                 alert(`📢 새로운 랭킹 시즌${SEASON_VERSION}가 시작되었습니다!\n기존 최고 기록이 초기화되고 새로운 경쟁이 시작됩니다.`);
@@ -3476,6 +4304,8 @@
                 level: gameState.bestRecords.level || 0,
                 problems: gameState.bestRecords.problemsSolved || 0,
                 damage: gameState.bestRecords.totalDamage || 0,
+                tower: getExtraRecords().tower,
+                combo: getExtraRecords().combo,
                 timestamp: new Date().toISOString(),
                 client_validation: true // 클라이언트 검증 완료 표시
             };
@@ -3646,6 +4476,8 @@
                     case 'level': label = '레벨'; break;
                     case 'problems': label = '문제 수'; break;
                     case 'damage': label = '피해량'; break;
+                    case 'tower': label = '층'; break;
+                    case 'combo': label = '콤보'; break;
                 }
 
                 // 👇 내 순위 찾기
@@ -3666,6 +4498,8 @@
                             case 'level': myValue = record.level; break;
                             case 'problems': myValue = record.problems; break;
                             case 'damage': myValue = record.damage; break;
+                            case 'tower': myValue = record.tower || 0; break;
+                            case 'combo': myValue = record.combo || 0; break;
                         }
                     }
                 });
@@ -3704,6 +4538,8 @@
                         case 'level': value = record.level; break;
                         case 'problems': value = record.problems; break;
                         case 'damage': value = record.damage; break;
+                        case 'tower': value = record.tower || 0; break;
+                        case 'combo': value = record.combo || 0; break;
                     }
                     
                     const row = document.createElement('tr');
