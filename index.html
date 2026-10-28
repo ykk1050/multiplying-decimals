@@ -726,6 +726,37 @@
             margin-top: 8px;
         }
 
+        /* 영상 이펙트: 검은 배경은 사라지고 빛만 보이게 */
+        .fx-video {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 140%;
+            height: 140%;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            mix-blend-mode: screen;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        .fx-video.big {
+            width: 175%;
+            height: 175%;
+        }
+
+        .character-avatar.shake {
+            animation: avatarShake 0.45s ease-in-out;
+        }
+
+        @keyframes avatarShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-7px) rotate(-2deg); }
+            40% { transform: translateX(7px) rotate(2deg); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+
         .shop-coin-info {
             text-align: center;
             margin-bottom: 25px;
@@ -1559,7 +1590,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.400</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.401</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -1968,16 +1999,16 @@
         /* //스킬 */
         // 마왕 단계: 레벨 10마다 다른 마왕으로 변신 (91레벨부터는 최종 마왕)
         const VILLAIN_STAGES = [
-            { name: '수학 마왕', image: 'devilking.png', weak: 'light', resist: 'dark' },
-            { name: '화염 마왕', image: 'images/devil2.webp', weak: 'ice', resist: 'fire' },
-            { name: '빙결 마왕', image: 'images/devil3.webp', weak: 'fire', resist: 'ice' },
-            { name: '독안개 마왕', image: 'images/devil4.webp', weak: 'light', resist: 'dark' },
-            { name: '번개 마왕', image: 'images/devil5.webp', weak: 'physical', resist: 'lightning' },
-            { name: '대지 마왕', image: 'images/devil6.webp', weak: 'ice', resist: 'lightning' },
-            { name: '그림자 마왕', image: 'images/devil7.webp', weak: 'light', resist: 'dark' },
-            { name: '시계태엽 마왕', image: 'images/devil8.webp', weak: 'lightning', resist: 'physical' },
-            { name: '혼돈의 숫자 마왕', image: 'images/devil9.webp', weak: 'dark', resist: 'light' },
-            { name: '최종 마왕', image: 'images/devil10.webp', weak: 'lightning', resist: 'fire' }
+            { name: '수학 마왕', image: 'devilking.png', weak: 'light', resist: 'dark', special: { name: '🌑 어둠의 수식', fx: 'dm_math' } },
+            { name: '화염 마왕', image: 'images/devil2.webp', weak: 'ice', resist: 'fire', special: { name: '🔥 용암 폭발', fx: 'dm_fire' } },
+            { name: '빙결 마왕', image: 'images/devil3.webp', weak: 'fire', resist: 'ice', special: { name: '❄️ 빙결의 숨결', fx: 'dm_ice' } },
+            { name: '독안개 마왕', image: 'images/devil4.webp', weak: 'light', resist: 'dark', special: { name: '☠️ 맹독 안개', fx: 'dm_poison' } },
+            { name: '번개 마왕', image: 'images/devil5.webp', weak: 'physical', resist: 'lightning', special: { name: '⚡ 낙뢰', fx: 'dm_lightning' } },
+            { name: '대지 마왕', image: 'images/devil6.webp', weak: 'ice', resist: 'lightning', special: { name: '🪨 대지 분쇄', fx: 'dm_earth' } },
+            { name: '그림자 마왕', image: 'images/devil7.webp', weak: 'light', resist: 'dark', special: { name: '🌑 그림자 손톱', fx: 'dm_shadow' } },
+            { name: '시계태엽 마왕', image: 'images/devil8.webp', weak: 'lightning', resist: 'physical', special: { name: '⚙️ 톱니 폭풍', fx: 'dm_clock' } },
+            { name: '혼돈의 숫자 마왕', image: 'images/devil9.webp', weak: 'dark', resist: 'light', special: { name: '✖️ 숫자 운석', fx: 'dm_chaos' } },
+            { name: '최종 마왕', image: 'images/devil10.webp', weak: 'lightning', resist: 'fire', special: { name: '👑 멸망의 일격', fx: 'dm_final' } }
         ];
 
         function getVillainStage(level) {
@@ -2128,6 +2159,7 @@
         function announceElement(result) {
             if (result === 'weak') {
                 addBattleLog('💥 효과가 굉장했다! (약점 공격 ×2)');
+                shakeAvatar('villain');
                 showBattlePopup('효과가 굉장했다!', 'weak');
             } else if (result === 'resist') {
                 addBattleLog('🛡️ 효과가 별로인 듯하다... (내성 ×0.5)');
@@ -2145,7 +2177,7 @@
             const stage = getCurrentStage();
             gameState.ownedSkills.forEach(id => {
                 const btn = document.getElementById(`skill-${id}`);
-                const skill = SKILLS[id];
+                const skill = resolveSkill(SKILLS[id]);
                 if (!btn || !skill) return;
                 btn.classList.toggle('effective', skill.element === stage.weak);
                 btn.classList.toggle('resisted', skill.element === stage.resist);
@@ -2270,7 +2302,7 @@
             gameState.currentStats.dailyStats.totalDamage += damage;
             addBattleLog(`⚡ 피버 추가 공격! ${damage}의 피해!`);
             playHeroAttackSound();
-            triggerHitEffect('heroattack');
+            playFx('fever_hit', 'villain');
             updateRecordsDisplay();
             updateDisplay();
             if (gameState.villain.hp <= 0) victory();
@@ -2402,7 +2434,7 @@
                 gameState.currentStats.dailyStats.totalDamage += result.damage;
                 addBattleLog(`🐾 ${pet.name}의 ${elementLabel(pet.element)} 공격! ${result.damage}의 피해!`);
                 announceElement(result.result);
-                triggerHitEffect(pet.element === 'fire' ? 'explosion' : 'heroattack');
+                playFx(pet.element === 'fire' ? 'pet_fire' : 'pet_ice', 'villain');
                 petAction();
                 updateRecordsDisplay();
                 updateDisplay();
@@ -2410,12 +2442,14 @@
             } else if (pet.type === 'mana' && player.mana < player.maxMana) {
                 player.mana = Math.min(player.maxMana, player.mana + pet.amount);
                 addBattleLog(`🐾 ${pet.name}가 마나를 ${pet.amount} 채워 주었습니다!`);
+                playFx('pet_mana', 'hero');
                 petAction();
                 updateDisplay();
             } else if (pet.type === 'heal' && player.hp > 0 && player.hp < player.maxHp) {
                 const heal = Math.max(1, Math.floor(player.maxHp * pet.ratio));
                 player.hp = Math.min(player.maxHp, player.hp + heal);
                 addBattleLog(`🐾 ${pet.name}가 체력을 ${heal} 회복시켜 주었습니다!`);
+                playFx('pet_heal', 'hero');
                 petAction();
                 updateDisplay();
             }
@@ -2744,6 +2778,67 @@
         }
 
 
+        // ===== 영상 이펙트 =====
+        const FX_PATH = 'images/fx/';
+
+        // target: 'villain'(마왕 쪽) 또는 'hero'(용사 쪽)
+        function playFx(name, target, options) {
+            const opts = options || {};
+            const avatar = document.querySelector(target === 'hero' ? '.player-avatar' : '.villain-avatar');
+            if (!avatar || !name) return;
+            const video = document.createElement('video');
+            video.className = 'fx-video' + (opts.big ? ' big' : '');
+            video.muted = true;
+            video.playsInline = true;
+            video.setAttribute('playsinline', '');
+            video.setAttribute('muted', '');
+            video.src = FX_PATH + name + '.mp4';
+            avatar.appendChild(video);
+            const done = () => video.remove();
+            video.addEventListener('ended', done);
+            video.addEventListener('error', done);
+            setTimeout(done, 6000);
+            const playing = video.play();
+            if (playing && playing.catch) playing.catch(done);
+            if (opts.shake) shakeAvatar(target);
+        }
+
+        function shakeAvatar(target) {
+            const avatar = document.querySelector(target === 'hero' ? '.player-avatar' : '.villain-avatar');
+            if (!avatar) return;
+            avatar.classList.remove('shake');
+            void avatar.offsetWidth;
+            avatar.classList.add('shake');
+        }
+
+        // 자주 쓰는 이펙트는 미리 받아 두기 (처음 재생할 때 끊기지 않게)
+        function warmFx(names) {
+            names.forEach(name => {
+                const video = document.createElement('video');
+                video.preload = 'auto';
+                video.muted = true;
+                video.src = FX_PATH + name + '.mp4';
+            });
+        }
+
+        // 궁극기는 선택한 용사에 따라 이름·속성·연출이 달라짐
+        const HERO_ULTIMATES = {
+            knight: { name: '⚔️ 천검 강림', icon: '⚔️', description: '하늘에서 거대한 룬 검이 내리꽂힘', element: 'physical', fx: 'ult_knight' },
+            mage: { name: '❄️ 절대 영도', icon: '❄️', description: '모든 것을 얼려 산산조각 냄', element: 'ice', fx: 'ult_mage' },
+            archer: { name: '⚡ 뇌신의 화살', icon: '⚡', description: '번개로 만든 거대한 화살 한 발', element: 'lightning', fx: 'ult_archer' },
+            paladin: { name: '☀️ 천상의 빛', icon: '☀️', description: '하늘에서 쏟아지는 거룩한 빛기둥', element: 'light', fx: 'ult_paladin' },
+            ninja: { name: '🌑 그림자 분신술', icon: '🌑', description: '그림자 분신들의 연속 베기', element: 'dark', fx: 'ult_ninja' },
+            dragon: { name: '🔥 용왕의 분노', icon: '🔥', description: '불꽃 용이 덮쳐 대폭발', element: 'fire', fx: 'ult_dragon' }
+        };
+
+        function resolveSkill(skill) {
+            if (!skill) return skill;
+            if (skill.id === 'ultimate') {
+                return { ...skill, ...HERO_ULTIMATES[getSelectedHero().id] };
+            }
+            return skill;
+        }
+
         const SKILLS = {
             fireball: {
                 id: 'fireball', element: 'fire',
@@ -2799,7 +2894,7 @@
                 cost: 90,
                 useCost: { type: 'mana', amount: 20 },
                 damage: 70, attackScale: 1,
-                effect: 'fullpower'
+                fx: 'ex_rune_slash', sound: 'fullpower'
             },
             star_storm: {
                 id: 'star_storm', hero: 'mage', element: 'ice',
@@ -2809,7 +2904,7 @@
                 cost: 110,
                 useCost: { type: 'mana', amount: 35 },
                 damage: 130, attackScale: 1,
-                effect: 'meteor'
+                fx: 'ex_star_storm', sound: 'meteor'
             },
             arrow_rain: {
                 id: 'arrow_rain', hero: 'archer', element: 'lightning',
@@ -2819,7 +2914,7 @@
                 cost: 120,
                 useCost: { type: 'mana', amount: 20 },
                 damage: 25, attackScale: 0.5, hits: 3,
-                effect: 'heroattack'
+                fx: 'ex_arrow_rain', sound: 'hero'
             },
             holy_judgment: {
                 id: 'holy_judgment', hero: 'paladin', element: 'light',
@@ -2829,7 +2924,7 @@
                 cost: 130,
                 useCost: { type: 'mana', amount: 25 },
                 damage: 50, attackScale: 1, healRatio: 0.3,
-                effect: 'ultimate'
+                fx: 'ex_holy_judgment', sound: 'ultimate'
             },
             shadow_raid: {
                 id: 'shadow_raid', hero: 'ninja', element: 'dark',
@@ -2839,7 +2934,7 @@
                 cost: 140,
                 useCost: { type: 'hp', amount: 15 },
                 damage: 60, attackScale: 1.5,
-                effect: 'berserk'
+                fx: 'ex_shadow_raid', sound: 'berserk'
             },
             dragon_breath: {
                 id: 'dragon_breath', hero: 'dragon', element: 'fire',
@@ -2849,7 +2944,7 @@
                 cost: 160,
                 useCost: { type: 'both', hp: 15, mana: 25 },
                 damage: 150, attackScale: 1.5,
-                effect: 'explosion'
+                fx: 'ex_dragon_breath', sound: 'fireball'
             }
         };
 
@@ -2918,6 +3013,7 @@
             applyHero();
             applyPet();
             startPetLoop();
+            warmFx([HERO_ULTIMATES[getSelectedHero().id].fx, SKILLS[getSelectedHero().skill].fx, getCurrentStage().special.fx]);
             updateComboDisplay();
             
             // Element SDK 초기화 (있으면)
@@ -3550,7 +3646,8 @@
                 gameState.player.mana -= 20;
                 gameState.player.hp = gameState.player.maxHp;
                 addBattleLog(`🔮 리커버리 마법으로 체력을 완전 회복했습니다!`);
-                playhealingSound()
+                playhealingSound();
+                playFx('recovery', 'hero');
                 updateDisplay();
                 saveGameProgress();
 
@@ -3617,10 +3714,10 @@
                         const effectiveDefense = Math.floor(gameState.player.defense * (1 - armorPenetration));
                         villainDamage = Math.max(2, gameState.villain.attack - effectiveDefense);
                         playfirebreakSound();  // 불꽃 공격 전용 효과음
-                        triggerHitEffect('firebreak');  // 불꽃 공격
+                        playFx(getCurrentStage().special.fx, 'hero', { shake: true });  // 마왕별 특수 공격
                         
                         const penetrationPercent = Math.round(armorPenetration * 100);
-                        addBattleLog(`⚡ ${document.getElementById('villainName').textContent}의 불꽃 공격(방어 일부 무시)! (방어력 ${penetrationPercent}% 무시) ${villainDamage}의 피해!`);
+                        addBattleLog(`${getCurrentStage().special.icon || ''}${document.getElementById('villainName').textContent}의 ${getCurrentStage().special.name}! (방어력 ${penetrationPercent}% 무시) ${villainDamage}의 피해!`);
                     } else {
                         // 일반 공격
                         villainDamage = Math.max(1, gameState.villain.attack - gameState.player.defense);
@@ -3760,7 +3857,7 @@
             const shopElement = document.getElementById('skillShop');
             shopElement.innerHTML = '';
             
-            const skillList = Object.values(SKILLS).filter(isSkillAvailable).sort((a, b) => (b.hero ? 1 : 0) - (a.hero ? 1 : 0));
+            const skillList = Object.values(SKILLS).map(resolveSkill).filter(isSkillAvailable).sort((a, b) => (b.hero ? 1 : 0) - (a.hero ? 1 : 0));
             skillList.forEach(skill => {
                 const owned = gameState.ownedSkills.includes(skill.id);
                 const canBuy = gameState.coins >= skill.cost && !owned;
@@ -3830,7 +3927,7 @@
             container.innerHTML = '';
             
             gameState.ownedSkills.forEach(skillId => {
-                const skill = SKILLS[skillId];
+                const skill = resolveSkill(SKILLS[skillId]);
                 if (!skill || !isSkillAvailable(skill)) return;
 
                 const btn = document.createElement('button');
@@ -3885,7 +3982,7 @@
         function useSkill(skillId) {
             if (!gameState.gameActive) return;
             
-            const skill = SKILLS[skillId];
+            const skill = resolveSkill(SKILLS[skillId]);
             if (!skill || !isSkillAvailable(skill)) return;
 
             // 비용 체크
@@ -3950,18 +4047,18 @@
                 const heal = Math.floor(gameState.player.maxHp * skill.healRatio);
                 gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + heal);
                 addBattleLog(`💖 빛의 힘으로 체력을 ${heal} 회복했습니다!`);
+                playFx('recovery', 'hero');
             }
 
             // 스킬별 효과음 및 이펙트
-            if (skill.hero) {
-                const sounds = { fullpower: playfullpowerSound, meteor: playmeteoSound, heroattack: playHeroAttackSound,
-                                 ultimate: playhealingSound, berserk: playberserkSound, explosion: playFireballSound };
-                (sounds[skill.effect] || playHeroAttackSound)();
-                triggerHitEffect(skill.effect);
+            if (skill.fx) {
+                // 전용기·캐릭터별 궁극기: 고유 영상 이펙트
+                const sounds = { fullpower: playfullpowerSound, meteor: playmeteoSound, hero: playHeroAttackSound,
+                                 ultimate: playultimateSound, berserk: playberserkSound, fireball: playFireballSound };
+                (skillId === 'ultimate' ? playultimateSound : (sounds[skill.sound] || playHeroAttackSound))();
+                playFx(skill.fx, 'villain', { big: skillId === 'ultimate', shake: true });
                 if (skill.hits > 1) {
-                    for (let i = 1; i < skill.hits; i++) {
-                        setTimeout(() => { playHeroAttackSound(); triggerHitEffect(skill.effect); }, i * 350);
-                    }
+                    for (let i = 1; i < skill.hits; i++) setTimeout(playHeroAttackSound, i * 350);
                 }
             } else if (skillId === 'fireball') {
                 playFireballSound();
