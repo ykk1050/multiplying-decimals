@@ -1433,13 +1433,376 @@
 
     </style>
   <style>@view-transition { navigation: auto; }</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <style id="theme-dark-fantasy">
+        /* 전투 화면 2단 배치: 왼쪽 전투·기록, 오른쪽 문제 석판 */
+        .battle-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 20px;
+            align-items: start;
+            margin-bottom: 24px;
+        }
+
+        .battle-main {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .battle-main .battle-arena { margin-bottom: 0; }
+        .records-section { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+        @media (max-width: 1200px) {
+            .battle-layout .character-avatar { width: 150px; height: 150px; }
+        }
+
+        @media (max-width: 900px) {
+            .battle-layout { grid-template-columns: 1fr; }
+        }
+
+        /* =====================================================
+           다크 판타지 테마 (마법 도서관) — 기존 스타일을 덮어씀
+           ===================================================== */
+        :root {
+            --ink: #0d0a1a;
+            --panel: rgba(18, 14, 36, 0.82);
+            --panel-2: rgba(28, 22, 54, 0.88);
+            --gold: #d9b45a;
+            --gold-2: #f6e3a1;
+            --gold-dim: rgba(217, 180, 90, 0.45);
+            --text: #efe7d2;
+            --text-dim: #b9b0c9;
+            --violet: #8b6cff;
+            --crimson: #e2475b;
+            --teal: #3ec9b0;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+            color: var(--text);
+            background: var(--ink) url('images/bg_library.webp') center top / cover fixed no-repeat;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(139, 108, 255, 0.18), transparent 60%),
+                linear-gradient(180deg, rgba(10, 7, 22, 0.55), rgba(10, 7, 22, 0.88));
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(180deg, rgba(20, 15, 40, 0.78), rgba(12, 9, 26, 0.86));
+            border: 1px solid var(--gold-dim);
+            border-radius: 18px;
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.35), 0 0 40px rgba(139, 108, 255, 0.18), inset 0 0 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+        }
+
+        /* 제목 */
+        .game-title {
+            font-family: 'Black Han Sans', 'Noto Sans KR', sans-serif;
+            font-weight: 400;
+            font-size: 2.6rem;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+            background: linear-gradient(180deg, #fff6d6 0%, #f0cf73 45%, #b8862f 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.6)) drop-shadow(0 0 14px rgba(240, 207, 115, 0.35));
+            text-shadow: none;
+        }
+
+        .game-title::after {
+            content: '';
+            display: block;
+            width: 240px;
+            height: 2px;
+            margin: 10px auto 0;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .notice-banner {
+            font-size: 0.88rem;
+            color: var(--gold-2);
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--gold-dim);
+            border-left: 4px solid var(--gold);
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        /* 상단 버튼 / 코인 */
+        .coin-display {
+            background: linear-gradient(180deg, #2a2148, #16112c);
+            border: 1px solid var(--gold);
+            color: var(--gold-2);
+            box-shadow: 0 0 14px rgba(240, 207, 115, 0.25), inset 0 0 10px rgba(0, 0, 0, 0.6);
+            font-family: 'Black Han Sans', sans-serif;
+            font-weight: 400;
+        }
+
+        .shop-btn, .ranking-btn, .tower-main-btn {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 800;
+            color: var(--text);
+            border: 1px solid var(--gold-dim);
+            border-radius: 10px;
+            padding: 12px 18px;
+            background: linear-gradient(180deg, #3a2d68, #211a40);
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .shop-btn { background: linear-gradient(180deg, #7a4a1c, #432610); }
+        .ranking-btn { background: linear-gradient(180deg, #7a2232, #3f1019); }
+        .tower-main-btn { background: linear-gradient(180deg, #1f4e86, #11284a); }
+
+        .shop-btn:hover, .ranking-btn:hover, .tower-main-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold);
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45), 0 0 16px rgba(240, 207, 115, 0.3);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            justify-content: center;
+        }
+
+        .action-row > button { flex: 1; position: static; }
+
+        /* 레벨 표시 */
+        .level-indicator {
+            font-family: 'Black Han Sans', sans-serif;
+            font-weight: 400;
+            color: var(--gold-2);
+            font-size: 1.35rem;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(240, 207, 115, 0.4);
+        }
+
+        /* 기록 패널 */
+        .records-section {
+            background: var(--panel);
+            border: 1px solid var(--gold-dim);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .current-stats h3, .best-records h3 {
+            color: var(--gold-2);
+            font-family: 'Black Han Sans', sans-serif;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .stat-item, .record-item {
+            background: linear-gradient(180deg, rgba(48, 38, 88, 0.7), rgba(26, 20, 50, 0.8));
+            border: 1px solid rgba(217, 180, 90, 0.25);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            color: var(--text);
+        }
+
+        .stat-number {
+            color: var(--gold-2);
+            font-family: 'Black Han Sans', sans-serif;
+            font-weight: 400;
+            text-shadow: 0 0 10px rgba(240, 207, 115, 0.35);
+        }
+
+        .stat-label, .record-label { color: var(--text-dim); }
+        .record-value { color: var(--gold-2); font-weight: 800; }
+
+        .reset-btn {
+            padding: 8px 18px;
+            background: rgba(226, 71, 91, 0.15);
+            color: #ffb3bd;
+            border: 1px solid rgba(226, 71, 91, 0.6);
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* 전투 카드 */
+        .character-card {
+            background: linear-gradient(180deg, rgba(30, 24, 58, 0.9), rgba(14, 11, 28, 0.92));
+            border: 1px solid;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.55);
+        }
+
+        .player-card { border-color: rgba(62, 201, 176, 0.75); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.55), 0 0 18px rgba(62, 201, 176, 0.2); }
+        .villain-card { border-color: rgba(226, 71, 91, 0.8); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.55), 0 0 18px rgba(226, 71, 91, 0.25); }
+
+        .character-name {
+            font-family: 'Black Han Sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.45rem;
+            letter-spacing: 1px;
+            color: var(--gold-2);
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.7);
+        }
+
+        .villain-card .character-name { color: #ffd0d6; }
+        .mastery-badge { color: #7fe3cf; }
+        .villain-element { color: #ff9aa8; }
+
+        .character-avatar {
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            overflow: visible;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.6), 0 0 18px rgba(240, 207, 115, 0.25);
+        }
+
+        .character-avatar > img:first-child { border-radius: 8px; }
+        .player-avatar, .villain-avatar { background: #0b0816; }
+
+        .stat-label { color: var(--text-dim); }
+
+        .stat-value {
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(217, 180, 90, 0.3);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .stat-fill {
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        .hp-fill { background: linear-gradient(180deg, #ff6b7d, #b3182f); }
+        .attack-fill { background: linear-gradient(180deg, #ffb35c, #b8620f); }
+        .defense-fill { background: linear-gradient(180deg, #6fb6ff, #1f5fa8); }
+        .mana-fill { background: linear-gradient(180deg, #b49bff, #5b33c9); }
+
+        /* 문제 영역: 고대 석판 */
+        .math-section {
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(139, 108, 255, 0.22), transparent 70%),
+                linear-gradient(180deg, rgba(36, 28, 66, 0.92), rgba(16, 12, 32, 0.95));
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.55), 0 0 24px rgba(139, 108, 255, 0.2);
+        }
+
+        .math-problem {
+            font-family: 'Black Han Sans', sans-serif;
+            font-weight: 400;
+            font-size: 2.3rem;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 12px rgba(180, 155, 255, 0.8), 0 2px 0 rgba(0, 0, 0, 0.7);
+        }
+
+        .combo-display { color: #ffcf6e; text-shadow: 0 0 8px rgba(255, 160, 50, 0.5); }
+
+        .answer-input {
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--gold-2);
+            border: 2px solid var(--gold);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7), 0 0 10px rgba(240, 207, 115, 0.2);
+        }
+
+        .answer-input::placeholder { color: rgba(239, 231, 210, 0.45); }
+
+        .submit-btn, .next-level-btn {
+            background: linear-gradient(180deg, #f3d27a, #b8862f);
+            color: #2a1a05;
+            border: 1px solid #fff0b8;
+            box-shadow: 0 4px 0 #6d4a14, 0 0 14px rgba(240, 207, 115, 0.35);
+            font-weight: 900;
+        }
+
+        .submit-btn:hover { box-shadow: 0 6px 0 #6d4a14, 0 0 20px rgba(240, 207, 115, 0.5); }
+
+        /* 강화 / 기술 버튼 */
+        .upgrade-section {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--gold-dim);
+            border-radius: 12px;
+        }
+
+        #upgradeTitle { color: var(--gold-2) !important; }
+
+        .upgrade-btn {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .upgrade-hp { background: linear-gradient(180deg, #e2475b, #8e1a2b); }
+        .upgrade-attack { background: linear-gradient(180deg, #f08a2c, #92470a); }
+        .upgrade-defense { background: linear-gradient(180deg, #3d8fe0, #1a4b88); }
+        .upgrade-mana { background: linear-gradient(180deg, #8b6cff, #4a2bb0); }
+
+        .skill-use-btn {
+            background: linear-gradient(180deg, #4a3a86, #261d4d);
+            border: 1px solid var(--gold-dim);
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        }
+
+        .skill-use-btn:hover { border-color: var(--gold); box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5), 0 0 16px rgba(240, 207, 115, 0.3); }
+        .skill-cost-badge { background: rgba(0, 0, 0, 0.4); color: var(--gold-2); }
+
+        .recovery-btn {
+            background: linear-gradient(180deg, #3ec9b0, #17705f) !important;
+            font-size: 1.1rem;
+            padding: 12px 25px;
+        }
+
+        /* 전투 기록 */
+        .battle-log {
+            height: 160px;
+            background: rgba(6, 4, 14, 0.85);
+            border: 1px solid var(--gold-dim);
+            color: #d8cfee;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.85rem;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .app-footer { color: rgba(239, 231, 210, 0.55); position: relative; z-index: 1; }
+
+        /* 창(상점·랭킹·탑·결과): 양피지 */
+        .shop-content, .ranking-content, .tower-content, .result-content, .cheat-content {
+            background: linear-gradient(180deg, #f6ecd2, #e6d3a6);
+            border: 2px solid #8a6a2b;
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.45), 0 20px 60px rgba(0, 0, 0, 0.6);
+            color: #3b2a12;
+        }
+
+        .shop-title, .ranking-title, .tower-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-weight: 400;
+            color: #5a3d10;
+            letter-spacing: 1px;
+        }
+
+        .hero-card, .skill-card {
+            background: linear-gradient(180deg, #fffaf0, #f1e2bd);
+            border-color: #c9a75e;
+        }
+
+        .ranking-table th { background: linear-gradient(180deg, #5a3d10, #3b280a) !important; color: #f6e3a1; }
+        .username-section { background: rgba(255, 250, 235, 0.7); border-color: #c9a75e; }
+  </style>
  </head>
  <body>
   <div class="game-container">
    <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁 2</h1>  
    <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
        <button class="ranking-btn" onclick="openCheat()" style="position: static;">🎮 개발자 기능</button>
-       <span style="font-size: 0.9rem; color: #e53e3e; font-weight: bold; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; border: 1px solid #e53e3e;">
+       <span class="notice-banner">
            📢공지사항: 수학 악마 전쟁 2가 출시되었습니다. 향후 몇 주간 간단한 업데이트가 이루어질 수 있습니다.
        </span>
    </div>
@@ -1456,57 +1819,8 @@
 
     레벨 1
    </div>
-   <div class="records-section" id="recordsSection">
-    <div class="current-stats">
-     <h3>🏆 현재 플레이 기록</h3>
-     <div class="stats-grid">
-      <div class="stat-item"><span class="stat-number" id="currentLevel">1</span> <span class="stat-label">현재 레벨</span>
-      </div>
-      <div class="stat-item"><span class="stat-number" id="problemsSolved">0</span> <span class="stat-label">해결한 문제</span>
-      </div>
-      <div class="stat-item"><span class="stat-number" id="totalDamage">0</span> <span class="stat-label">총 피해량</span>
-      </div>
-      <div class="stat-item"><span class="stat-number" id="playTime">0:00</span> <span class="stat-label">플레이 시간</span>
-      </div>
-     </div>
-
-     <!-- 👇 여기에 버튼 추가 -->
-     <div style="display: flex; gap: 10px; margin-top: 100px; justify-content: center;">
-         <button class="shop-btn" onclick="openShop()" style="position: static; flex: 1;">
-             🏪 기술상점
-         </button>
-         <button class="ranking-btn" onclick="openRanking()" style="position: static; flex: 1;">
-             🏆 랭킹
-         </button>
-         <button class="ranking-btn" onclick="openTower()" style="position: static; flex: 1; background: linear-gradient(135deg, #4299e1, #3182ce);">
-             🗼 무한의 탑
-         </button>
-     </div>
-    
-
-    </div>
-    <div class="best-records">
-     <h3>⭐ 최고 기록</h3>
-     <div class="record-item"><span class="record-label">최고 레벨:</span> <span class="record-value" id="bestLevel">-</span>
-     </div>
-     <div class="record-item"><span class="record-label">최다 문제 해결:</span> <span class="record-value" id="bestProblems">-</span>
-     </div>
-     <div class="record-item"><span class="record-label">최대 총 피해량:</span> <span class="record-value" id="bestDamage">-</span>
-     </div>
-     <div class="record-item"><span class="record-label">최강 체력:</span> <span class="record-value" id="bestHp">-</span>
-     </div>
-     <div class="record-item"><span class="record-label">최강 공격력:</span> <span class="record-value" id="bestAttack">-</span>
-     </div>
-     
-
-     
-     <!-- 👇 이 부분 추가 -->
-     <div style="text-align: center; margin-top: 15px;">
-         <button onclick="resetBestRecords()" style="padding: 8px 20px; background: linear-gradient(135deg, #f56565, #e53e3e); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
-             🔄 기록 초기화
-         </button>
-    </div>
-   </div>
+   <div class="battle-layout">
+    <div class="battle-main">
    <div class="battle-arena">
     <!-- 용사 카드 -->
     <div class="character-card player-card">
@@ -1610,7 +1924,11 @@
         </div>
     </div>
    </div>
-
+   <!-- 오른쪽: 전투 로그 -->
+   <div class="battle-log" id="battleLog">
+    게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
+   </div>
+    </div>
    <div class="math-section">
     <div class="math-problem" id="mathProblem">
          문제 로딩 중...
@@ -1627,16 +1945,63 @@
         <!-- 스킬 버튼들이 여기에 동적으로 추가됩니다 -->
         <div id="skillButtonsContainer" style="display: contents;"></div>
     </div>
-    <div style="text-align: center; margin-top: 20px;"><button class="upgrade-btn" id="recoveryBtn" onclick="useRecovery()" style="background: linear-gradient(135deg, #9f7aea, #805ad5); font-size: 1.1rem; padding: 12px 25px;" disabled> 🔮 리커버리 (마나 20) </button>
+    <div style="text-align: center; margin-top: 20px;"><button class="upgrade-btn recovery-btn" id="recoveryBtn" onclick="useRecovery()" disabled> 🔮 리커버리 (마나 20) </button>
     </div>
    </div>
-    
-   <!-- 오른쪽: 전투 로그 -->
-   <div class="battle-log" id="battleLog">
-    게임이 시작되었습니다! 소수 곱셈 문제를 풀어서 캐릭터를 강화하세요!<br>
    </div>
-   
-   </div>  <!-- 👇 game-content 닫기 -->
+   <div class="records-section" id="recordsSection">
+    <div class="current-stats">
+     <h3>🏆 현재 플레이 기록</h3>
+     <div class="stats-grid">
+      <div class="stat-item"><span class="stat-number" id="currentLevel">1</span> <span class="stat-label">현재 레벨</span>
+      </div>
+      <div class="stat-item"><span class="stat-number" id="problemsSolved">0</span> <span class="stat-label">해결한 문제</span>
+      </div>
+      <div class="stat-item"><span class="stat-number" id="totalDamage">0</span> <span class="stat-label">총 피해량</span>
+      </div>
+      <div class="stat-item"><span class="stat-number" id="playTime">0:00</span> <span class="stat-label">플레이 시간</span>
+      </div>
+     </div>
+
+     <!-- 👇 여기에 버튼 추가 -->
+     <div class="action-row">
+         <button class="shop-btn" onclick="openShop()">
+             🏪 기술상점
+         </button>
+         <button class="ranking-btn" onclick="openRanking()">
+             🏆 랭킹
+         </button>
+         <button class="tower-main-btn" onclick="openTower()">
+             🗼 무한의 탑
+         </button>
+     </div>
+    
+
+    </div>
+    <div class="best-records">
+     <h3>⭐ 최고 기록</h3>
+     <div class="record-item"><span class="record-label">최고 레벨:</span> <span class="record-value" id="bestLevel">-</span>
+     </div>
+     <div class="record-item"><span class="record-label">최다 문제 해결:</span> <span class="record-value" id="bestProblems">-</span>
+     </div>
+     <div class="record-item"><span class="record-label">최대 총 피해량:</span> <span class="record-value" id="bestDamage">-</span>
+     </div>
+     <div class="record-item"><span class="record-label">최강 체력:</span> <span class="record-value" id="bestHp">-</span>
+     </div>
+     <div class="record-item"><span class="record-label">최강 공격력:</span> <span class="record-value" id="bestAttack">-</span>
+     </div>
+     
+
+     
+     <!-- 👇 이 부분 추가 -->
+     <div style="text-align: center; margin-top: 15px;">
+         <button class="reset-btn" onclick="resetBestRecords()">
+             🔄 기록 초기화
+         </button>
+    </div>
+   </div>
+   </div>
+
 
    <!-- 승리 모달 -->
     <div class="result-modal" id="victoryModal">
@@ -1660,7 +2025,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.403</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.404</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
