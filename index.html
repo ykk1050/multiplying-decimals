@@ -740,6 +740,12 @@
             z-index: 15;
         }
 
+        /* 기본 공격: 칼 휘두르기 GIF와 비슷한 크기 */
+        .fx-video.small {
+            width: 100%;
+            height: 100%;
+        }
+
         .fx-video.big {
             width: 175%;
             height: 175%;
@@ -1654,7 +1660,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.402</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.403</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2723,15 +2729,15 @@
             { id: 'knight', name: '용사', description: '모든 능력이 고른 기본 용사', image: 'hero.png', cost: 0,
               stats: { hp: 100, attack: 15, defense: 10, mana: 20 }, growth: { hp: 20, attack: 5, defense: 1, mana: 5 }, skill: 'rune_slash' },
             { id: 'mage', name: '마법사', description: '마나가 많고 몸이 약한 마법사', image: 'images/hero_mage.webp', cost: 100,
-              stats: { hp: 80, attack: 12, defense: 7, mana: 40 }, growth: { hp: 15, attack: 4, defense: 1, mana: 10 }, skill: 'star_storm' },
+              stats: { hp: 80, attack: 12, defense: 7, mana: 40 }, growth: { hp: 15, attack: 4, defense: 1, mana: 10 }, skill: 'star_storm', basicFx: 'atk_mage' },
             { id: 'archer', name: '궁수', description: '빠르고 정확한 요정 궁수', image: 'images/hero_archer.webp', cost: 150,
-              stats: { hp: 90, attack: 18, defense: 8, mana: 25 }, growth: { hp: 18, attack: 6, defense: 1, mana: 6 }, skill: 'arrow_rain' },
+              stats: { hp: 90, attack: 18, defense: 8, mana: 25 }, growth: { hp: 18, attack: 6, defense: 1, mana: 6 }, skill: 'arrow_rain', basicFx: 'atk_archer' },
             { id: 'paladin', name: '성기사', description: '튼튼한 방패의 수호자', image: 'images/hero_paladin.webp', cost: 200,
-              stats: { hp: 130, attack: 13, defense: 14, mana: 25 }, growth: { hp: 26, attack: 4, defense: 2, mana: 6 }, skill: 'holy_judgment' },
+              stats: { hp: 130, attack: 13, defense: 14, mana: 25 }, growth: { hp: 26, attack: 4, defense: 2, mana: 6 }, skill: 'holy_judgment', basicFx: 'atk_paladin' },
             { id: 'ninja', name: '닌자', description: '공격력이 가장 날카로운 닌자', image: 'images/hero_ninja.webp', cost: 250,
-              stats: { hp: 85, attack: 21, defense: 8, mana: 20 }, growth: { hp: 16, attack: 7, defense: 1, mana: 5 }, skill: 'shadow_raid' },
+              stats: { hp: 85, attack: 21, defense: 8, mana: 20 }, growth: { hp: 16, attack: 7, defense: 1, mana: 5 }, skill: 'shadow_raid', basicFx: 'atk_ninja' },
             { id: 'dragon', name: '용기사', description: '힘과 체력을 모두 갖춘 기사', image: 'images/hero_dragon.webp', cost: 300,
-              stats: { hp: 115, attack: 18, defense: 11, mana: 30 }, growth: { hp: 22, attack: 6, defense: 1, mana: 7 }, skill: 'dragon_breath' }
+              stats: { hp: 115, attack: 18, defense: 11, mana: 30 }, growth: { hp: 22, attack: 6, defense: 1, mana: 7 }, skill: 'dragon_breath', basicFx: 'atk_dragon' }
         ];
 
         function getSelectedHero() {
@@ -3077,7 +3083,7 @@
             applyHero();
             applyPet();
             startPetLoop();
-            warmFx([HERO_ULTIMATES[getSelectedHero().id].fx, SKILLS[getSelectedHero().skill].fx, getCurrentStage().special.fx]);
+            warmFx([HERO_ULTIMATES[getSelectedHero().id].fx, SKILLS[getSelectedHero().skill].fx, getCurrentStage().special.fx, getSelectedHero().basicFx].filter(Boolean));
             updateComboDisplay();
             
             // Element SDK 초기화 (있으면)
@@ -3748,7 +3754,10 @@
 
                 updateRecordsDisplay();
                 playHeroAttackSound();
-                triggerHitEffect('heroattack');
+                // 기본 공격 이펙트: 용사마다 다름 (기본 용사는 원래 GIF)
+                const basicFx = getSelectedHero().basicFx;
+                if (basicFx) playFx(basicFx, 'villain', { small: true });
+                else triggerHitEffect('heroattack');
 
                 if (gameState.villain.hp <= 0) {
                     victory();
