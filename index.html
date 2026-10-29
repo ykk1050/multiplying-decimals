@@ -1437,6 +1437,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
   <style id="theme-dark-fantasy">
+        .action-row { margin: 0 0 18px; }
+        .ranking-btn, .notice-banner { white-space: normal; }
+        button.ranking-btn[onclick="openCheat()"] { white-space: nowrap; }
+
+        @media (max-width: 900px) {
+            .game-container .battle-layout { display: flex; flex-direction: column; align-items: stretch; }
+            .game-container .battle-main { display: contents; }
+            .game-container .battle-main .battle-arena { order: 1; }
+            .game-container .battle-layout .math-section { order: 2; }
+            .game-container .battle-main .battle-log { order: 3; }
+        }
+
+        @media (min-width: 560px) {
+            .answer-section { flex-direction: row !important; justify-content: center; gap: 10px; }
+        }
+
         /* 전투 화면 2단 배치: 왼쪽 전투·기록, 오른쪽 문제 석판 */
         .battle-layout {
             display: grid;
@@ -1795,6 +1811,35 @@
 
         .ranking-table th { background: linear-gradient(180deg, #5a3d10, #3b280a) !important; color: #f6e3a1; }
         .username-section { background: rgba(255, 250, 235, 0.7); border-color: #c9a75e; }
+
+        /* 양피지 창 안쪽 색 맞춤 */
+        .victory, .game-over {
+            background: linear-gradient(180deg, #fff8e6, #f0dfb4);
+            border: 2px solid #b8913f;
+            box-shadow: inset 0 0 20px rgba(138, 106, 43, 0.15);
+        }
+
+        .victory h2 { color: #6b4a0e !important; font-family: 'Black Han Sans', sans-serif; font-weight: 400; letter-spacing: 1px; }
+        .victory p { color: #7a5a1e !important; }
+        .game-over { border-color: #a33a3a; }
+        .game-over h2 { color: #7a1f1f !important; font-family: 'Black Han Sans', sans-serif; font-weight: 400; letter-spacing: 1px; }
+        .game-over p { color: #8f3030 !important; }
+
+        .ranking-subtitle { color: #6b5228; }
+        .ranking-tab { background: #efe0bb; color: #5a3d10; border: 1px solid #c9a75e; }
+        .ranking-tab.active { background: linear-gradient(180deg, #7a5214, #4e330a); color: #f6e3a1; border-color: #4e330a; }
+        .ranking-table td { border-bottom-color: rgba(138, 106, 43, 0.25); color: #3b2a12; }
+        .ranking-table tr:hover { background: rgba(217, 180, 90, 0.15); }
+        .my-rank { background: rgba(240, 207, 115, 0.45) !important; }
+
+        .current-username { color: #6b4a0e; }
+        .my-nick-btn, .nick-word-btn, .nick-slot, .nick-spin-btn { border-color: #b8913f; color: #4e330a; background: #fffaf0; }
+        .nick-slot.open { background: #fbefcf; box-shadow: 0 0 0 3px rgba(184, 145, 63, 0.35); }
+        .nick-word-btn.chosen, .my-nick-btn.current { background: #7a5214; border-color: #4e330a; color: #f6e3a1; }
+        .nick-word-btn.random, .nick-spin-btn { background: #f6e3a1; }
+        .nick-preview { color: #4e330a; }
+        .username-save-btn { background: linear-gradient(180deg, #8a5d17, #5a3a0a); }
+        .username-save-btn:disabled { background: #c8b893; }
   </style>
  </head>
  <body>
@@ -1819,6 +1864,18 @@
 
     레벨 1
    </div>
+     <!-- 상점·랭킹·무한의 탑 -->
+     <div class="action-row">
+         <button class="shop-btn" onclick="openShop()">
+             🏪 기술상점
+         </button>
+         <button class="ranking-btn" onclick="openRanking()">
+             🏆 랭킹
+         </button>
+         <button class="tower-main-btn" onclick="openTower()">
+             🗼 무한의 탑
+         </button>
+     </div>
    <div class="battle-layout">
     <div class="battle-main">
    <div class="battle-arena">
@@ -1963,18 +2020,6 @@
       </div>
      </div>
 
-     <!-- 👇 여기에 버튼 추가 -->
-     <div class="action-row">
-         <button class="shop-btn" onclick="openShop()">
-             🏪 기술상점
-         </button>
-         <button class="ranking-btn" onclick="openRanking()">
-             🏆 랭킹
-         </button>
-         <button class="tower-main-btn" onclick="openTower()">
-             🗼 무한의 탑
-         </button>
-     </div>
     
 
     </div>
@@ -2025,7 +2070,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.404</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.405</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
