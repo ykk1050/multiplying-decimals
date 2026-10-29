@@ -1964,6 +1964,44 @@
         @media (max-width: 1200px) {
             .game-container .battle-layout .character-avatar { width: 180px; height: 180px; }
         }
+
+        /* 기술 버튼: 한 줄로, 새 기술은 오른쪽에 추가 (넘치면 옆으로 밀어 보기) */
+        .skill-panel .skills-container {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: visible;
+            padding: 12px 4px 6px;
+            margin-top: 4px;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .skill-panel .skill-use-btn {
+            flex: 0 0 auto;
+            min-width: 92px;
+            padding: 8px 10px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            gap: 3px;
+        }
+
+        .skill-panel .skill-cost-badge { font-size: 0.68rem; padding: 1px 6px; }
+
+        .skill-panel .recovery-btn {
+            background: linear-gradient(180deg, #3ec9b0, #17705f) !important;
+            border-color: rgba(127, 227, 207, 0.7);
+            padding: 8px 10px !important;
+            font-size: 0.85rem !important;
+        }
+
+        .skill-panel .skill-use-btn.effective::before { top: -9px; right: -4px; }
+        .skill-panel .skills-container { scrollbar-color: rgba(217, 180, 90, 0.6) rgba(0, 0, 0, 0.3); }
+        .skill-panel .skills-container::-webkit-scrollbar { height: 6px; }
+        .skill-panel .skills-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 3px; }
+        .skill-panel .skills-container::-webkit-scrollbar-thumb { background: rgba(217, 180, 90, 0.6); border-radius: 3px; }
   </style>
  </head>
  <body>
@@ -2108,10 +2146,9 @@
     <div class="skill-panel">
      <div class="skill-panel-title">⚔️ 기술 · 회복</div>
     <div class="skills-container">
-        <!-- 스킬 버튼들이 여기에 동적으로 추가됩니다 -->
+        <!-- 리커버리는 맨 왼쪽 고정, 산 기술은 오른쪽으로 한 칸씩 추가 -->
+        <button class="skill-use-btn recovery-btn" id="recoveryBtn" onclick="useRecovery()" disabled><span>🔮 리커버리</span><span class="skill-cost-badge">마나 20</span></button>
         <div id="skillButtonsContainer" style="display: contents;"></div>
-    </div>
-    <div style="text-align: center; margin-top: 20px;"><button class="upgrade-btn recovery-btn" id="recoveryBtn" onclick="useRecovery()" disabled> 🔮 리커버리 (마나 20) </button>
     </div>
     </div>
    <!-- 오른쪽: 전투 로그 -->
@@ -2199,7 +2236,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.408</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.409</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
