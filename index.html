@@ -2002,6 +2002,154 @@
         .skill-panel .skills-container::-webkit-scrollbar { height: 6px; }
         .skill-panel .skills-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 3px; }
         .skill-panel .skills-container::-webkit-scrollbar-thumb { background: rgba(217, 180, 90, 0.6); border-radius: 3px; }
+
+        /* ===== 실력의 탑 ===== */
+        .tower-content { max-width: 760px; max-height: 94vh; overflow-y: auto; }
+        .tower-body { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 16px; align-items: start; }
+        .tower-main { min-width: 0; }
+
+        .tower-track {
+            border: 2px solid #8a6a2b;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            padding: 6px;
+            color: #f6e3a1;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .track-above { font-size: 0.7rem; text-align: center; padding: 4px 2px 6px; color: #f6e3a1; min-height: 1.4em; }
+        .track-floors { display: flex; flex-direction: column; gap: 3px; }
+
+        .track-row {
+            position: relative;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 6px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(217, 180, 90, 0.25);
+            font-size: 0.75rem;
+            transition: background 0.3s;
+        }
+
+        .track-row.done { background: rgba(217, 180, 90, 0.25); }
+        .track-row.current { background: rgba(240, 207, 115, 0.45); border-color: #f6e3a1; box-shadow: 0 0 10px rgba(240, 207, 115, 0.6); }
+        .track-row.gate { border-color: #e2475b; }
+        .track-num { font-weight: 800; min-width: 30px; }
+
+        .track-hero {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #f6e3a1;
+            animation: heroClimb 0.5s ease-out;
+        }
+
+        @keyframes heroClimb {
+            from { transform: translateY(26px); opacity: 0.4; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .track-flag { font-size: 0.62rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffe08a; }
+        .track-flag.mine { color: #7fe3cf; }
+
+        .tower-rules { text-align: left; font-size: 0.88rem; margin: 6px auto; padding-left: 20px; max-width: 420px; }
+        .tower-hero-bonus { background: rgba(138, 106, 43, 0.15); border-radius: 8px; padding: 6px; font-weight: 700; }
+
+        .tower-status { align-items: center; font-size: 1.15rem; }
+        .tower-type { font-weight: 800; color: #7a5214; margin: 4px 0; }
+        .tower-problem { white-space: pre-line; font-size: 1.7rem; }
+
+        .tower-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+        .tower-choice {
+            padding: 14px 8px;
+            border-radius: 10px;
+            border: 2px solid #b8913f;
+            background: linear-gradient(180deg, #fffaf0, #ead7a8);
+            color: #4e330a;
+            font-size: 1.25rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #8a6a2b;
+        }
+
+        .tower-choice:active { transform: translateY(3px); box-shadow: 0 1px 0 #8a6a2b; }
+        .tower-choice:disabled { opacity: 0.25; text-decoration: line-through; cursor: not-allowed; }
+        .tower-streak { color: #b8620f; font-weight: 800; min-height: 1.3em; }
+        .tower-run-info { font-size: 0.82rem; color: #6b5228; margin-top: 4px; }
+
+        .event-title { font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; color: #5a3d10; margin: 6px 0; }
+        .path-choices, .chest-row { display: flex; gap: 12px; justify-content: center; margin: 12px 0; }
+
+        .path-btn {
+            flex: 1;
+            max-width: 220px;
+            padding: 14px 10px;
+            border-radius: 12px;
+            border: 2px solid #8a6a2b;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+        }
+
+        .path-btn small { font-size: 0.75rem; font-weight: 600; }
+        .path-btn.safe { background: linear-gradient(180deg, #3ec9b0, #17705f); }
+        .path-btn.hard { background: linear-gradient(180deg, #e2475b, #8e1a2b); }
+
+        .chest-btn {
+            width: 84px;
+            height: 84px;
+            font-size: 2.6rem;
+            border-radius: 14px;
+            border: 2px solid #b8913f;
+            background: linear-gradient(180deg, #fff3cf, #e6c77a);
+            cursor: pointer;
+            box-shadow: 0 5px 0 #8a6a2b;
+        }
+
+        .chest-btn.picked { box-shadow: 0 0 0 4px #f0cf73, 0 0 18px #f0cf73; }
+        .chest-result { font-weight: 900; font-size: 1.2rem; color: #6b4a0e; min-height: 1.5em; }
+
+        @media (max-width: 640px) {
+            .tower-body { grid-template-columns: 1fr; }
+            .tower-track { order: 2; }
+        }
+
+        /* ===== 강화 표시 ===== */
+        .lv-badge {
+            display: inline-block;
+            background: #7a5214;
+            color: #f6e3a1;
+            font-size: 0.72rem;
+            padding: 1px 7px;
+            border-radius: 8px;
+            margin-left: 4px;
+        }
+
+        .upgrade-item-btn {
+            margin-top: 6px;
+            width: 100%;
+            padding: 7px 8px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(180deg, #8b6cff, #4a2bb0);
+            box-shadow: 0 3px 0 #2d1a73;
+        }
+
+        .upgrade-item-btn:disabled { background: #b9ad93; box-shadow: none; cursor: not-allowed; }
+        .upgrade-max { margin-top: 6px; font-weight: 800; color: #8a5d17; }
   </style>
  </head>
  <body>
@@ -2019,6 +2167,8 @@
     <div class="coin-display">
         <span class="coin-icon">💰</span>
         <span id="coinAmount">0</span>
+        <span class="coin-icon">🔷</span>
+        <span id="runeAmount">0</span>
     </div>
     <!-- 여기까지 추가 -->
 
@@ -2236,14 +2386,14 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.411</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.412</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
         <button class="shop-close" onclick="closeShop()">×</button>
         <h2 class="shop-title">🏪 기술 상점</h2>
         <div class="shop-coin-info">
-            보유 코인: <span id="shopCoinAmount">0</span> 💰
+            보유 금화: <span id="shopCoinAmount">0</span> 💰 · 룬 조각: <span id="shopRuneAmount">0</span> 🔷
         </div>
         <div class="shop-section-title">🦸 용사 선택 <span style="font-size: 0.85rem; font-weight: normal; color: #718096;">(한 번 구매하면 계속 사용할 수 있어요)</span></div>
         <div class="hero-grid" id="heroShop"></div>
@@ -2313,27 +2463,47 @@
 <div class="tower-modal" id="towerModal">
     <div class="tower-content">
         <button class="shop-close" onclick="closeTower()">×</button>
-        <h2 class="tower-title">🗼 무한의 탑</h2>
-        <div id="towerIntro">
-            <p>제한 시간 안에 소수 곱셈을 풀고 한 층씩 올라가세요!<br>❤️ 기회는 3번! 높이 올라갈수록 문제가 어려워지고 시간이 짧아져요.</p>
-            <p>보상: 1층마다 💰1코인, 10층마다 💰10코인 보너스</p>
-            <p>내 최고 기록: <b id="towerBest">0</b>층</p>
-            <button class="tower-btn" onclick="startTower()">도전 시작!</button>
-        </div>
-        <div id="towerPlay" style="display: none;">
-            <div class="tower-status"><span id="towerFloor">1층</span><span id="towerLives">❤️❤️❤️</span></div>
-            <div class="tower-timer"><div class="tower-timer-fill" id="towerTimerFill"></div></div>
-            <div class="tower-problem" id="towerProblem"></div>
-            <input type="text" readonly inputmode="none" autocomplete="off" class="answer-input" id="towerAnswer" placeholder="답을 입력하세요">
-            <div class="num-pad parchment" data-target="towerAnswer"></div>
-            <div><button class="tower-btn" onclick="submitTowerAnswer()">제출</button></div>
-            <div class="tower-feedback" id="towerFeedback"></div>
-        </div>
-        <div id="towerResult" style="display: none;">
-            <p style="font-size: 1.4rem; font-weight: bold;">🏁 <span id="towerResultFloor">0</span>층까지 올랐어요!</p>
-            <p id="towerResultReward"></p>
-            <button class="tower-btn" onclick="startTower()">다시 도전</button>
-            <button class="tower-btn secondary" onclick="closeTower()">돌아가기</button>
+        <h2 class="tower-title">🗼 실력의 탑</h2>
+        <div class="tower-body">
+            <div class="tower-track" id="towerTrack"></div>
+            <div class="tower-main">
+                <div id="towerIntro">
+                    <p>층마다 문제 모양이 바뀌어요!<br>🧮 계산 → 🔒 봉인된 숫자 → 🚪 두 갈래 문 → 🎯 어림 자물쇠 → ✨ 소수점 찾기</p>
+                    <ul class="tower-rules">
+                        <li>❤️ 3칸으로 시작, 빨리 맞히면 남은 시간이 다음 층으로 저금돼요</li>
+                        <li>🔥 연속 정답 5개마다 ❤️ 1칸 회복</li>
+                        <li>🏁 10층마다 관문: 3문제 연속 정답!</li>
+                        <li>⚔️ 관문 뒤에는 안전한 길 / 험한 길(보상 2배) 선택</li>
+                        <li>🎁 가끔 보물 상자 층이 나와요</li>
+                    </ul>
+                    <p class="tower-hero-bonus">🦸 <span id="towerHeroBonus"></span></p>
+                    <p>보상: 🔷 룬 조각(기술·펫 강화 재료) · 💰 금화</p>
+                    <p>내 최고 기록: <b id="towerBest">0</b>층 · 보유 룬: <b id="towerRunes">0</b>🔷</p>
+                    <button class="tower-btn" onclick="startTower()">도전 시작!</button>
+                </div>
+                <div id="towerPlay" style="display: none;">
+                    <div class="tower-status"><span id="towerFloor">1층</span><span id="towerTime"></span><span id="towerLives">❤️❤️❤️</span></div>
+                    <div class="tower-timer"><div class="tower-timer-fill" id="towerTimerFill"></div></div>
+                    <div class="tower-type" id="towerType"></div>
+                    <div class="tower-problem" id="towerProblem"></div>
+                    <div id="towerPadArea">
+                        <input type="text" readonly inputmode="none" autocomplete="off" class="answer-input" id="towerAnswer" placeholder="답을 입력">
+                        <div class="num-pad parchment" data-target="towerAnswer"></div>
+                        <button class="tower-btn" onclick="submitTowerAnswer()">✔ 제출</button>
+                    </div>
+                    <div class="tower-choices" id="towerChoices"></div>
+                    <div class="tower-streak" id="towerStreak"></div>
+                    <div class="tower-feedback" id="towerFeedback"></div>
+                    <div class="tower-run-info" id="towerRunInfo"></div>
+                </div>
+                <div id="towerEvent" style="display: none;"></div>
+                <div id="towerResult" style="display: none;">
+                    <p style="font-size: 1.4rem; font-weight: bold;">🏁 <span id="towerResultFloor">0</span>층까지 올랐어요!</p>
+                    <p id="towerResultReward"></p>
+                    <button class="tower-btn" onclick="startTower()">다시 도전</button>
+                    <button class="tower-btn secondary" onclick="closeTower()">돌아가기</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -3075,7 +3245,7 @@
             const player = gameState.player;
             if (pet.type === 'attack') {
                 // 공격력의 30% + 5, 마왕 방어력 무시, 속성 적용
-                const result = applyElement(5 + Math.floor(player.attack * 0.3), pet.element);
+                const result = applyElement(Math.floor((5 + Math.floor(player.attack * 0.3)) * (1 + 0.2 * (getPetLevel(pet.id) - 1))), pet.element);
                 gameState.villain.hp = Math.max(0, gameState.villain.hp - result.damage);
                 gameState.currentStats.totalDamage += result.damage;
                 gameState.currentStats.dailyStats.totalDamage += result.damage;
@@ -3087,13 +3257,14 @@
                 updateDisplay();
                 if (gameState.villain.hp <= 0) victory();
             } else if (pet.type === 'mana' && player.mana < player.maxMana) {
-                player.mana = Math.min(player.maxMana, player.mana + pet.amount);
-                addBattleLog(`🐾 ${pet.name}가 마나를 ${pet.amount} 채워 주었습니다!`);
+                const amount = pet.amount + getPetLevel(pet.id) - 1;
+                player.mana = Math.min(player.maxMana, player.mana + amount);
+                addBattleLog(`🐾 ${pet.name}가 마나를 ${amount} 채워 주었습니다!`);
                 playFx('pet_mana', 'hero');
                 petAction();
                 updateDisplay();
             } else if (pet.type === 'heal' && player.hp > 0 && player.hp < player.maxHp) {
-                const heal = Math.max(1, Math.floor(player.maxHp * pet.ratio));
+                const heal = Math.max(1, Math.floor(player.maxHp * (pet.ratio + 0.015 * (getPetLevel(pet.id) - 1))));
                 player.hp = Math.min(player.maxHp, player.hp + heal);
                 addBattleLog(`🐾 ${pet.name}가 체력을 ${heal} 회복시켜 주었습니다!`);
                 playFx('pet_heal', 'hero');
@@ -3122,11 +3293,23 @@
                     action = `<button onclick="buyPet('${pet.id}')" ${gameState.coins < pet.cost ? 'disabled' : ''}>💰 ${pet.cost} 코인</button>`;
                 }
 
+                const lv = getPetLevel(pet.id);
+                let upgrade = '';
+                if (owned) {
+                    if (lv >= PET_MAX_LEVEL) {
+                        upgrade = '<div class="upgrade-max">⭐ 최고 강화</div>';
+                    } else {
+                        const cost = petUpgradeCost(pet);
+                        const can = gameState.coins >= cost.coins && getRunes() >= cost.runes;
+                        upgrade = `<button class="upgrade-item-btn" onclick="upgradePet('${pet.id}')" ${can ? '' : 'disabled'}>⬆ Lv${lv + 1}: 💰${cost.coins} 🔷${cost.runes}</button>`;
+                    }
+                }
                 card.innerHTML = `
                     <img src="${pet.image}" alt="${pet.name}">
-                    <div class="hero-card-name">${pet.name}</div>
-                    <div class="hero-card-desc">${pet.description}</div>
+                    <div class="hero-card-name">${pet.name} <span class="lv-badge">Lv${lv}</span></div>
+                    <div class="hero-card-desc">${pet.description}<br><b>${petEffectText(pet, lv)}</b></div>
                     ${action}
+                    ${upgrade}
                 `;
                 container.appendChild(card);
             });
@@ -3161,19 +3344,204 @@
             renderShop();
         }
 
-        // ===== 무한의 탑 =====
-        const TOWER_LIVES = 3;
+        // ===== 강화: 룬 조각 · 기술 강화 · 펫 강화 (게임오버 후에도 유지) =====
+        const SKILL_MAX_LEVEL = 5;
+        const PET_MAX_LEVEL = 5;
+
+        function getRunes() {
+            const d = secureLoad('runes').data;
+            return (d && Number.isInteger(d.n) && d.n >= 0) ? d.n : 0;
+        }
+
+        function setRunes(n) {
+            secureSave('runes', { n: Math.max(0, Math.floor(n)) });
+        }
+
+        function getLevels(key) {
+            const d = secureLoad(key).data;
+            return (d && typeof d === 'object') ? { ...d } : {};
+        }
+
+        function getSkillLevel(id) {
+            return Math.min(SKILL_MAX_LEVEL, Math.max(1, getLevels('skillLevels')[id] || 1));
+        }
+
+        function getPetLevel(id) {
+            return Math.min(PET_MAX_LEVEL, Math.max(1, getLevels('petLevels')[id] || 1));
+        }
+
+        // 기술 1레벨마다 위력 +15% (최대 Lv5 = +60%)
+        function getSkillLevelMultiplier(id) {
+            return 1 + 0.15 * (getSkillLevel(id) - 1);
+        }
+
+        // 다음 레벨로 올리는 비용: 레벨이 오를수록 금화·룬 모두 늘어남
+        function skillUpgradeCost(skill) {
+            const lv = getSkillLevel(skill.id);
+            return { coins: Math.round(skill.cost * 0.6 * lv), runes: 3 * lv };
+        }
+
+        function petUpgradeCost(pet) {
+            const lv = getPetLevel(pet.id);
+            return { coins: Math.round(pet.cost * 0.5 * lv), runes: 4 * lv };
+        }
+
+        function petEffectText(pet, lv) {
+            if (pet.type === 'attack') return `피해 +${(lv - 1) * 20}%`;
+            if (pet.type === 'mana') return `마나 +${pet.amount + lv - 1}씩 회복`;
+            return `체력 ${Math.round((pet.ratio + 0.015 * (lv - 1)) * 1000) / 10}%씩 회복`;
+        }
+
+        function upgradeSkill(id) {
+            const skill = SKILLS[id];
+            if (!skill || !gameState.ownedSkills.includes(id) || !isSkillAvailable(skill) || getSkillLevel(id) >= SKILL_MAX_LEVEL) return;
+            const cost = skillUpgradeCost(skill);
+            if (gameState.coins < cost.coins || getRunes() < cost.runes) {
+                addBattleLog('❌ 금화 또는 룬 조각이 부족합니다!');
+                return;
+            }
+            gameState.coins -= cost.coins;
+            setRunes(getRunes() - cost.runes);
+            const levels = getLevels('skillLevels');
+            levels[id] = getSkillLevel(id) + 1;
+            secureSave('skillLevels', levels);
+            addBattleLog(`⬆️ ${resolveSkill(skill).name} 강화 Lv${levels[id]}! 위력 +${(levels[id] - 1) * 15}%`);
+            playupgradeSound();
+            renderShop();
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        function upgradePet(id) {
+            const pet = PETS.find(x => x.id === id);
+            if (!pet || !getPetData().owned.includes(id) || getPetLevel(id) >= PET_MAX_LEVEL) return;
+            const cost = petUpgradeCost(pet);
+            if (gameState.coins < cost.coins || getRunes() < cost.runes) {
+                addBattleLog('❌ 금화 또는 룬 조각이 부족합니다!');
+                return;
+            }
+            gameState.coins -= cost.coins;
+            setRunes(getRunes() - cost.runes);
+            const levels = getLevels('petLevels');
+            levels[id] = getPetLevel(id) + 1;
+            secureSave('petLevels', levels);
+            addBattleLog(`⬆️ ${pet.name} 강화 Lv${levels[id]}! (${petEffectText(pet, levels[id])})`);
+            playupgradeSound();
+            renderShop();
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        // ===== 실력의 탑 =====
+        const TOWER_TYPES = ['calc', 'blank', 'compare', 'estimate', 'point'];
+        const TOWER_TYPE_INFO = {
+            calc: '🧮 계산의 층',
+            blank: '🔒 봉인된 숫자',
+            compare: '🚪 두 갈래 문',
+            estimate: '🎯 어림 자물쇠',
+            point: '✨ 소수점 찾기'
+        };
+        const TOWER_HERO_BONUS = {
+            knight: '관문에서 오답 1번 무효',
+            mage: '모든 층 제한 시간 +2초',
+            archer: '4지선다 문제에서 오답 보기 1개 지우기',
+            paladin: '시작 ❤️ +1 (4칸)',
+            ninja: '연속 정답 4개마다 ❤️ 회복 (원래 5개)',
+            dragon: '룬 조각 +25%'
+        };
+        const TOWER_MAX_LIVES = 5;
+        const TOWER_GATE_COUNT = 3;
         let tower = null;
         let towerResumeActive = false;
+        let towerFlags = [];
+
+        const fmtNum = n => String(Math.round(n * 10000) / 10000);
+        const towerRnd = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+        const towerProduct = (a, b) => Math.round(a * b * 10000) / 10000;
+        const decimalPlaces = n => (fmtNum(n).split('.')[1] || '').length;
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // 층이 높을수록 어려운 수
+        function towerOperands(floor) {
+            let a, b;
+            if (floor <= 10) { a = towerRnd(2, 9); b = towerRnd(1, 9) / 10; }
+            else if (floor <= 20) { a = towerRnd(2, 20); b = towerRnd(11, 99) / 100; }
+            else if (floor <= 35) { a = towerRnd(1, 9) / 10; b = towerRnd(11, 99) / 10; }
+            else { a = towerRnd(11, 99) / 10; b = towerRnd(11, 99) / 100; }
+            if (Math.random() < 0.5) [a, b] = [b, a];
+            return [a, b];
+        }
+
+        // 보기 4개 만들기 (서로 다른 값, 섞어서 정답 위치 기록)
+        function choiceQuestion(type, text, correct, wrongs, reveal) {
+            const labels = [fmtNum(correct)];
+            wrongs.forEach(w => { const t = fmtNum(w); if (!labels.includes(t) && w > 0) labels.push(t); });
+            let k = 2;
+            while (labels.length < 4) { const t = fmtNum(correct * k); if (!labels.includes(t)) labels.push(t); k++; }
+            const options = shuffleArray(labels.slice(0, 4));
+            return { type, input: 'choice', text, options, answer: options.indexOf(fmtNum(correct)), reveal };
+        }
+
+        function makeTowerQuestion(floor, type) {
+            const [a, b] = towerOperands(floor);
+            const c = towerProduct(a, b);
+            if (type === 'blank') {
+                return { type, input: 'pad', text: `□ × ${fmtNum(b)} = ${fmtNum(c)}`, answer: a, reveal: fmtNum(a) };
+            }
+            if (type === 'compare') {
+                let a2, b2, c2, tries = 0;
+                do { [a2, b2] = towerOperands(floor); c2 = towerProduct(a2, b2); tries++; }
+                while (Math.abs(c2 - c) < Math.max(c, c2) * 0.06 && tries < 30);
+                return {
+                    type, input: 'choice', text: '곱이 더 큰 문을 고르세요',
+                    options: [`${fmtNum(a)} × ${fmtNum(b)}`, `${fmtNum(a2)} × ${fmtNum(b2)}`],
+                    answer: c >= c2 ? 0 : 1, reveal: `${fmtNum(c)}  vs  ${fmtNum(c2)}`
+                };
+            }
+            if (type === 'estimate') {
+                const approx = Number(c.toPrecision(1));
+                return choiceQuestion(type, `${fmtNum(a)} × ${fmtNum(b)} 에 가장 가까운 값은?`, approx,
+                                      [approx * 10, approx / 10, approx * 5], `${fmtNum(c)} ≈ ${fmtNum(approx)}`);
+            }
+            if (type === 'point') {
+                const da = decimalPlaces(a), db = decimalPlaces(b);
+                const A = Math.round(a * 10 ** da), B = Math.round(b * 10 ** db), P = A * B;
+                const k = da + db;
+                const at = n => P / 10 ** n;
+                return choiceQuestion(type, `${A} × ${B} = ${P} 이에요.\n그럼 ${fmtNum(a)} × ${fmtNum(b)} = ?`, at(k),
+                                      [at(k - 1), at(k + 1), Math.random() < 0.5 ? at(k + 2) : at(k - 2)], fmtNum(c));
+            }
+            return { type: 'calc', input: 'pad', text: `${fmtNum(a)} × ${fmtNum(b)} = ?`, answer: c, reveal: fmtNum(c) };
+        }
+
+        function getTowerTimeLimit(floor) {
+            let sec = Math.max(8, 25 - Math.floor((floor - 1) / 5) * 2);   // 25초에서 5층마다 2초씩, 최소 8초
+            if (getSelectedHero().id === 'mage') sec += 2;
+            if (tower && tower.path === 'hard') sec = Math.max(6, Math.round(sec * 0.7));
+            return sec;
+        }
+
+        const towerSection = floor => Math.floor((floor - 1) / 10);
 
         function openTower() {
             towerResumeActive = gameState.gameActive;
             gameState.gameActive = false;   // 탑에 있는 동안 전투 일시정지
+            tower = null;
+            const hero = getSelectedHero();
             document.getElementById('towerBest').textContent = getExtraRecords().tower;
-            document.getElementById('towerIntro').style.display = 'block';
-            document.getElementById('towerPlay').style.display = 'none';
-            document.getElementById('towerResult').style.display = 'none';
+            document.getElementById('towerRunes').textContent = getRunes();
+            document.getElementById('towerHeroBonus').textContent = `${hero.name}: ${TOWER_HERO_BONUS[hero.id]}`;
+            showTowerScreen('towerIntro');
             document.getElementById('towerModal').style.display = 'flex';
+            renderTowerTrack();
+            loadTowerFlags();
         }
 
         function closeTower() {
@@ -3182,90 +3550,287 @@
             gameState.gameActive = towerResumeActive;
         }
 
-        function getTowerTimeLimit(floor) {
-            return Math.max(8, 25 - Math.floor((floor - 1) / 5) * 2);  // 25초에서 5층마다 2초씩, 최소 8초
+        function showTowerScreen(id) {
+            ['towerIntro', 'towerPlay', 'towerEvent', 'towerResult'].forEach(x => {
+                document.getElementById(x).style.display = x === id ? 'block' : 'none';
+            });
         }
 
-        // 층이 높을수록 어려운 문제
-        function makeTowerProblem(floor) {
-            const rnd = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
-            let a, b;
-            if (floor <= 10) { a = rnd(2, 9); b = rnd(1, 9) / 10; }           // 자연수 × 소수 한 자리
-            else if (floor <= 20) { a = rnd(2, 20); b = rnd(11, 99) / 100; }  // 자연수 × 소수 두 자리
-            else if (floor <= 35) { a = rnd(1, 9) / 10; b = rnd(11, 99) / 10; } // 소수 × 소수
-            else { a = rnd(11, 99) / 10; b = rnd(11, 99) / 100; }             // 더 어려운 소수 × 소수
-            if (Math.random() < 0.5) [a, b] = [b, a];
-            return { text: `${a} × ${b} = ?`, answer: Math.round(a * b * 10000) / 10000 };
+        // 친구들 최고층 깃발 (랭킹 상위 5명)
+        async function loadTowerFlags() {
+            try {
+                const response = await fetch(`${SPREADSHEET_URL}?type=tower`);
+                const data = await response.json();
+                towerFlags = (Array.isArray(data) ? data : []).filter(r => (r.tower || 0) > 0).slice(0, 5).map(r => ({
+                    name: String(r.username || '').split(' ').pop() || '친구',
+                    floor: r.tower,
+                    mine: (r.id || r.username) === gameState.username
+                }));
+            } catch (e) {
+                towerFlags = [];
+            }
+            renderTowerTrack();
+        }
+
+        // 왼쪽 탑 그림: 10층 구간을 보여 주고, 선택한 용사가 한 층씩 올라감
+        function renderTowerTrack() {
+            const track = document.getElementById('towerTrack');
+            const floor = tower ? tower.floor : 1;
+            const section = towerSection(floor);
+            const base = section * 10;
+            const stage = VILLAIN_STAGES[Math.min(section, VILLAIN_STAGES.length - 1)];
+            track.style.backgroundImage = `linear-gradient(180deg, rgba(10, 7, 22, 0.55), rgba(10, 7, 22, 0.8)), url('${stage.image}')`;
+
+            const above = towerFlags.filter(f => f.floor > base + 10);
+            let html = `<div class="track-above">${above.length ? '▲ ' + above.map(f => `${f.name} ${f.floor}층`).join(', ') : `구간 ${section + 1}`}</div>`;
+            html += '<div class="track-floors">';
+            for (let f = base + 10; f > base; f--) {
+                const isGate = f % 10 === 0;
+                const flags = towerFlags.filter(x => x.floor === f)
+                    .map(x => `<span class="track-flag${x.mine ? ' mine' : ''}">🚩${x.name}</span>`).join('');
+                const here = f === floor ? `<img class="track-hero" src="${getSelectedHero().image}" alt="">` : '';
+                html += `<div class="track-row${isGate ? ' gate' : ''}${f < floor ? ' done' : ''}${f === floor ? ' current' : ''}">
+                    <span class="track-num">${isGate ? '🏁' : ''}${f}</span>${here}${flags}</div>`;
+            }
+            html += '</div>';
+            track.innerHTML = html;
         }
 
         function startTower() {
-            tower = { floor: 1, lives: TOWER_LIVES, running: true, problem: null, deadline: 0, startedAt: 0, timer: null };
-            document.getElementById('towerIntro').style.display = 'none';
-            document.getElementById('towerResult').style.display = 'none';
-            document.getElementById('towerPlay').style.display = 'block';
+            const hero = getSelectedHero();
+            tower = {
+                floor: 1, lives: 3 + (hero.id === 'paladin' ? 1 : 0), streak: 0, bank: 0,
+                path: 'safe', running: true, q: null, deadline: 0, startedAt: 0, limit: 0, timer: null,
+                gate: null, shieldUsed: false, runes: 0, coins: 0, treasureCooldown: 0, gatesPassed: 0
+            };
             document.getElementById('towerFeedback').textContent = '';
-            nextTowerProblem();
+            nextTowerStep();
         }
 
-        function nextTowerProblem() {
-            tower.problem = makeTowerProblem(tower.floor);
+        function nextTowerStep() {
+            if (!tower || !tower.running) return;
+            renderTowerTrack();
+            const floor = tower.floor;
+            if (floor % 10 === 0) {
+                if (!tower.gate) tower.gate = { done: 0 };
+                askTowerQuestion(TOWER_TYPES[towerRnd(0, TOWER_TYPES.length - 1)]);
+                return;
+            }
+            if (floor > 3 && tower.treasureCooldown <= 0 && Math.random() < 0.15) {
+                showTreasure();
+                return;
+            }
+            tower.treasureCooldown--;
+            askTowerQuestion(TOWER_TYPES[(floor - 1) % TOWER_TYPES.length]);
+        }
+
+        function askTowerQuestion(type) {
+            showTowerScreen('towerPlay');
+            const q = makeTowerQuestion(tower.floor, type);
+            tower.q = q;
+            tower.limit = getTowerTimeLimit(tower.floor) + tower.bank;
+            tower.bank = 0;
             tower.startedAt = Date.now();
-            tower.deadline = tower.startedAt + getTowerTimeLimit(tower.floor) * 1000;
-            document.getElementById('towerFloor').textContent = `${tower.floor}층`;
-            document.getElementById('towerLives').textContent = '❤️'.repeat(tower.lives) + '🤍'.repeat(TOWER_LIVES - tower.lives);
-            document.getElementById('towerProblem').textContent = tower.problem.text;
-            const input = document.getElementById('towerAnswer');
-            input.value = '';
+            tower.deadline = tower.startedAt + tower.limit * 1000;
+
+            const gateText = tower.gate ? ` · 🏁 관문 ${tower.gate.done}/${TOWER_GATE_COUNT}` : '';
+            document.getElementById('towerType').textContent = TOWER_TYPE_INFO[q.type] + gateText;
+            document.getElementById('towerProblem').textContent = q.text;
+            document.getElementById('towerAnswer').value = '';
+            document.getElementById('towerPadArea').style.display = q.input === 'pad' ? 'block' : 'none';
+
+            const choices = document.getElementById('towerChoices');
+            choices.innerHTML = '';
+            choices.style.display = q.input === 'choice' ? 'grid' : 'none';
+            choices.className = 'tower-choices' + (q.options && q.options.length === 2 ? ' two' : '');
+            if (q.input === 'choice') {
+                // 궁수 보너스: 4지선다에서 오답 보기 1개 지우기
+                let removed = -1;
+                if (getSelectedHero().id === 'archer' && q.options.length === 4) {
+                    const wrongs = q.options.map((_, i) => i).filter(i => i !== q.answer);
+                    removed = wrongs[towerRnd(0, wrongs.length - 1)];
+                }
+                q.options.forEach((label, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'tower-choice';
+                    btn.textContent = (q.options.length === 2 ? (i === 0 ? '🚪 ' : '🚪 ') : '') + label;
+                    btn.disabled = i === removed;
+                    btn.onclick = () => chooseTowerOption(i);
+                    choices.appendChild(btn);
+                });
+            }
+            updateTowerStatus();
             clearInterval(tower.timer);
             tower.timer = setInterval(updateTowerTimer, 100);
             updateTowerTimer();
         }
 
+        function updateTowerStatus() {
+            document.getElementById('towerFloor').textContent = `${tower.floor}층`;
+            document.getElementById('towerLives').textContent = '❤️'.repeat(tower.lives);
+            const need = getSelectedHero().id === 'ninja' ? 4 : 5;
+            document.getElementById('towerStreak').textContent = tower.streak > 0 ? `🔥${tower.streak}연속 (❤️까지 ${need - (tower.streak % need)})` : '';
+            document.getElementById('towerRunInfo').textContent =
+                `이번 판: 🔷 룬 ${Math.floor(tower.runes)} · 💰 ${tower.coins} · ${tower.path === 'hard' ? '⚔️ 험한 길 (보상 2배)' : '🛡️ 안전한 길'}`;
+        }
+
         function updateTowerTimer() {
-            if (!tower || !tower.running) return;
-            const total = getTowerTimeLimit(tower.floor) * 1000;
+            if (!tower || !tower.running || !tower.q) return;
             const left = tower.deadline - Date.now();
-            document.getElementById('towerTimerFill').style.width = `${Math.max(0, left / total * 100)}%`;
-            if (left <= 0) loseTowerLife('⏰ 시간 초과!');
+            document.getElementById('towerTimerFill').style.width = `${Math.max(0, left / (tower.limit * 1000) * 100)}%`;
+            document.getElementById('towerTime').textContent = `${Math.max(0, Math.ceil(left / 1000))}초`;
+            if (left <= 0) towerAnswered(false, '⏰ 시간 초과!');
         }
 
         function submitTowerAnswer() {
-            if (!tower || !tower.running) return;
-            if (Date.now() - tower.startedAt < 500) return;  // 매크로 방지
+            if (!tower || !tower.running || !tower.q || tower.q.input !== 'pad') return;
+            if (Date.now() - tower.startedAt < 500) return;   // 매크로 방지
             const value = parseFloat(document.getElementById('towerAnswer').value);
             if (isNaN(value)) return;
-            if (Math.abs(value - tower.problem.answer) < 0.001) {
-                document.getElementById('towerFeedback').textContent = `⭕ 정답! ${tower.floor}층 통과`;
-                tower.floor++;
-                if ((tower.floor - 1) % 10 === 0) playupgradeSound();
-                nextTowerProblem();
-            } else {
-                loseTowerLife(`❌ 틀렸어요! 정답은 ${tower.problem.answer}`);
-            }
+            towerAnswered(Math.abs(value - tower.q.answer) < 0.001);
         }
 
-        function loseTowerLife(message) {
-            tower.lives--;
-            document.getElementById('towerFeedback').textContent = message;
-            if (tower.lives <= 0) {
-                finishTower();
-            } else {
-                nextTowerProblem();
+        function chooseTowerOption(i) {
+            if (!tower || !tower.running || !tower.q || tower.q.input !== 'choice') return;
+            if (Date.now() - tower.startedAt < 500) return;
+            towerAnswered(i === tower.q.answer);
+        }
+
+        const runeGain = n => n * (tower.path === 'hard' ? 2 : 1) * (getSelectedHero().id === 'dragon' ? 1.25 : 1);
+
+        function towerAnswered(correct, message) {
+            const q = tower.q;
+            tower.q = null;
+            clearInterval(tower.timer);
+            const feedback = document.getElementById('towerFeedback');
+
+            if (correct) {
+                tower.streak++;
+                const need = getSelectedHero().id === 'ninja' ? 4 : 5;
+                let extra = '';
+                if (tower.streak % need === 0 && tower.lives < TOWER_MAX_LIVES) {
+                    tower.lives++;
+                    extra = ' ❤️ 연속 정답 보너스!';
+                }
+                const left = Math.max(0, (tower.deadline - Date.now()) / 1000);
+                if (tower.gate) {
+                    tower.gate.done++;
+                    feedback.textContent = `⭕ 관문 ${tower.gate.done}/${TOWER_GATE_COUNT} 통과!${extra}`;
+                    if (tower.gate.done >= TOWER_GATE_COUNT) { gatePassed(); return; }
+                    setTimeout(() => askTowerQuestion(TOWER_TYPES[towerRnd(0, TOWER_TYPES.length - 1)]), 500);
+                    return;
+                }
+                tower.bank = Math.min(10, Math.floor(left));   // 남은 시간은 다음 층으로 (최대 10초)
+                tower.runes += runeGain(1);
+                tower.coins += tower.path === 'hard' ? 2 : 1;
+                feedback.textContent = `⭕ 정답! ${tower.floor}층 통과${tower.bank ? ` · ⏳ +${tower.bank}초 저금` : ''}${extra}`;
+                tower.floor++;
+                if (tower.floor % 10 === 1) playupgradeSound();
+                setTimeout(nextTowerStep, 450);
+                return;
             }
+
+            tower.streak = 0;
+            const answerText = `정답: ${q.reveal}`;
+            if (tower.gate && getSelectedHero().id === 'knight' && !tower.shieldUsed) {
+                tower.shieldUsed = true;
+                feedback.textContent = `🛡️ 용사의 방패! 이번 오답은 무효예요. (${answerText})`;
+                setTimeout(() => askTowerQuestion(TOWER_TYPES[towerRnd(0, TOWER_TYPES.length - 1)]), 900);
+                return;
+            }
+            tower.lives--;
+            if (tower.gate) tower.gate.done = 0;
+            feedback.textContent = `${message || '❌ 틀렸어요!'} ${answerText}${tower.gate ? ' · 관문 처음부터' : ''}`;
+            updateTowerStatus();
+            if (tower.lives <= 0) {
+                setTimeout(finishTower, 900);
+                return;
+            }
+            setTimeout(() => (tower.gate ? askTowerQuestion(TOWER_TYPES[towerRnd(0, TOWER_TYPES.length - 1)]) : nextTowerStep()), 900);
+        }
+
+        function gatePassed() {
+            const runes = runeGain(5);
+            const coins = tower.path === 'hard' ? 20 : 10;
+            tower.runes += runes;
+            tower.coins += coins;
+            tower.gate = null;
+            tower.gatesPassed++;
+            tower.floor++;
+            playupgradeSound();
+            renderTowerTrack();   // 다음 구간 색(마왕 테마)으로 바뀜
+            const nextStage = VILLAIN_STAGES[Math.min(towerSection(tower.floor), VILLAIN_STAGES.length - 1)];
+            showTowerEvent(`
+                <div class="event-title">🏁 관문 돌파!</div>
+                <p>보상: 🔷 룬 ${Math.floor(runes)} · 💰 ${coins}</p>
+                <p>다음 구간: <b>${nextStage.name}의 층</b></p>
+                <p>어느 길로 갈까요?</p>
+                <div class="path-choices">
+                    <button class="path-btn safe" onclick="chooseTowerPath('safe')">🛡️ 안전한 길<small>시간 넉넉 · 보상 보통</small></button>
+                    <button class="path-btn hard" onclick="chooseTowerPath('hard')">⚔️ 험한 길<small>시간 30% 짧음 · 보상 2배</small></button>
+                </div>`);
+        }
+
+        function chooseTowerPath(path) {
+            if (!tower || !tower.running) return;
+            tower.path = path === 'hard' ? 'hard' : 'safe';
+            document.getElementById('towerFeedback').textContent = tower.path === 'hard' ? '⚔️ 험한 길을 골랐어요! 보상 2배' : '🛡️ 안전한 길을 골랐어요';
+            nextTowerStep();
+        }
+
+        function showTowerEvent(html) {
+            clearInterval(tower.timer);
+            showTowerScreen('towerEvent');
+            document.getElementById('towerEvent').innerHTML = html;
+        }
+
+        // 🎁 보물 상자 층: 3개 중 1개 고르기 (❤️ 회복 / 시간 / 금화)
+        function showTreasure() {
+            tower.treasureCooldown = 3;
+            tower.chests = shuffleArray(['heal', 'time', 'coins']);
+            showTowerEvent(`
+                <div class="event-title">🎁 보물 상자 층!</div>
+                <p>상자 하나를 골라 보세요.</p>
+                <div class="chest-row">
+                    ${[0, 1, 2].map(i => `<button class="chest-btn" onclick="openTreasure(${i})">🎁</button>`).join('')}
+                </div>
+                <p class="chest-result" id="chestResult"></p>`);
+        }
+
+        function openTreasure(i) {
+            if (!tower || !tower.running || !tower.chests) return;
+            const kinds = tower.chests;
+            tower.chests = null;
+            const label = { heal: '❤️ 회복', time: '⏳ 시간 +8초', coins: '💰 금화' };
+            const pick = kinds[i];
+            let result;
+            if (pick === 'heal' && tower.lives < TOWER_MAX_LIVES) { tower.lives++; result = '❤️ 1칸 회복!'; }
+            else if (pick === 'time') { tower.bank += 8; result = '⏳ 다음 문제 시간 +8초!'; }
+            else { const c = towerRnd(10, 20) * (tower.path === 'hard' ? 2 : 1); tower.coins += c; result = `💰 금화 ${c}개!`; }
+            document.querySelectorAll('.chest-btn').forEach((btn, k) => {
+                btn.disabled = true;
+                btn.textContent = label[kinds[k]].split(' ')[0];
+                if (k === i) btn.classList.add('picked');
+            });
+            document.getElementById('chestResult').textContent = result;
+            tower.floor++;
+            setTimeout(nextTowerStep, 1300);
         }
 
         function finishTower() {
             clearInterval(tower.timer);
             tower.running = false;
             const cleared = tower.floor - 1;
-            const reward = cleared + Math.floor(cleared / 10) * 10;
-            gameState.coins += reward;
+            const runes = Math.floor(tower.runes);
+            gameState.coins += tower.coins;
+            setRunes(getRunes() + runes);
             const isNewRecord = saveExtraRecord('tower', cleared);
             document.getElementById('towerResultFloor').textContent = cleared;
-            document.getElementById('towerResultReward').textContent = `💰 ${reward}코인을 얻었어요!${isNewRecord ? ' 🎉 최고 기록!' : ''}`;
-            document.getElementById('towerPlay').style.display = 'none';
-            document.getElementById('towerResult').style.display = 'block';
-            addBattleLog(`🗼 무한의 탑 ${cleared}층 도달! 💰${reward}코인 획득`);
+            document.getElementById('towerResultReward').textContent =
+                `🔷 룬 조각 ${runes}개 · 💰 금화 ${tower.coins}개를 얻었어요!${isNewRecord ? ' 🎉 최고 기록!' : ''}`;
+            document.getElementById('towerRunes').textContent = getRunes();
+            showTowerScreen('towerResult');
+            addBattleLog(`🗼 실력의 탑 ${cleared}층 도달! 🔷${runes} · 💰${tower.coins} 획득`);
             updateDisplay();
             saveGameProgress();
         }
@@ -3300,7 +3865,9 @@
             getHeroData, buyHero, selectHero,
             applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
             openTower, closeTower, startTower, submitTowerAnswer,
-            saveProblemState, loadProblemState
+            saveProblemState, loadProblemState,
+            getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
+            chooseTowerOption, chooseTowerPath, openTreasure
         };
         })();
 
@@ -3312,7 +3879,9 @@
             getHeroData, buyHero, selectHero,
             applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
             openTower, closeTower, startTower, submitTowerAnswer,
-            saveProblemState, loadProblemState
+            saveProblemState, loadProblemState,
+            getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
+            chooseTowerOption, chooseTowerPath, openTreasure
         } = GameContent;
 
         // 용사 캐릭터: 상점에서 구매 후 선택 (구매 기록은 게임오버 후에도 유지)
@@ -4473,6 +5042,8 @@
             // 코인 표시 업데이트 추가
             document.getElementById('coinAmount').textContent = gameState.coins;
             document.getElementById('shopCoinAmount').textContent = gameState.coins;
+            document.getElementById('runeAmount').textContent = getRunes();
+            document.getElementById('shopRuneAmount').textContent = getRunes();
             // 플레이어 스탯 업데이트
             const playerHpPercent = (gameState.player.hp / gameState.player.maxHp) * 100;
             document.getElementById('playerHpBar').style.width = `${playerHpPercent}%`;
@@ -4576,12 +5147,18 @@
                     <div class="skill-use-cost">사용: ${useCostText}</div>
                     <div class="skill-use-cost">속성: ${elementLabel(skill.element)}</div>
                     <div class="skill-use-cost">데미지: ${getSkillDamageText(skill)}${skill.hero && getMasteryLevel(skill.hero) > 1 ? ` (숙련 +${(getMasteryLevel(skill.hero) - 1) * 10}%)` : ''}</div>
-                    ${owned ? 
+                    <div class="skill-use-cost"><span class="lv-badge">강화 Lv${getSkillLevel(skill.id)}</span>${getSkillLevel(skill.id) > 1 ? ` 위력 +${(getSkillLevel(skill.id) - 1) * 15}%` : ''}</div>
+                    ${owned ?
                         '<div class="owned-badge">✅ 보유중</div>' :
                         `<button class="buy-skill-btn" onclick="buySkill('${skill.id}')" ${!canBuy ? 'disabled' : ''}>
                             구매하기
                         </button>`
                     }
+                    ${owned ? (getSkillLevel(skill.id) >= 5 ? '<div class="upgrade-max">⭐ 최고 강화</div>' : (() => {
+                        const cost = skillUpgradeCost(skill);
+                        const can = gameState.coins >= cost.coins && getRunes() >= cost.runes;
+                        return `<button class="upgrade-item-btn" onclick="upgradeSkill('${skill.id}')" ${can ? '' : 'disabled'}>⬆ Lv${getSkillLevel(skill.id) + 1}: 💰${cost.coins} 🔷${cost.runes}</button>`;
+                    })()) : ''}
                 `;
                 shopElement.appendChild(card);
             });
@@ -4705,7 +5282,7 @@
             }
             
             // 데미지 적용 (검증 포함)
-            let damage = getSkillDamage(skill);
+            let damage = Math.floor(getSkillDamage(skill) * getSkillLevelMultiplier(skill.id));
             if (skill.hero) damage = Math.floor(damage * getMasteryMultiplier(skill.hero));
             const elementResult = applyElement(damage, skill.element);
             damage = elementResult.damage;
