@@ -1917,6 +1917,53 @@
             .game-container .battle-layout .math-section { order: 3; }
             .game-container .battle-main .battle-log { order: 4; }
         }
+
+        /* 능력치 막대: 이름과 수치를 막대 안에 */
+        .character-card .stat-bar { gap: 0; }
+        .character-card .stat-bar > .stat-label { display: none; }
+
+        .character-card .stat-value {
+            height: 26px;
+            overflow: hidden;
+        }
+
+        .character-card .stat-fill {
+            color: transparent !important;
+            text-shadow: none !important;
+            font-size: 0 !important;
+        }
+
+        .character-card .stat-value::before,
+        .character-card .stat-value::after {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .character-card .stat-value::before { content: attr(data-label); left: 8px; opacity: 0.9; }
+        .character-card .stat-value::after { content: attr(data-val); right: 8px; }
+
+        .character-card .stats { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .character-card .character-content { width: 100%; gap: 10px; justify-content: space-between; }
+        .character-card .stat-value::before { left: 6px; }
+        .character-card .stat-value::after { right: 6px; }
+        .character-card .stat-value::before, .character-card .stat-value::after { font-size: 0.74rem; }
+        .character-card .character-right { flex: 1; min-width: 0; }
+
+        /* 막대가 좁아진 만큼 그림을 다시 크게 */
+        .game-container .character-card { padding: 16px; }
+
+        @media (max-width: 1200px) {
+            .game-container .battle-layout .character-avatar { width: 180px; height: 180px; }
+        }
   </style>
  </head>
  <body>
@@ -2152,7 +2199,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.407</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.408</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -4394,6 +4441,19 @@
             const baseVillainName = VILLAIN_STAGES[getVillainStage(gameState.level) - 1].name;
             document.getElementById('villainName').textContent = `Lv${gameState.level} ${baseVillainName}`;
             applyVillainStage(false);
+            syncStatBars();
+        }
+
+        // 능력치 막대 안에 "이름(왼쪽) · 수치(오른쪽)"를 함께 표시 (막대 밖 이름 칸을 없애 공간 절약)
+        function syncStatBars() {
+            document.querySelectorAll('.stat-bar').forEach(bar => {
+                const label = bar.querySelector('.stat-label');
+                const value = bar.querySelector('.stat-value');
+                const fill = bar.querySelector('.stat-fill');
+                if (!label || !value || !fill) return;
+                value.dataset.label = label.textContent.trim();
+                value.dataset.val = fill.textContent.trim();
+            });
         }
 
         // 훈련장 열기
