@@ -1840,6 +1840,45 @@
         .nick-preview { color: #4e330a; }
         .username-save-btn { background: linear-gradient(180deg, #8a5d17, #5a3a0a); }
         .username-save-btn:disabled { background: #c8b893; }
+
+        /* 화면 숫자패드 */
+        .num-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 260px;
+            margin: 12px auto 4px;
+        }
+
+        .num-pad-key {
+            height: 52px;
+            border-radius: 10px;
+            border: 1px solid var(--gold-dim);
+            background: linear-gradient(180deg, #3a2d68, #1f1840);
+            color: var(--gold-2);
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .num-pad-key:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); }
+        .num-pad-key.back { color: #ffb3bd; font-size: 1.3rem; }
+
+        .num-pad.parchment .num-pad-key {
+            background: linear-gradient(180deg, #fffaf0, #ead7a8);
+            border-color: #b8913f;
+            color: #4e330a;
+            box-shadow: 0 4px 0 #8a6a2b;
+        }
+
+        .num-pad.parchment .num-pad-key.back { color: #a33a3a; }
+        .answer-input { caret-color: transparent; cursor: default; }
+        .tower-content .answer-input { background: #fffaf0; color: #4e330a; border-color: #b8913f; box-shadow: inset 0 2px 4px rgba(138, 106, 43, 0.25); }
+        .tower-content .answer-input::placeholder { color: rgba(78, 51, 10, 0.45); }
   </style>
  </head>
  <body>
@@ -1991,8 +2030,9 @@
          문제 로딩 중...
     </div>
     <div class="combo-display" id="comboDisplay"></div>
-    <div class="answer-section"><input type="number" step="0.001" class="answer-input" id="answerInput" placeholder="답을 입력하세요"> <button class="submit-btn" id="submitBtn">제출</button>
+    <div class="answer-section"><input type="text" readonly inputmode="none" autocomplete="off" class="answer-input" id="answerInput" placeholder="답을 입력하세요"> <button class="submit-btn" id="submitBtn">제출</button>
     </div>
+    <div class="num-pad" data-target="answerInput"></div>
     <div class="upgrade-section" id="upgradeSection">
      <h3 id="upgradeTitle" style="color: #744210; margin-bottom: 10px;">정답입니다! 💰5코인을 얻었습니다. 능력치를 선택하여 강화하세요:</h3>
      <div class="upgrade-buttons"><button class="upgrade-btn upgrade-hp" id="upgradeHpBtn" onclick="upgradePlayer('hp')">체력 +20</button> <button class="upgrade-btn upgrade-attack" id="upgradeAttackBtn" onclick="upgradePlayer('attack')">공격력 +5</button> <button class="upgrade-btn upgrade-defense" id="upgradeDefenseBtn" onclick="upgradePlayer('defense')">방어력 +1</button> <button class="upgrade-btn upgrade-mana" id="upgradeManaBtn" onclick="upgradePlayer('mana')">🔮 최대 마나 +5</button>
@@ -2070,7 +2110,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.405</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.406</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2158,7 +2198,8 @@
             <div class="tower-status"><span id="towerFloor">1층</span><span id="towerLives">❤️❤️❤️</span></div>
             <div class="tower-timer"><div class="tower-timer-fill" id="towerTimerFill"></div></div>
             <div class="tower-problem" id="towerProblem"></div>
-            <input type="number" step="any" class="answer-input" id="towerAnswer" placeholder="답을 입력하세요" onkeydown="if (event.key === 'Enter') submitTowerAnswer()">
+            <input type="text" readonly inputmode="none" autocomplete="off" class="answer-input" id="towerAnswer" placeholder="답을 입력하세요">
+            <div class="num-pad parchment" data-target="towerAnswer"></div>
             <div><button class="tower-btn" onclick="submitTowerAnswer()">제출</button></div>
             <div class="tower-feedback" id="towerFeedback"></div>
         </div>
@@ -3049,7 +3090,6 @@
             document.getElementById('towerProblem').textContent = tower.problem.text;
             const input = document.getElementById('towerAnswer');
             input.value = '';
-            input.focus();
             clearInterval(tower.timer);
             tower.timer = setInterval(updateTowerTimer, 100);
             updateTowerTimer();
@@ -5307,13 +5347,52 @@
                 tbody.innerHTML = '<tr><td colspan="3" class="no-data">랭킹 데이터를 불러오는데 실패했습니다.</td></tr>';
             }
         }
+        // ===== 화면 숫자패드 (브라우저·화면 키보드 대신 사용) =====
+        const NUM_PAD_KEYS = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '.', '0', '⌫'];
+        const NUM_PAD_MAX = 8;
+
+        function pressNumPad(targetId, key) {
+            const input = document.getElementById(targetId);
+            if (!input || input.disabled) return;
+            let value = input.value;
+            if (key === '⌫') {
+                value = value.slice(0, -1);
+            } else if (key === '.') {
+                if (value.includes('.')) return;
+                value = value === '' ? '0.' : value + '.';
+            } else {
+                if (value.length >= NUM_PAD_MAX) return;
+                value = value === '0' ? key : value + key;   // 맨 앞 0 다음 숫자는 0을 바꿈
+            }
+            input.value = value;
+        }
+
+        function buildNumPads() {
+            document.querySelectorAll('.num-pad').forEach(pad => {
+                pad.innerHTML = '';
+                NUM_PAD_KEYS.forEach(key => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'num-pad-key' + (key === '⌫' ? ' back' : '');
+                    btn.textContent = key;
+                    btn.setAttribute('aria-label', key === '⌫' ? '한 글자 지우기' : key);
+                    btn.addEventListener('click', () => pressNumPad(pad.dataset.target, key));
+                    pad.appendChild(btn);
+                });
+            });
+        }
+        buildNumPads();
+
+        // 실제 키보드로 입력하지 못하게 막음 (입력칸은 읽기 전용, 붙여넣기도 차단)
+        ['answerInput', 'towerAnswer'].forEach(id => {
+            const input = document.getElementById(id);
+            input.addEventListener('keydown', e => e.preventDefault());
+            input.addEventListener('paste', e => e.preventDefault());
+            input.addEventListener('drop', e => e.preventDefault());
+        });
+
         // 이벤트 리스너
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
-        document.getElementById('answerInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                checkAnswer();
-            }
-        });
 
         // 게임 초기화
         generateProblem();
