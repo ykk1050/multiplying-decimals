@@ -2386,7 +2386,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.412</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.413</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -3345,7 +3345,7 @@
         }
 
         // ===== 강화: 룬 조각 · 기술 강화 · 펫 강화 (게임오버 후에도 유지) =====
-        const SKILL_MAX_LEVEL = 5;
+        const SKILL_MAX_LEVEL = 99;   // 사실상 제한 없음: 강화할수록 위력 +15%씩 계속 증가
         const PET_MAX_LEVEL = 5;
 
         function getRunes() {
@@ -5146,7 +5146,7 @@
                     <div class="skill-cost">💰 ${skill.cost} 코인</div>
                     <div class="skill-use-cost">사용: ${useCostText}</div>
                     <div class="skill-use-cost">속성: ${elementLabel(skill.element)}</div>
-                    <div class="skill-use-cost">데미지: ${getSkillDamageText(skill)}${skill.hero && getMasteryLevel(skill.hero) > 1 ? ` (숙련 +${(getMasteryLevel(skill.hero) - 1) * 10}%)` : ''}</div>
+                    <div class="skill-use-cost">데미지: ${getSkillDamageText(skill)}${getSkillLevel(skill.id) > 1 || skill.attackScale ? ` → <b>지금 ${Math.floor(getSkillDamage(skill) * getSkillLevelMultiplier(skill.id))}</b>` : ''}${skill.hero && getMasteryLevel(skill.hero) > 1 ? ` (숙련 +${(getMasteryLevel(skill.hero) - 1) * 10}%)` : ''}</div>
                     <div class="skill-use-cost"><span class="lv-badge">강화 Lv${getSkillLevel(skill.id)}</span>${getSkillLevel(skill.id) > 1 ? ` 위력 +${(getSkillLevel(skill.id) - 1) * 15}%` : ''}</div>
                     ${owned ?
                         '<div class="owned-badge">✅ 보유중</div>' :
@@ -5154,7 +5154,7 @@
                             구매하기
                         </button>`
                     }
-                    ${owned ? (getSkillLevel(skill.id) >= 5 ? '<div class="upgrade-max">⭐ 최고 강화</div>' : (() => {
+                    ${owned ? (getSkillLevel(skill.id) >= 99 ? '<div class="upgrade-max">⭐ 최고 강화</div>' : (() => {
                         const cost = skillUpgradeCost(skill);
                         const can = gameState.coins >= cost.coins && getRunes() >= cost.runes;
                         return `<button class="upgrade-item-btn" onclick="upgradeSkill('${skill.id}')" ${can ? '' : 'disabled'}>⬆ Lv${getSkillLevel(skill.id) + 1}: 💰${cost.coins} 🔷${cost.runes}</button>`;
