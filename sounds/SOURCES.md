@@ -4,13 +4,13 @@
 
 | 파일 | 원본 이름 | 올린 사람 | Pixabay ID |
 |---|---|---|---|
-| atk_mage.mp3 | Sound Effect: Twinkle/Sparkle | ShidenBeatsMusic | 115095 |
+| atk_mage.mp3 | Elemental Magic Spell Impact Outgoing | RescopicSound | 228342 |
 | atk_archer.mp3 | Arrow Swish_03 | DJARTMUSIC | 306040 |
 | atk_paladin.mp3 | KS MOTION METAL HIT | ALEXIS_GAMING_CAM | 351564 |
 | atk_ninja.mp3 | Metal Blade Slice 76 | floraphonic | 200891 |
 | atk_dragon.mp3 | Fire Sound Effect - Designed Fire - Short Swoosh | GregorQuendel | 120589 |
 | ult_knight.mp3 | Cinematic Impact Boom 05 | Universfield | 352465 |
-| ult_mage.mp3 | Shattering Ice | DRAGON-STUDIO | 454251 |
+| ult_mage.mp3 | Ice Spell Impact | DRAGON-STUDIO | 448563 |
 | ult_archer.mp3 | Lightning Strike | DRAGON-STUDIO | 386161 |
 | ult_paladin.mp3 | Holy Spell Cast | DRAGON-STUDIO | 450460 |
 | ult_ninja.mp3 | Sword Slice 2 | DRAGON-STUDIO | 393845 |
