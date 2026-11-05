@@ -2386,7 +2386,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.413</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.414</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -3118,7 +3118,6 @@
             gameState.currentStats.totalDamage += damage;
             gameState.currentStats.dailyStats.totalDamage += damage;
             addBattleLog(`⚡ 피버 추가 공격! ${damage}의 피해!`);
-            playHeroAttackSound();
             playFx('fever_hit', 'villain');
             updateRecordsDisplay();
             updateDisplay();
@@ -3865,7 +3864,7 @@
             getHeroData, buyHero, selectHero,
             applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
             openTower, closeTower, startTower, submitTowerAnswer,
-            saveProblemState, loadProblemState,
+            saveProblemState, loadProblemState, getCurrentStage,
             getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
             chooseTowerOption, chooseTowerPath, openTreasure
         };
@@ -3879,7 +3878,7 @@
             getHeroData, buyHero, selectHero,
             applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
             openTower, closeTower, startTower, submitTowerAnswer,
-            saveProblemState, loadProblemState,
+            saveProblemState, loadProblemState, getCurrentStage,
             getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
             chooseTowerOption, chooseTowerPath, openTreasure
         } = GameContent;
@@ -4011,12 +4010,28 @@
 
         // ===== 영상 이펙트 =====
         const FX_PATH = 'images/fx/';
+        const SFX_PATH = 'sounds/';      // 이펙트별 전용 효과음 (이펙트와 같은 이름)
+        const fxSounds = {};
+
+        // 같은 소리가 겹쳐 나와도 끊기지 않게 재생 중이면 복제해서 재생
+        function playFxSound(name) {
+            if (!fxSounds[name]) {
+                fxSounds[name] = new Audio(SFX_PATH + name + '.mp3');
+                fxSounds[name].preload = 'auto';
+            }
+            const base = fxSounds[name];
+            const audio = base.paused ? base : base.cloneNode();
+            audio.currentTime = 0;
+            const playing = audio.play();
+            if (playing && playing.catch) playing.catch(() => {});
+        }
 
         // target: 'villain'(마왕 쪽) 또는 'hero'(용사 쪽)
         function playFx(name, target, options) {
             const opts = options || {};
             const avatar = document.querySelector(target === 'hero' ? '.player-avatar' : '.villain-avatar');
             if (!avatar || !name) return;
+            playFxSound(name);
             const video = document.createElement('video');
             video.className = 'fx-video' + (opts.big ? ' big' : '');
             video.muted = true;
@@ -4049,6 +4064,10 @@
                 video.preload = 'auto';
                 video.muted = true;
                 video.src = FX_PATH + name + '.mp4';
+                if (!fxSounds[name]) {
+                    fxSounds[name] = new Audio(SFX_PATH + name + '.mp3');
+                    fxSounds[name].preload = 'auto';
+                }
             });
         }
 
@@ -4125,7 +4144,7 @@
                 cost: 90,
                 useCost: { type: 'mana', amount: 20 },
                 damage: 70, attackScale: 1,
-                fx: 'ex_rune_slash', sound: 'fullpower'
+                fx: 'ex_rune_slash'
             },
             star_storm: {
                 id: 'star_storm', hero: 'mage', element: 'ice',
@@ -4135,7 +4154,7 @@
                 cost: 110,
                 useCost: { type: 'mana', amount: 35 },
                 damage: 130, attackScale: 1,
-                fx: 'ex_star_storm', sound: 'meteor'
+                fx: 'ex_star_storm'
             },
             arrow_rain: {
                 id: 'arrow_rain', hero: 'archer', element: 'lightning',
@@ -4145,7 +4164,7 @@
                 cost: 120,
                 useCost: { type: 'mana', amount: 20 },
                 damage: 25, attackScale: 0.5, hits: 3,
-                fx: 'ex_arrow_rain', sound: 'hero'
+                fx: 'ex_arrow_rain'
             },
             holy_judgment: {
                 id: 'holy_judgment', hero: 'paladin', element: 'light',
@@ -4155,7 +4174,7 @@
                 cost: 130,
                 useCost: { type: 'mana', amount: 25 },
                 damage: 50, attackScale: 1, healRatio: 0.3,
-                fx: 'ex_holy_judgment', sound: 'ultimate'
+                fx: 'ex_holy_judgment'
             },
             shadow_raid: {
                 id: 'shadow_raid', hero: 'ninja', element: 'dark',
@@ -4165,7 +4184,7 @@
                 cost: 140,
                 useCost: { type: 'hp', amount: 15 },
                 damage: 60, attackScale: 1.5,
-                fx: 'ex_shadow_raid', sound: 'berserk'
+                fx: 'ex_shadow_raid'
             },
             dragon_breath: {
                 id: 'dragon_breath', hero: 'dragon', element: 'fire',
@@ -4175,7 +4194,7 @@
                 cost: 160,
                 useCost: { type: 'both', hp: 15, mana: 25 },
                 damage: 150, attackScale: 1.5,
-                fx: 'ex_dragon_breath', sound: 'fireball'
+                fx: 'ex_dragon_breath'
             }
         };
 
@@ -4892,7 +4911,6 @@
                 gameState.player.mana -= 20;
                 gameState.player.hp = gameState.player.maxHp;
                 addBattleLog(`🔮 리커버리 마법으로 체력을 완전 회복했습니다!`);
-                playhealingSound();
                 playFx('recovery', 'hero');
                 updateDisplay();
                 saveGameProgress();
@@ -4929,11 +4947,14 @@
                 }
 
                 updateRecordsDisplay();
-                playHeroAttackSound();
-                // 기본 공격 이펙트: 용사마다 다름 (기본 용사는 원래 GIF)
+                // 기본 공격 이펙트·소리: 용사마다 다름 (기본 용사는 원래 GIF와 칼 소리)
                 const basicFx = getSelectedHero().basicFx;
-                if (basicFx) playFx(basicFx, 'villain', { small: true });
-                else triggerHitEffect('heroattack');
+                if (basicFx) {
+                    playFx(basicFx, 'villain', { small: true });
+                } else {
+                    playHeroAttackSound();
+                    triggerHitEffect('heroattack');
+                }
 
                 if (gameState.villain.hp <= 0) {
                     victory();
@@ -4962,8 +4983,7 @@
                         const armorPenetration = Math.min(0.5, gameState.level * 0.04);
                         const effectiveDefense = Math.floor(gameState.player.defense * (1 - armorPenetration));
                         villainDamage = Math.max(2, gameState.villain.attack - effectiveDefense);
-                        playfirebreakSound();  // 불꽃 공격 전용 효과음
-                        playFx(getCurrentStage().special.fx, 'hero', { shake: true });  // 마왕별 특수 공격
+                        playFx(getCurrentStage().special.fx, 'hero', { shake: true });  // 마왕별 특수 공격 (영상+소리)
                         
                         const penetrationPercent = Math.round(armorPenetration * 100);
                         addBattleLog(`${getCurrentStage().special.icon || ''}${document.getElementById('villainName').textContent}의 ${getCurrentStage().special.name}! (방어력 ${penetrationPercent}% 무시) ${villainDamage}의 피해!`);
@@ -4974,8 +4994,11 @@
                     }
                     
                     gameState.player.hp = Math.max(0, gameState.player.hp - villainDamage);
-                    playBossAttackSound(); 
-                    triggerHitEffect('devilattack'); 
+                    // 일반 공격만 기본 소리·GIF (특수 공격은 전용 영상과 소리)
+                    if (!isPenetrationActive) {
+                        playBossAttackSound();
+                        triggerHitEffect('devilattack');
+                    }
                     
                     if (gameState.player.hp <= 0) {
                         gameOver();
@@ -5322,14 +5345,8 @@
 
             // 스킬별 효과음 및 이펙트
             if (skill.fx) {
-                // 전용기·캐릭터별 궁극기: 고유 영상 이펙트
-                const sounds = { fullpower: playfullpowerSound, meteor: playmeteoSound, hero: playHeroAttackSound,
-                                 ultimate: playultimateSound, berserk: playberserkSound, fireball: playFireballSound };
-                (skillId === 'ultimate' ? playultimateSound : (sounds[skill.sound] || playHeroAttackSound))();
+                // 전용기·캐릭터별 궁극기: 고유 영상 이펙트와 전용 소리
                 playFx(skill.fx, 'villain', { big: skillId === 'ultimate', shake: true });
-                if (skill.hits > 1) {
-                    for (let i = 1; i < skill.hits; i++) setTimeout(playHeroAttackSound, i * 350);
-                }
             } else if (skillId === 'fireball') {
                 playFireballSound();
                 triggerHitEffect('explosion');
