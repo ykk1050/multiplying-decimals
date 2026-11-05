@@ -2124,6 +2124,68 @@
             .tower-track { order: 2; }
         }
 
+        /* ===== 인트로 영상 ===== */
+        .intro-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            transition: opacity 0.4s ease;
+        }
+        .intro-screen.leaving { opacity: 0; pointer-events: none; }
+        .intro-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+        .intro-hint {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: max(18px, env(safe-area-inset-bottom));
+            text-align: center;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #f3e6bf;
+            text-shadow: 0 1px 4px #000, 0 0 8px #000;
+            animation: introHint 1.6s ease-in-out infinite;
+        }
+        @keyframes introHint {
+            0%, 100% { opacity: 0.55; }
+            50% { opacity: 1; }
+        }
+        .intro-confirm {
+            position: absolute;
+            padding: 20px 26px;
+            text-align: center;
+            border-radius: 14px;
+            border: 2px solid #b8913f;
+            color: #f3e6bf;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 800;
+            background: rgba(20, 14, 34, 0.94);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        }
+        .intro-confirm p { margin: 0 0 14px; font-size: 1.1rem; }
+        .intro-confirm button {
+            min-width: 92px;
+            min-height: 46px;
+            margin: 0 6px;
+            border: 1px solid #b8913f;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            color: #2b1c05;
+            background: linear-gradient(180deg, #f0cf73, #b8913f);
+        }
+        .intro-confirm button.secondary { color: #f3e6bf; background: #2a2144; }
+
         /* ===== 노력의 전당 ===== */
         .tower-main-btn.hall-main-btn { background: linear-gradient(180deg, #8a6a2b, #4e3a12); }
         .hall-content { max-width: 720px; padding: 16px 20px; }
@@ -2203,6 +2265,16 @@
   </style>
  </head>
  <body>
+  <div class="intro-screen" id="introScreen">
+      <video class="intro-video" id="introVideo" src="images/intro/intro.mp4" preload="auto" playsinline></video>
+      <video class="intro-video" id="introTitle" src="images/intro/intro_title.mp4" preload="auto" playsinline muted loop hidden></video>
+      <div class="intro-confirm" id="introConfirm" hidden>
+          <p>인트로 영상을 스킵하시겠습니까?</p>
+          <button id="introSkipYes">예</button>
+          <button class="secondary" id="introSkipNo">아니오</button>
+      </div>
+      <div class="intro-hint" id="introHint"></div>
+  </div>
   <div class="game-container">
    <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁 2</h1>  
    <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
@@ -2439,7 +2511,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.422</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.423</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -4648,6 +4720,145 @@
             villain_name: "수학 마왕"
         };
 
+        // ===== 인트로 영상 =====
+        // 소리가 나는 영상은 브라우저가 입력 전 자동 재생을 막을 수 있어, 막히면 먼저 입력을 받고 재생
+        const INTRO_SEEN_KEY = 'introSeen';
+        let introState = 'off';
+        let introResumeActive = false;
+        let introFirstVisit = false;
+        let introHold = null;
+        let introInputAt = 0;
+
+        function setIntroHint(text) {
+            document.getElementById('introHint').textContent = text;
+        }
+
+        function markIntroSeen() {
+            try { localStorage.setItem(INTRO_SEEN_KEY, '1'); } catch (e) {}
+        }
+
+        function beginIntroPlayback() {
+            const video = document.getElementById('introVideo');
+            const playing = video.play();
+            if (!playing || !playing.then) { onIntroPlaying(); return; }
+            playing.then(onIntroPlaying).catch(() => {
+                if (introState === 'off') return;
+                introState = 'gate';
+                setIntroHint('시작하려면 아무 키나 누르세요');
+            });
+        }
+
+        function onIntroPlaying() {
+            if (introState === 'off' || introState === 'title') return;
+            introState = 'playing';
+            markIntroSeen();
+            setIntroHint(introFirstVisit ? '' : '스킵하시려면 아무 키나 누르세요.');
+        }
+
+        function showIntroTitle() {
+            if (introState === 'off' || introState === 'title') return;
+            introState = 'title';
+            markIntroSeen();
+            const main = document.getElementById('introVideo');
+            const title = document.getElementById('introTitle');
+            document.getElementById('introConfirm').hidden = true;
+            main.pause();
+            main.hidden = true;
+            title.hidden = false;
+            const playing = title.play();
+            if (playing && playing.catch) playing.catch(() => {});
+            setIntroHint('계속하시려면 아무 키나 누르세요');
+        }
+
+        function askIntroSkip() {
+            introState = 'confirm';
+            document.getElementById('introVideo').pause();
+            document.getElementById('introConfirm').hidden = false;
+        }
+
+        function resumeIntroPlayback() {
+            introState = 'playing';
+            document.getElementById('introConfirm').hidden = true;
+            document.getElementById('introVideo').play().catch(() => {});
+        }
+
+        function finishIntro() {
+            if (introState === 'off') return;
+            introState = 'off';
+            clearInterval(introHold);
+            document.removeEventListener('keydown', onIntroKey, true);
+            const screen = document.getElementById('introScreen');
+            const main = document.getElementById('introVideo');
+            const title = document.getElementById('introTitle');
+            main.pause();
+            title.pause();
+            screen.classList.add('leaving');
+            document.documentElement.style.overflow = '';
+            setTimeout(() => {
+                screen.remove();
+            }, 450);
+            gameState.gameActive = introResumeActive;
+        }
+
+        function onIntroInput() {
+            const now = Date.now();
+            if (now - introInputAt < 250) return;
+            introInputAt = now;
+            if (introState === 'gate') {
+                setIntroHint('');
+                beginIntroPlayback();
+            } else if (introState === 'playing') {
+                if (introFirstVisit) askIntroSkip();
+                else showIntroTitle();
+            } else if (introState === 'title') {
+                finishIntro();
+            }
+        }
+
+        function onIntroKey(event) {
+            if (introState === 'off') return;
+            // 새로고침, 개발자 도구, 조합키 같은 브라우저 동작은 건드리지 않음
+            if (event.repeat || event.ctrlKey || event.altKey || event.metaKey || /^F\d+$/.test(event.key) ||
+                ['Tab', 'Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(event.key)) return;
+            event.preventDefault();
+            event.stopPropagation();
+            if (introState === 'confirm') {
+                if (event.key === 'Enter' || event.key.toLowerCase() === 'y') showIntroTitle();
+                else if (event.key === 'Escape' || event.key.toLowerCase() === 'n') resumeIntroPlayback();
+                return;
+            }
+            onIntroInput();
+        }
+
+        function startIntro() {
+            const screen = document.getElementById('introScreen');
+            const main = document.getElementById('introVideo');
+            introState = 'starting';
+            document.documentElement.style.overflow = 'hidden';
+            try { introFirstVisit = localStorage.getItem(INTRO_SEEN_KEY) !== '1'; } catch (e) { introFirstVisit = true; }
+
+            // 영상을 보는 동안에는 전투 정지
+            introResumeActive = gameState.gameActive;
+            gameState.gameActive = false;
+            introHold = setInterval(() => {
+                if (gameState.gameActive) {
+                    introResumeActive = true;
+                    gameState.gameActive = false;
+                }
+            }, 100);
+
+            screen.addEventListener('pointerdown', event => {
+                if (event.target.closest('.intro-confirm')) return;
+                onIntroInput();
+            });
+            document.addEventListener('keydown', onIntroKey, true);
+            document.getElementById('introSkipYes').addEventListener('click', showIntroTitle);
+            document.getElementById('introSkipNo').addEventListener('click', resumeIntroPlayback);
+            main.addEventListener('ended', showIntroTitle);
+            main.addEventListener('error', finishIntro);
+            beginIntroPlayback();
+        }
+
         // 페이지 로드 시 데이터 로드
         window.addEventListener('DOMContentLoaded', function() {
             console.log('게임 초기화 시작...');
@@ -4666,6 +4877,7 @@
             // 선택한 용사 모습 적용
             applyHero();
             applyPet();
+            startIntro();
             startPetLoop();
             warmFx([HERO_ULTIMATES[getSelectedHero().id].fx, SKILLS[getSelectedHero().skill].fx, getCurrentStage().special.fx, getSelectedHero().basicFx].filter(Boolean));
             updateComboDisplay();
