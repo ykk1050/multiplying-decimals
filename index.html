@@ -2124,6 +2124,56 @@
             .tower-track { order: 2; }
         }
 
+        /* ===== 노력의 전당 ===== */
+        .tower-main-btn.hall-main-btn { background: linear-gradient(180deg, #8a6a2b, #4e3a12); }
+        .hall-content { max-width: 720px; padding: 16px 20px; }
+        .hall-content .tower-title { font-size: 1.5rem; margin-bottom: 6px; }
+        @media (min-width: 640px) {
+            .hall-play-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: center; }
+            .hall-play-grid .num-pad { margin-top: 6px; }
+            .hall-play-grid .num-pad-key { height: 44px; padding: 0; }
+        }
+        .hall-stage {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 12px 18px 10px;
+            margin-bottom: 10px;
+            border-radius: 14px;
+            border: 2px solid #b89139;
+            overflow: hidden;
+            background: #2b2110 url('images/bg_hall.webp') center 62% / cover no-repeat;
+        }
+        .hall-fighter { width: 44%; max-width: 190px; text-align: center; }
+        .hall-avatar { position: relative; width: 112px; height: 112px; margin: 0 auto 6px; }
+        .hall-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 2px solid #f0cf73;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+        }
+        .hall-avatar.shake { animation: avatarShake 0.45s ease-in-out; }
+        .hall-name { color: #fff; font-weight: 800; font-size: 0.86rem; text-shadow: 0 1px 3px #000, 0 0 6px #000; }
+        .hall-bar { height: 12px; margin-top: 4px; border-radius: 6px; overflow: hidden; background: rgba(0, 0, 0, 0.6); }
+        .hall-bar-fill { height: 100%; width: 100%; transition: width 0.3s ease; }
+        .hall-bar-fill.hero { background: linear-gradient(90deg, #3ec9b0, #7ee0a0); }
+        .hall-bar-fill.master { background: linear-gradient(90deg, #f0cf73, #ffa43a); }
+        .hall-line {
+            min-height: 2.6em;
+            padding: 8px 12px;
+            margin: 0 0 8px;
+            border-radius: 10px;
+            font-weight: 800;
+            color: #4e330a;
+            background: rgba(138, 106, 43, 0.15);
+        }
+        .hall-locked-text { font-size: 1.15rem; font-weight: 800; }
+        .hall-progress { font-weight: 800; color: #7a5214; }
+
         /* ===== 강화 표시 ===== */
         .lv-badge {
             display: inline-block;
@@ -2186,6 +2236,9 @@
          </button>
          <button class="tower-main-btn" onclick="openTower()">
              🗼 무한의 탑
+         </button>
+         <button class="tower-main-btn hall-main-btn" onclick="openHall()">
+             🏛️ 노력의 전당
          </button>
      </div>
    <div class="battle-layout">
@@ -2386,7 +2439,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.419</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.420</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2504,6 +2557,59 @@
                     <button class="tower-btn secondary" onclick="closeTower()">돌아가기</button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="tower-modal" id="hallModal">
+    <div class="tower-content hall-content">
+        <button class="shop-close" onclick="closeHall()">×</button>
+        <h2 class="tower-title">🏛️ 노력의 전당</h2>
+        <div class="hall-stage" id="hallStage">
+            <div class="hall-fighter">
+                <div class="hall-avatar" id="hallHeroAvatar"><img id="hallHeroImage" alt="용사"></div>
+                <div class="hall-name" id="hallHeroName">용사</div>
+                <div class="hall-bar"><div class="hall-bar-fill hero" id="hallHeroBar"></div></div>
+            </div>
+            <div class="hall-fighter">
+                <div class="hall-avatar" id="hallMasterAvatar"><img src="images/master_sage.webp" alt="수련의 대현자"></div>
+                <div class="hall-name">수련의 대현자</div>
+                <div class="hall-bar"><div class="hall-bar-fill master" id="hallMasterBar"></div></div>
+            </div>
+        </div>
+        <p class="hall-line" id="hallLine"></p>
+        <div id="hallLocked" style="display: none;">
+            <p class="hall-locked-text">🔒 마왕과의 전투 경험이 부족하다.</p>
+            <p>전당의 문이 굳게 봉인되어 있습니다.</p>
+            <button class="tower-btn secondary" onclick="closeHall()">돌아가기</button>
+        </div>
+        <div id="hallIntro" style="display: none;">
+            <p>대현자와 일격을 주고받으며 수련합니다. 지쳐도 쓰러지지 않아요.</p>
+            <p class="hall-progress" id="hallIntroInfo"></p>
+            <p>보상: 🔷 룬 조각 (하루 최대 3개) · 💰 봉인을 완성하면 금화</p>
+            <button class="tower-btn" id="hallStartBtn" onclick="startHall()">수련 시작!</button>
+            <button class="tower-btn secondary" onclick="closeHall()">돌아가기</button>
+        </div>
+        <div id="hallPlay" style="display: none;">
+            <div class="hall-play-grid">
+                <div>
+                    <div class="hall-progress" id="hallProgress"></div>
+                    <div class="tower-problem" id="hallProblem"></div>
+                </div>
+                <div>
+                    <div id="hallPadArea">
+                        <input type="text" readonly inputmode="none" autocomplete="off" class="answer-input" id="hallAnswer" placeholder="답을 입력하세요">
+                        <div class="num-pad parchment" data-target="hallAnswer"></div>
+                        <button class="tower-btn" onclick="submitHallAnswer()">✔ 제출</button>
+                    </div>
+                    <div class="tower-choices" id="hallChoices"></div>
+                </div>
+            </div>
+        </div>
+        <div id="hallResult" style="display: none;">
+            <p style="font-size: 1.3rem; font-weight: bold;">🏛️ 오늘의 수련 완료!</p>
+            <p id="hallResultReward"></p>
+            <button class="tower-btn" onclick="closeHall()">돌아가기</button>
         </div>
     </div>
 </div>
@@ -3052,6 +3158,7 @@
             if (problem === lastRewardedProblem || now - lastRewardAt < 500) return 5;
             lastRewardedProblem = problem;
             lastRewardAt = now;
+            recordSolveTime(problem);
 
             combo++;
             saveExtraRecord('combo', combo);
@@ -3730,6 +3837,7 @@
             }
 
             tower.streak = 0;
+            noteTowerProblem(q);
             const answerText = `정답: ${q.reveal}`;
             if (tower.gate && getSelectedHero().id === 'knight' && !tower.shieldUsed) {
                 tower.shieldUsed = true;
@@ -3834,6 +3942,296 @@
             saveGameProgress();
         }
 
+        // ===== 노력의 전당 =====
+        // 틀린 문제와 평균의 1.5배 이상 오래 걸린 문제를 모아 다음 날부터 복습 (전투 기록과 분리)
+        const EFFORT_BASELINE = 30;      // 업데이트 후 이만큼 풀어야 시간 비교 시작
+        const EFFORT_RECENT = 50;        // 평균은 최근 이만큼만 사용
+        const EFFORT_SLOW_RATIO = 1.5;
+        const EFFORT_MAX_MS = 60000;     // 이보다 오래 걸린 기록은 평균에서 제외
+        const HALL_OPEN_AT = 30;         // 이만큼 모이면 전당이 열림 (한 번 열리면 유지)
+        const HALL_MAX_ITEMS = 60;       // 넘치면 가장 오래된 문제부터 교체
+        const HALL_DAILY_PROBLEMS = 5;
+        const HALL_DAILY_RUNES = 3;      // 탑 10층 한 판(약 14개)의 1/5 수준
+        const HALL_SEAL_NEED = 2;        // 서로 다른 날 2번 맞히면 봉인 완료
+        const HALL_SEAL_COINS = 10;
+        const HALL_MODALS = ['shopModal', 'rankingModal', 'cheatModal', 'towerModal', 'hallModal', 'victoryModal', 'gameOverModal'];
+
+        function localDateKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function getEffortStats() {
+            const d = secureLoad('effortStats').data;
+            return (d && Array.isArray(d.recent)) ? { n: Number(d.n) || 0, recent: d.recent.slice() } : { n: 0, recent: [] };
+        }
+
+        function getHallData() {
+            const d = secureLoad('hallData').data;
+            const data = (d && Array.isArray(d.items)) ? JSON.parse(JSON.stringify(d)) : { open: false, items: [], date: '', done: 0, runes: 0 };
+            const today = localDateKey();
+            if (data.date !== today) { data.date = today; data.done = 0; data.runes = 0; }
+            return data;
+        }
+
+        // 풀이 시간: 문제를 실제로 보고 있는 동안만 측정
+        let problemMs = 0;
+        let problemClockOn = false;
+        let problemClockLast = 0;
+
+        function startProblemClock() {
+            problemMs = 0;
+            problemClockOn = true;
+            problemClockLast = Date.now();
+        }
+
+        function isProblemClockRunning() {
+            if (!gameState.gameActive || document.visibilityState !== 'visible' || !document.hasFocus()) return false;
+            const upgrade = document.getElementById('upgradeSection');
+            if (upgrade && upgrade.style.display === 'block') return false;
+            return HALL_MODALS.every(id => {
+                const el = document.getElementById(id);
+                return !el || el.style.display === '' || el.style.display === 'none';
+            });
+        }
+
+        setInterval(() => {
+            if (!problemClockOn) return;
+            const now = Date.now();
+            const delta = Math.min(1000, now - problemClockLast);
+            problemClockLast = now;
+            if (isProblemClockRunning()) problemMs += delta;
+        }, 250);
+
+        function addHallItem(item) {
+            const data = getHallData();
+            const key = JSON.stringify([item.t, item.o || null]);
+            if (data.items.some(x => JSON.stringify([x.t, x.o || null]) === key)) return;
+            data.items.push({ ...item, d: localDateKey(), p: 0, l: '' });
+            if (data.items.length > HALL_MAX_ITEMS) data.items.shift();
+            if (data.items.length >= HALL_OPEN_AT) data.open = true;
+            secureSave('hallData', data);
+        }
+
+        function battleProblemItem(problem) {
+            return { t: `${problem.num1} × ${problem.num2} = ?`, a: problem.answer };
+        }
+
+        function noteWrongProblem(problem) {
+            if (problem) addHallItem(battleProblemItem(problem));
+        }
+
+        function noteTowerProblem(q) {
+            if (!q) return;
+            const item = { t: q.text, a: q.answer };
+            if (q.input === 'choice') item.o = q.options;
+            addHallItem(item);
+        }
+
+        function recordSolveTime(problem) {
+            if (!problemClockOn) return;       // 새로고침으로 이어진 문제는 측정하지 않음
+            problemClockOn = false;
+            const ms = problemMs;
+            const stats = getEffortStats();
+            if (stats.n >= EFFORT_BASELINE && stats.recent.length) {
+                const average = stats.recent.reduce((sum, v) => sum + v, 0) / stats.recent.length;
+                if (ms >= average * EFFORT_SLOW_RATIO) addHallItem(battleProblemItem(problem));
+            }
+            if (ms > 0 && ms <= EFFORT_MAX_MS) {
+                stats.n++;
+                stats.recent.push(ms);
+                if (stats.recent.length > EFFORT_RECENT) stats.recent.shift();
+                secureSave('effortStats', stats);
+            }
+        }
+
+        let hall = null;
+        let hallResumeActive = false;
+        const HALL_SCREENS = ['hallLocked', 'hallIntro', 'hallPlay', 'hallResult'];
+
+        function showHallScreen(id) {
+            HALL_SCREENS.forEach(name => {
+                document.getElementById(name).style.display = name === id ? 'block' : 'none';
+            });
+        }
+
+        function setHallLine(text) {
+            document.getElementById('hallLine').textContent = text;
+        }
+
+        function setHallBars(heroRatio, masterRatio) {
+            document.getElementById('hallHeroBar').style.width = `${Math.max(0, heroRatio) * 100}%`;
+            document.getElementById('hallMasterBar').style.width = `${Math.max(0, masterRatio) * 100}%`;
+        }
+
+        function getHallToday(data) {
+            const today = localDateKey();
+            return data.items.filter(item => item.d < today && item.l !== today);
+        }
+
+        function openHall() {
+            hallResumeActive = gameState.gameActive;
+            gameState.gameActive = false;
+            hall = null;
+            const hero = getSelectedHero();
+            document.getElementById('hallHeroImage').src = hero.image;
+            document.getElementById('hallHeroName').textContent = hero.name;
+            setHallBars(1, 1);
+            warmFx(['ms_strike', 'ms_guard', 'ms_clear']);
+            document.getElementById('hallModal').style.display = 'flex';
+
+            const data = getHallData();
+            if (!data.open) {
+                setHallLine('아직은 때가 아니다. 더 많은 전투를 겪고 오너라.');
+                showHallScreen('hallLocked');
+                return;
+            }
+            const left = Math.min(HALL_DAILY_PROBLEMS - data.done, getHallToday(data).length);
+            document.getElementById('hallIntroInfo').textContent = `오늘의 수련: ${data.done} / ${HALL_DAILY_PROBLEMS}`;
+            document.getElementById('hallStartBtn').style.display = left > 0 ? 'inline-block' : 'none';
+            setHallLine(left > 0 ? '땀 흘린 만큼 강해진다. 준비되었느냐?' : '오늘의 수련은 충분하다. 내일 다시 오너라.');
+            showHallScreen('hallIntro');
+        }
+
+        function closeHall() {
+            hall = null;
+            document.getElementById('hallModal').style.display = 'none';
+            gameState.gameActive = hallResumeActive;
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        function startHall() {
+            const data = getHallData();
+            const list = shuffleArray(getHallToday(data)).slice(0, HALL_DAILY_PROBLEMS - data.done);
+            if (!list.length) return;
+            hall = { list, index: 0, wrong: 0, runes: 0, coins: 0, sealed: 0, q: null, startedAt: 0, busy: false };
+            setHallBars(1, 1);
+            setHallLine('자, 일격을 보여 보아라!');
+            askHallQuestion();
+        }
+
+        function askHallQuestion() {
+            if (!hall) return;
+            const q = hall.list[hall.index];
+            hall.q = q;
+            hall.busy = false;
+            hall.startedAt = Date.now();
+            showHallScreen('hallPlay');
+            document.getElementById('hallProgress').textContent = `수련 ${hall.index + 1} / ${hall.list.length}`;
+            document.getElementById('hallProblem').textContent = q.t;
+            document.getElementById('hallAnswer').value = '';
+            const isChoice = Array.isArray(q.o);
+            document.getElementById('hallPadArea').style.display = isChoice ? 'none' : 'block';
+            const choices = document.getElementById('hallChoices');
+            choices.innerHTML = '';
+            choices.style.display = isChoice ? 'grid' : 'none';
+            choices.className = 'tower-choices' + (isChoice && q.o.length === 2 ? ' two' : '');
+            if (isChoice) {
+                q.o.forEach((label, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'tower-choice';
+                    btn.textContent = label;
+                    btn.onclick = () => chooseHallOption(i);
+                    choices.appendChild(btn);
+                });
+            }
+        }
+
+        function submitHallAnswer() {
+            if (!hall || !hall.q || hall.busy || Array.isArray(hall.q.o)) return;
+            if (Date.now() - hall.startedAt < 500) return;   // 매크로 방지
+            const value = parseFloat(document.getElementById('hallAnswer').value);
+            if (isNaN(value)) return;
+            hallAnswered(Math.abs(value - hall.q.a) < 0.001);
+        }
+
+        function chooseHallOption(i) {
+            if (!hall || !hall.q || hall.busy || Date.now() - hall.startedAt < 500) return;
+            hallAnswered(i === hall.q.a);
+        }
+
+        function hallStrike() {
+            const hero = getSelectedHero();
+            if (hero.basicFx) playFx(hero.basicFx, 'hallMaster', { small: true });
+            else playHeroAttackSound();
+            setTimeout(() => {
+                if (hall) playFx('ms_guard', 'hallMaster', { shake: true });
+            }, 300);
+        }
+
+        function hallAnswered(correct) {
+            hall.busy = true;
+            const data = getHallData();
+            const key = JSON.stringify([hall.q.t, hall.q.o || null]);
+            const found = data.items.findIndex(x => JSON.stringify([x.t, x.o || null]) === key);
+            let sealedNow = false;
+            data.done++;
+            if (found >= 0) {
+                const item = data.items[found];
+                item.l = data.date;
+                if (correct) {
+                    item.p = (item.p || 0) + 1;
+                    if (item.p >= HALL_SEAL_NEED) {
+                        data.items.splice(found, 1);
+                        sealedNow = true;
+                    }
+                }
+            }
+            if (correct && data.runes < HALL_DAILY_RUNES) {
+                data.runes++;
+                hall.runes++;
+                setRunes(getRunes() + 1);
+            }
+            if (sealedNow) {
+                hall.sealed++;
+                hall.coins += HALL_SEAL_COINS;
+                gameState.coins += HALL_SEAL_COINS;
+            }
+            secureSave('hallData', data);
+
+            const total = hall.list.length;
+            if (!correct) hall.wrong++;
+            const hit = hall.index + 1 - hall.wrong;
+            setHallBars(1 - hall.wrong / total, 1 - hit / total);
+            if (correct) {
+                hallStrike();
+                setHallLine(sealedNow ? '훌륭하다! 이 수식의 봉인이 완성되었다.' : '좋은 일격이다!');
+                if (sealedNow) setTimeout(() => { if (hall) playFx('ms_clear', 'hallMaster'); }, 900);
+            } else {
+                playFx('ms_strike', 'hallHero', { shake: true });
+                setHallLine(`서두르지 마라. 정답은 ${Array.isArray(hall.q.o) ? hall.q.o[hall.q.a] : fmtNum(hall.q.a)}이다.`);
+            }
+            hall.index++;
+            setTimeout(() => {
+                if (!hall) return;
+                if (hall.index >= hall.list.length) finishHall();
+                else askHallQuestion();
+            }, sealedNow ? 2800 : 1800);
+        }
+
+        function finishHall() {
+            const rewards = [`🔷 룬 조각 ${hall.runes}개`];
+            if (hall.coins) rewards.push(`💰 금화 ${hall.coins}개`);
+            document.getElementById('hallResultReward').textContent =
+                hall.runes || hall.coins ? `${rewards.join(' · ')}를 얻었어요!${hall.sealed ? ` 봉인 완성 ${hall.sealed}개!` : ''}` : '오늘의 땀은 내일의 일격이 됩니다.';
+            setHallLine('오늘의 노력이 내일의 힘이 될 것이다.');
+            showHallScreen('hallResult');
+            playupgradeSound();
+            hall = null;
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        // 내 컴퓨터(localhost)에서만: 주소 끝에 ?hallTest 를 붙이면 문제 30개로 전당을 열어 시험
+        if (location.hostname === 'localhost' && new URLSearchParams(location.search).has('hallTest')) {
+            const samples = [];
+            for (let i = 1; i <= 30; i++) samples.push({ t: `0.${(i % 9) + 1} × ${i + 2} = ?`, a: Math.round((((i % 9) + 1) / 10) * (i + 2) * 1000) / 1000, d: '2000-01-01', p: i % 3 === 0 ? 1 : 0, l: '' });
+            samples.splice(1, 0, { t: '곱이 더 큰 문을 고르세요', o: ['0.5 × 8', '0.3 × 9'], a: 0, d: '2000-01-01', p: 0, l: '' });
+            if (new URLSearchParams(location.search).get('hallTest') === 'choice') samples.splice(2);
+            secureSave('hallData', { open: true, items: samples, date: localDateKey(), done: 0, runes: 0 });
+        }
+
         // ----- 현재 문제 저장: 새로고침으로 문제를 바꿔 고르지 못하게 -----
         function saveProblemState(problem, solved) {
             secureSave('currentProblem', { n1: problem.num1, n2: problem.num2, solved: !!solved });
@@ -3866,7 +4264,8 @@
             openTower, closeTower, startTower, submitTowerAnswer,
             saveProblemState, loadProblemState, getCurrentStage,
             getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
-            chooseTowerOption, chooseTowerPath, openTreasure
+            chooseTowerOption, chooseTowerPath, openTreasure,
+            startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer
         };
         })();
 
@@ -3880,7 +4279,8 @@
             openTower, closeTower, startTower, submitTowerAnswer,
             saveProblemState, loadProblemState, getCurrentStage,
             getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
-            chooseTowerOption, chooseTowerPath, openTreasure
+            chooseTowerOption, chooseTowerPath, openTreasure,
+            startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer
         } = GameContent;
 
         // 용사 캐릭터: 상점에서 구매 후 선택 (구매 기록은 게임오버 후에도 유지)
@@ -4010,6 +4410,10 @@
 
         // ===== 영상 이펙트 =====
         const FX_PATH = 'images/fx/';
+        const FX_TARGETS = {
+            hero: '.player-avatar', villain: '.villain-avatar',
+            hallHero: '#hallHeroAvatar', hallMaster: '#hallMasterAvatar'
+        };
         const SFX_PATH = 'sounds/';      // 이펙트별 전용 효과음 (이펙트와 같은 이름)
         const fxSounds = {};
 
@@ -4029,7 +4433,7 @@
         // target: 'villain'(마왕 쪽) 또는 'hero'(용사 쪽)
         function playFx(name, target, options) {
             const opts = options || {};
-            const avatar = document.querySelector(target === 'hero' ? '.player-avatar' : '.villain-avatar');
+            const avatar = document.querySelector(FX_TARGETS[target]);
             if (!avatar || !name) return;
             playFxSound(name);
             const video = document.createElement('video');
@@ -4050,7 +4454,7 @@
         }
 
         function shakeAvatar(target) {
-            const avatar = document.querySelector(target === 'hero' ? '.player-avatar' : '.villain-avatar');
+            const avatar = document.querySelector(FX_TARGETS[target]);
             if (!avatar) return;
             avatar.classList.remove('shake');
             void avatar.offsetWidth;
@@ -4815,6 +5219,7 @@
             
             gameState.currentProblem = { num1, num2, answer };
             saveProblemState(gameState.currentProblem, false);
+            startProblemClock();
             document.getElementById('mathProblem').textContent = `${num1} × ${num2} = ?`;
             document.getElementById('answerInput').value = '';
             document.getElementById('upgradeSection').style.display = 'none';
@@ -4857,6 +5262,7 @@
             } else {
                 addBattleLog(`틀렸습니다. 다시 시도하세요!`);
                 onWrongAnswer();
+                if (!isNaN(userAnswer)) noteWrongProblem(gameState.currentProblem);
                 document.getElementById('answerInput').value = '';
             }
         }

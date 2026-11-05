@@ -37,3 +37,6 @@
 | pet_heal.mp3 | Fairy Dust Shimmer 1 | floraphonic | 175611 |
 | recovery.mp3 | Holy Healing Spell | Coghezzi | 533279 |
 | fever_hit.mp3 | Fire Spell Impact | DRAGON-STUDIO | 393921 |
+| ms_strike.mp3 | Abstract Magic Whoosh 03 | DavidDumaisAudio | 204485 |
+| ms_guard.mp3 | Impact Magic Earth Shield Up Game Sound | Epic_Stock_Media | 333827 |
+| ms_clear.mp3 | Level Up Chime | Universfield | 132474 |
