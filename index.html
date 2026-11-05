@@ -2511,7 +2511,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.423</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.424</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -4743,6 +4743,12 @@
             if (!playing || !playing.then) { onIntroPlaying(); return; }
             playing.then(onIntroPlaying).catch(() => {
                 if (introState === 'off') return;
+                // 재접속: 입력을 기다리지 않고 소리 없이 재생 (첫 입력에 바로 게임으로)
+                if (!introFirstVisit && !video.muted) {
+                    video.muted = true;
+                    beginIntroPlayback();
+                    return;
+                }
                 introState = 'gate';
                 setIntroHint('시작하려면 아무 키나 누르세요');
             });
@@ -4752,7 +4758,7 @@
             if (introState === 'off' || introState === 'title') return;
             introState = 'playing';
             markIntroSeen();
-            setIntroHint(introFirstVisit ? '' : '스킵하시려면 아무 키나 누르세요.');
+            setIntroHint(introFirstVisit ? '' : '계속하시려면 아무 키나 누르세요');
         }
 
         function showIntroTitle() {
@@ -4809,7 +4815,7 @@
                 beginIntroPlayback();
             } else if (introState === 'playing') {
                 if (introFirstVisit) askIntroSkip();
-                else showIntroTitle();
+                else finishIntro();
             } else if (introState === 'title') {
                 finishIntro();
             }
