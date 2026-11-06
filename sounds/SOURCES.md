@@ -43,4 +43,4 @@
 | ev_fire.mp3 | Fireball Whoosh 5 | floraphonic | 179129 |
 | ev_ice.mp3 | Frost Spell Impact | DRAGON-STUDIO | 499662 |
 | ev_mana.mp3 | Power Up Sparkle 1 | floraphonic | 177983 |
-| ev_heal.mp3 | Clear Bell Chime | Universfield | 487898 |
+| ev_heal.mp3 | Harp glissando with chimes - Sound effect | ShidenBeatsMusic | 128349 |
