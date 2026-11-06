@@ -40,3 +40,7 @@
 | ms_strike.mp3 | Abstract Magic Whoosh 03 | DavidDumaisAudio | 204485 |
 | ms_guard.mp3 | Impact Magic Earth Shield Up Game Sound | Epic_Stock_Media | 333827 |
 | ms_clear.mp3 | Level Up Chime | Universfield | 132474 |
+| ev_fire.mp3 | Fireball Whoosh 5 | floraphonic | 179129 |
+| ev_ice.mp3 | Frost Spell Impact | DRAGON-STUDIO | 499662 |
+| ev_mana.mp3 | Power Up Sparkle 1 | floraphonic | 177983 |
+| ev_heal.mp3 | Clear Bell Chime | Universfield | 487898 |

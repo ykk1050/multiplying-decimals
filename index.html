@@ -2529,7 +2529,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.427</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.428</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -3420,6 +3420,7 @@
                 img.src = look.image;
                 img.alt = look.name;
                 img.style.display = 'block';
+                warmFx([petFx(pet)]);
             } else {
                 img.style.display = 'none';
             }
@@ -3451,7 +3452,7 @@
                 gameState.currentStats.dailyStats.totalDamage += result.damage;
                 addBattleLog(`🐾 ${pet.name}의 ${elementLabel(pet.element)} 공격! ${result.damage}의 피해!`);
                 announceElement(result.result);
-                playFx(pet.element === 'fire' ? 'pet_fire' : 'pet_ice', 'villain');
+                playFx(petFx(pet), 'villain');
                 petAction();
                 updateRecordsDisplay();
                 updateDisplay();
@@ -3460,14 +3461,14 @@
                 const amount = pet.amount + getPetLevel(pet.id) - 1;
                 player.mana = Math.min(player.maxMana, player.mana + amount);
                 addBattleLog(`🐾 ${pet.name}가 마나를 ${amount} 채워 주었습니다!`);
-                playFx('pet_mana', 'hero');
+                playFx(petFx(pet), 'hero');
                 petAction();
                 updateDisplay();
             } else if (pet.type === 'heal' && player.hp > 0 && player.hp < player.maxHp) {
                 const heal = Math.max(1, Math.floor(player.maxHp * (pet.ratio + 0.015 * (getPetLevel(pet.id) - 1))));
                 player.hp = Math.min(player.maxHp, player.hp + heal);
                 addBattleLog(`🐾 ${pet.name}가 체력을 ${heal} 회복시켜 주었습니다!`);
-                playFx('pet_heal', 'hero');
+                playFx(petFx(pet), 'hero');
                 petAction();
                 updateDisplay();
             }
@@ -3547,6 +3548,12 @@
             return isPetEvolved(pet.id) ? pet.evolved : pet;
         }
 
+        // 진화하면 시간 능력과 정답 효과 모두 새 임펙트로 바뀜
+        function petFx(pet) {
+            const kind = pet.type === 'attack' ? (pet.element === 'fire' ? 'fire' : 'ice') : pet.type;
+            return `${isPetEvolved(pet.id) ? 'ev' : 'pet'}_${kind}`;
+        }
+
         function petEvolveProof() {
             const c = getCollection().counters;
             return { sealed: Number(c.sealed) || 0, gates: Number(c.gates) || 0 };
@@ -3605,7 +3612,7 @@
                 const heal = Math.max(1, Math.floor(player.maxHp * PET_EVOLVE_HEAL_RATIO));
                 player.hp = Math.min(player.maxHp, player.hp + heal);
                 addBattleLog(`🌟 ${pet.evolved.name}가 체력을 ${heal} 회복시켜 주었습니다!`);
-                playFx('pet_heal', 'hero');
+                playFx(petFx(pet), 'hero');
                 petAction();
                 updateDisplay();
             }
@@ -3624,7 +3631,7 @@
             gameState.currentStats.dailyStats.totalDamage += result.damage;
             addBattleLog(`🌟 ${pet.evolved.name}의 ${elementLabel(pet.element)} 추가 공격! ${result.damage}의 피해!`);
             announceElement(result.result);
-            playFx(pet.element === 'fire' ? 'pet_fire' : 'pet_ice', 'villain');
+            playFx(petFx(pet), 'villain');
             petAction();
             updateRecordsDisplay();
             updateDisplay();
