@@ -2052,6 +2052,17 @@
             .tower-track { order: 2; }
         }
 
+        /* ===== 펫 진화 ===== */
+        .evolve-box {
+            margin-top: 6px;
+            padding: 6px;
+            border-radius: 8px;
+            font-size: 0.76rem;
+            line-height: 1.35;
+            background: rgba(240, 207, 115, 0.2);
+        }
+        .evolve-box .upgrade-item-btn { margin-top: 4px; }
+
         /* ===== 도감과 칭호 ===== */
         .tower-main-btn.collection-main-btn { background: linear-gradient(180deg, #5b3d8f, #2c1a4e); }
         .title-badge { color: #f0cf73; font-weight: 800; font-size: 0.9rem; text-align: center; }
@@ -2518,7 +2529,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.426</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.427</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -3246,6 +3257,7 @@
                 addBattleLog(`🔥 ${COMBO_BONUS_AT}콤보! 지금부터 정답마다 코인 +1`);
             }
             addMasteryXp(getSelectedHero().id, 1);
+            onEvolvedPetCorrect();
             updateComboDisplay();
             return getCorrectAnswerCoins();
         }
@@ -3382,10 +3394,10 @@
 
         // ===== 동료 펫 =====
         const PETS = [
-            { id: 'fire_dragon', name: '아기 불꽃용', description: '6초마다 🔥불 속성 공격', image: 'images/pet_dragon.webp', cost: 150, type: 'attack', element: 'fire', interval: 6 },
-            { id: 'frost_wolf', name: '서리 늑대', description: '6초마다 ❄️얼음 속성 공격', image: 'images/pet_wolf.webp', cost: 150, type: 'attack', element: 'ice', interval: 6 },
-            { id: 'owl', name: '지혜의 부엉이', description: '8초마다 마나 +4', image: 'images/pet_owl.webp', cost: 200, type: 'mana', amount: 4, interval: 8 },
-            { id: 'fairy', name: '빛의 요정', description: '10초마다 체력 6% 회복', image: 'images/pet_fairy.webp', cost: 250, type: 'heal', ratio: 0.06, interval: 10 }
+            { id: 'fire_dragon', evolved: { name: '화염룡', image: 'images/pet_dragon2.webp' }, name: '아기 불꽃용', description: '6초마다 🔥불 속성 공격', image: 'images/pet_dragon.webp', cost: 150, type: 'attack', element: 'fire', interval: 6 },
+            { id: 'frost_wolf', evolved: { name: '빙하 늑대', image: 'images/pet_wolf2.webp' }, name: '서리 늑대', description: '6초마다 ❄️얼음 속성 공격', image: 'images/pet_wolf.webp', cost: 150, type: 'attack', element: 'ice', interval: 6 },
+            { id: 'owl', evolved: { name: '별빛 대부엉이', image: 'images/pet_owl2.webp' }, name: '지혜의 부엉이', description: '8초마다 마나 +4', image: 'images/pet_owl.webp', cost: 200, type: 'mana', amount: 4, interval: 8 },
+            { id: 'fairy', evolved: { name: '여명의 대요정', image: 'images/pet_fairy2.webp' }, name: '빛의 요정', description: '10초마다 체력 6% 회복', image: 'images/pet_fairy.webp', cost: 250, type: 'heal', ratio: 0.06, interval: 10 }
         ];
         let petTimer = 0;
 
@@ -3404,8 +3416,9 @@
             const pet = getSelectedPet();
             const img = document.getElementById('petImage');
             if (pet) {
-                img.src = pet.image;
-                img.alt = pet.name;
+                const look = petLook(pet);
+                img.src = look.image;
+                img.alt = look.name;
                 img.style.display = 'block';
             } else {
                 img.style.display = 'none';
@@ -3491,15 +3504,131 @@
                         upgrade = `<button class="upgrade-item-btn" onclick="upgradePet('${pet.id}')" ${can ? '' : 'disabled'}>⬆ Lv${lv + 1}: 💰${cost.coins} 🔷${cost.runes}</button>`;
                     }
                 }
+                const look = petLook(pet);
+                const evolvedNow = isPetEvolved(pet.id);
                 card.innerHTML = `
-                    <img src="${pet.image}" alt="${pet.name}">
-                    <div class="hero-card-name">${pet.name} <span class="lv-badge">Lv${lv}</span></div>
-                    <div class="hero-card-desc">${pet.description}<br><b>${petEffectText(pet, lv)}</b></div>
+                    <img src="${look.image}" alt="${look.name}">
+                    <div class="hero-card-name">${look.name} <span class="lv-badge">Lv${lv}</span></div>
+                    <div class="hero-card-desc">${pet.description}<br><b>${petEffectText(pet, lv)}</b>${evolvedNow ? `<br><b>🌟 ${PET_EVOLVE_TEXT[pet.id]}</b>` : ''}</div>
                     ${action}
                     ${upgrade}
+                    ${owned && lv >= PET_MAX_LEVEL ? evolveSection(pet) : ''}
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // ===== 펫 진화 =====
+        // 기존 시간 능력은 그대로 두고, 진화 효과는 마왕 사냥의 정답으로만 발동 (기다리기만 해서는 강해지지 않게)
+        const PET_EVOLVE_COST = { coins: 500, runes: 30 };
+        const PET_EVOLVE_NEED = 5;           // 봉인 또는 탑 관문 돌파 횟수
+        const PET_EVOLVE_ATTACK_EVERY = 3;   // 공격 펫: 정답 몇 개마다 추가 공격
+        const PET_EVOLVE_HEAL_COMBO = 5;
+        const PET_EVOLVE_HEAL_RATIO = 0.1;
+        const PET_EVOLVE_TEXT = {
+            fire_dragon: `정답 ${PET_EVOLVE_ATTACK_EVERY}개마다 불 속성 추가 공격`,
+            frost_wolf: `정답 ${PET_EVOLVE_ATTACK_EVERY}개마다 얼음 속성 추가 공격`,
+            owl: '정답마다 마나 +1',
+            fairy: `${PET_EVOLVE_HEAL_COMBO}콤보마다 체력 10% 회복`
+        };
+        let petEvolveCorrect = 0;
+        let petEvolveAttackReady = false;
+
+        function getEvolvedPets() {
+            const d = secureLoad('petEvolved').data;
+            return (d && typeof d === 'object') ? { ...d } : {};
+        }
+
+        function isPetEvolved(id) {
+            return getEvolvedPets()[id] === true;
+        }
+
+        function petLook(pet) {
+            return isPetEvolved(pet.id) ? pet.evolved : pet;
+        }
+
+        function petEvolveProof() {
+            const c = getCollection().counters;
+            return { sealed: Number(c.sealed) || 0, gates: Number(c.gates) || 0 };
+        }
+
+        function evolveSection(pet) {
+            if (isPetEvolved(pet.id)) return '<div class="upgrade-max">🌟 진화 완료</div>';
+            const proof = petEvolveProof();
+            const ready = proof.sealed >= PET_EVOLVE_NEED || proof.gates >= PET_EVOLVE_NEED;
+            const can = ready && gameState.coins >= PET_EVOLVE_COST.coins && getRunes() >= PET_EVOLVE_COST.runes;
+            return `<div class="evolve-box">
+                <div>🌟 진화: ${PET_EVOLVE_TEXT[pet.id]}</div>
+                <div>조건: 봉인 ${Math.min(proof.sealed, PET_EVOLVE_NEED)}/${PET_EVOLVE_NEED} 또는 탑 관문 ${Math.min(proof.gates, PET_EVOLVE_NEED)}/${PET_EVOLVE_NEED}</div>
+                <button class="upgrade-item-btn" onclick="evolvePet('${pet.id}')" ${can ? '' : 'disabled'}>🌟 진화 💰${PET_EVOLVE_COST.coins} 🔷${PET_EVOLVE_COST.runes}</button>
+            </div>`;
+        }
+
+        function evolvePet(id) {
+            const pet = PETS.find(x => x.id === id);
+            if (!pet || !getPetData().owned.includes(id) || getPetLevel(id) < PET_MAX_LEVEL || isPetEvolved(id)) return;
+            const proof = petEvolveProof();
+            if (proof.sealed < PET_EVOLVE_NEED && proof.gates < PET_EVOLVE_NEED) return;
+            if (gameState.coins < PET_EVOLVE_COST.coins || getRunes() < PET_EVOLVE_COST.runes) {
+                addBattleLog('❌ 금화 또는 룬 조각이 부족합니다!');
+                return;
+            }
+            gameState.coins -= PET_EVOLVE_COST.coins;
+            setRunes(getRunes() - PET_EVOLVE_COST.runes);
+            const evolved = getEvolvedPets();
+            evolved[id] = true;
+            secureSave('petEvolved', evolved);
+            addBattleLog(`🌟 ${pet.name}이(가) ${pet.evolved.name}(으)로 진화했습니다!`);
+            playupgradeSound();
+            checkTitles();
+            applyPet();
+            renderShop();
+            updateDisplay();
+            saveGameProgress();
+        }
+
+        // 정답을 맞힌 순간 처리. 추가 공격은 승리 창과 강화 창이 겹치지 않게 강화를 고른 뒤 실행
+        function onEvolvedPetCorrect() {
+            const pet = getSelectedPet();
+            if (!pet || !isPetEvolved(pet.id)) return;
+            const player = gameState.player;
+            if (pet.type === 'attack') {
+                petEvolveCorrect++;
+                if (petEvolveCorrect >= PET_EVOLVE_ATTACK_EVERY) {
+                    petEvolveCorrect = 0;
+                    petEvolveAttackReady = true;
+                }
+            } else if (pet.type === 'mana' && player.mana < player.maxMana) {
+                player.mana = Math.min(player.maxMana, player.mana + 1);
+                updateDisplay();
+            } else if (pet.type === 'heal' && combo % PET_EVOLVE_HEAL_COMBO === 0 && player.hp > 0 && player.hp < player.maxHp) {
+                const heal = Math.max(1, Math.floor(player.maxHp * PET_EVOLVE_HEAL_RATIO));
+                player.hp = Math.min(player.maxHp, player.hp + heal);
+                addBattleLog(`🌟 ${pet.evolved.name}가 체력을 ${heal} 회복시켜 주었습니다!`);
+                playFx('pet_heal', 'hero');
+                petAction();
+                updateDisplay();
+            }
+        }
+
+        function runEvolvedPetAttack() {
+            if (!petEvolveAttackReady) return;
+            petEvolveAttackReady = false;
+            const pet = getSelectedPet();
+            if (!pet || pet.type !== 'attack' || !isPetEvolved(pet.id) || !gameState.gameActive) return;
+            const player = gameState.player;
+            const base = Math.floor((5 + Math.floor(player.attack * 0.3)) * (1 + 0.2 * (getPetLevel(pet.id) - 1)));
+            const result = applyElement(Math.floor(base * 1.5), pet.element);
+            gameState.villain.hp = Math.max(0, gameState.villain.hp - result.damage);
+            gameState.currentStats.totalDamage += result.damage;
+            gameState.currentStats.dailyStats.totalDamage += result.damage;
+            addBattleLog(`🌟 ${pet.evolved.name}의 ${elementLabel(pet.element)} 추가 공격! ${result.damage}의 피해!`);
+            announceElement(result.result);
+            playFx(pet.element === 'fire' ? 'pet_fire' : 'pet_ice', 'villain');
+            petAction();
+            updateRecordsDisplay();
+            updateDisplay();
+            if (gameState.villain.hp <= 0) victory();
         }
 
         function buyPet(petId) {
@@ -4109,6 +4238,8 @@
                 ['mastery10', '전설의 숙련자', 'epic', '용사 1명 숙련도 Lv10', () => HEROES.some(h => getMasteryLevel(h.id) >= 10)],
                 ['mastery5All', '모두의 스승', 'legend', '용사 6명 모두 숙련도 Lv5', () => allHeroMastery(5)],
                 ['skillLv5', '기술 연구가', 'rare', '기술 1개 Lv5', () => Object.values(getLevels('skillLevels')).some(lv => lv >= 5)],
+                ['firstEvolve', '첫 진화', 'rare', '펫 1마리 진화', () => PETS.some(pet => isPetEvolved(pet.id))],
+                ['allEvolve', '진화의 완성자', 'legend', '펫 4마리 모두 진화', () => PETS.every(pet => isPetEvolved(pet.id))],
                 ['collector', '도감 완성자', 'legend', '도감 전체 완성', (c, x, d) => collectionDone(d, c)]
             ]],
             ['숨은 칭호', [
@@ -4343,8 +4474,12 @@
                 HEROES.forEach(hero => grid.appendChild(collectionCard(hero.image, hero.name,
                     [hero.description, getMasteryText(hero.id), `전용기 ${SKILLS[hero.skill].name}`], heroes.includes(hero.id))));
             } else if (collectionTab === 'pets') {
-                PETS.forEach(pet => grid.appendChild(collectionCard(pet.image, pet.name,
-                    [pet.description, `강화 Lv${getPetLevel(pet.id)}`], pets.includes(pet.id))));
+                PETS.forEach(pet => {
+                    const look = petLook(pet);
+                    grid.appendChild(collectionCard(look.image, look.name,
+                        [pet.description, `강화 Lv${getPetLevel(pet.id)}`, isPetEvolved(pet.id) ? `🌟 ${PET_EVOLVE_TEXT[pet.id]}` : '진화 전'],
+                        pets.includes(pet.id)));
+                });
             } else {
                 grid.appendChild(collectionCard('images/master_sage.webp', '수련의 대현자',
                     ['노력의 전당을 지키는 스승', '땀 흘린 만큼 강해진다고 믿는다'], c.hallEnter >= 1));
@@ -4392,8 +4527,13 @@
 
         // 내 컴퓨터(localhost)에서만: ?collectionTest 로 기록을 채워 화면 시험
         if (location.hostname === 'localhost' && new URLSearchParams(location.search).has('collectionTest')) {
+            setRunes(100);
+            secureSave('heroData', { owned: ['knight'], selected: 'knight' });
+            secureSave('petData', { owned: PETS.map(pet => pet.id), selected: 'fire_dragon' });
+            secureSave('petLevels', Object.fromEntries(PETS.map(pet => [pet.id, PET_MAX_LEVEL])));
+            secureSave('petEvolved', {});
             secureSave('collection', {
-                counters: { correct: 9, decimalDecimal: 99, naturalDecimal: 40, fast: 3, fever: 9, weak: 99, sealed: 1, hallEnter: 1, gates: 19 },
+                counters: { correct: 9, decimalDecimal: 99, naturalDecimal: 40, fast: 3, fever: 9, weak: 99, sealed: 1, hallEnter: 1, gates: 5 },
                 demons: [0, 1, 2], titles: {}, equipped: null, backfilled: true, hallLastDay: ''
             });
         }
@@ -4726,7 +4866,7 @@
             getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
             chooseTowerOption, chooseTowerPath, openTreasure,
             startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer,
-            initCollection, noteVictory, noteGameOver, openCollection, closeCollection, getEquippedTitleName
+            initCollection, noteVictory, noteGameOver, openCollection, closeCollection, getEquippedTitleName, evolvePet, runEvolvedPetAttack
         };
         })();
 
@@ -4742,7 +4882,7 @@
             getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
             chooseTowerOption, chooseTowerPath, openTreasure,
             startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer,
-            initCollection, noteVictory, noteGameOver, openCollection, closeCollection, getEquippedTitleName
+            initCollection, noteVictory, noteGameOver, openCollection, closeCollection, getEquippedTitleName, evolvePet, runEvolvedPetAttack
         } = GameContent;
 
         // 용사 캐릭터: 상점에서 구매 후 선택 (구매 기록은 게임오버 후에도 유지)
@@ -5902,6 +6042,7 @@
             saveGameProgress();
             generateProblem();
             document.getElementById('submitBtn').disabled = false;
+            runEvolvedPetAttack();
         }
 
         // 마나 회복 시스템
