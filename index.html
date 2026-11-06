@@ -67,77 +67,6 @@
             transform: translateY(-2px);
         }
 
-        /* 👇 여기에 추가 */
-        /* 치트 모달 */
-        .cheat-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .cheat-content {
-            background: linear-gradient(145deg, #2d3748, #1a202c);
-            border: 3px solid #ffd700;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.3);
-        }
-
-        .cheat-title {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #ffd700;
-            margin-bottom: 20px;
-        }
-
-        .cheat-input {
-            padding: 15px;
-            font-size: 1.2rem;
-            border: 2px solid #ffd700;
-            border-radius: 10px;
-            text-align: center;
-            width: 200px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .cheat-btn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            color: #744210;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .cheat-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
-        }
-
-        .cheat-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #ffd700;
-            background: none;
-            border: none;
-        }
-
         /* 랭킹 모달 */
         .ranking-modal {
             display: none;
@@ -1439,7 +1368,6 @@
   <style id="theme-dark-fantasy">
         .action-row { margin: 0 0 18px; }
         .ranking-btn, .notice-banner { white-space: normal; }
-        button.ranking-btn[onclick="openCheat()"] { white-space: nowrap; }
 
         @media (max-width: 900px) {
             .game-container .battle-layout { display: flex; flex-direction: column; align-items: stretch; }
@@ -1790,7 +1718,7 @@
         .app-footer { color: rgba(239, 231, 210, 0.55); position: relative; z-index: 1; }
 
         /* 창(상점·랭킹·탑·결과): 양피지 */
-        .shop-content, .ranking-content, .tower-content, .result-content, .cheat-content {
+        .shop-content, .ranking-content, .tower-content, .result-content {
             background: linear-gradient(180deg, #f6ecd2, #e6d3a6);
             border: 2px solid #8a6a2b;
             box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.45), 0 20px 60px rgba(0, 0, 0, 0.6);
@@ -2354,7 +2282,6 @@
   <div class="game-container">
    <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁 2</h1>  
    <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
-       <button class="ranking-btn" onclick="openCheat()" style="position: static;">🎮 개발자 기능</button>
        <span class="notice-banner">
            📢공지사항: 수학 악마 전쟁 2가 출시되었습니다. 향후 몇 주간 간단한 업데이트가 이루어질 수 있습니다.
        </span>
@@ -2591,7 +2518,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.425</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.426</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2664,7 +2591,6 @@
     </div>
 </div>
 
-<!-- 👇 여기에 치트 모달 HTML 추가 -->
 <div class="tower-modal" id="towerModal">
     <div class="tower-content">
         <button class="shop-close" onclick="closeTower()">×</button>
@@ -2774,18 +2700,6 @@
         </div>
     </div>
 </div>
-
-<div class="cheat-modal" id="cheatModal" onclick="closeCheatOnBackdrop(event)">
-    <div class="cheat-content" onclick="event.stopPropagation()">
-        <button class="cheat-close" onclick="closeCheat()">×</button>
-        <h2 class="cheat-title">🎮 치트 모드</h2>
-        <p style="color: #cbd5e0; margin-bottom: 20px;">비밀번호를 입력하세요</p>
-        <input type="password" class="cheat-input" id="cheatInput" placeholder="비밀번호" maxlength="4">
-        <br>
-        <button class="cheat-btn" onclick="activateCheat()">활성화</button>
-    </div>
-</div>
-
 
   <audio id="hero-hit" src="quick-swing-sound-419581.mp3"></audio>
   <audio id="boss-hit" src="deadly-strike-352458.mp3"></audio>
@@ -4496,7 +4410,7 @@
         const HALL_DAILY_RUNES = 3;      // 탑 10층 한 판(약 14개)의 1/5 수준
         const HALL_SEAL_NEED = 2;        // 서로 다른 날 2번 맞히면 봉인 완료
         const HALL_SEAL_COINS = 10;
-        const HALL_MODALS = ['shopModal', 'rankingModal', 'cheatModal', 'towerModal', 'hallModal', 'collectionModal', 'victoryModal', 'gameOverModal'];
+        const HALL_MODALS = ['shopModal', 'rankingModal', 'towerModal', 'hallModal', 'collectionModal', 'victoryModal', 'gameOverModal'];
 
         function localDateKey() {
             const d = new Date();
@@ -7000,62 +6914,6 @@
         function closeRanking() {
             document.getElementById('rankingModal').style.display = 'none';
         }
-
-        // 👇 여기에 추가
-        // ========== 치트 시스템 ==========
-
-        // 치트 모달 열기
-        function openCheat() {
-            document.getElementById('cheatModal').style.display = 'flex';
-            document.getElementById('cheatInput').value = '';
-        }
-
-        // 치트 모달 닫기
-        function closeCheat() {
-            document.getElementById('cheatModal').style.display = 'none';
-        }
-
-        // 배경 클릭시 닫기
-        function closeCheatOnBackdrop(event) {
-            if (event.target.id === 'cheatModal') {
-                closeCheat();
-            }
-        }
-
-        // 치트 활성화
-        function activateCheat() {
-            const password = document.getElementById('cheatInput').value;
-            
-            if (password === '1050') {
-                // 치트 사용 제한: 이미 코인이 많거나 의심스러운 패턴이 있으면 거부
-                if (gameState.coins > 1000) {
-                    alert('❌ 이미 충분한 코인을 보유하고 있습니다!');
-                    document.getElementById('cheatInput').value = '';
-                    return;
-                }
-
-                // 일일 통계 확인
-                dataValidator.resetDailyStatsIfNeeded();
-                if (gameState.currentStats.dailyStats.problemsSolved > GAME_LIMITS.MAX_PROBLEMS_PER_DAY / 2) {
-                    alert('❌ 오늘 이미 많은 문제를 해결했습니다!');
-                    document.getElementById('cheatInput').value = '';
-                    return;
-                }
-
-                gameState.coins += 1000; // 코인 양도 줄임
-                updateDisplay();
-                saveGameProgress();
-                addBattleLog('🎮 개발자 지원: 1,000 코인을 얻었습니다!');
-                playupgradeSound();
-                alert('개발자 지원: 1,000 코인을 얻었습니다! 🎉');
-                closeCheat();
-            } else {
-                alert('❌ 비밀번호가 틀렸습니다!');
-                document.getElementById('cheatInput').value = '';
-            }
-        }
-
-
 
         // 배경 클릭시 닫기
         function closeRankingOnBackdrop(event) {
