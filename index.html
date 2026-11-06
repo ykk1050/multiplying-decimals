@@ -2124,6 +2124,82 @@
             .tower-track { order: 2; }
         }
 
+        /* ===== 도감과 칭호 ===== */
+        .tower-main-btn.collection-main-btn { background: linear-gradient(180deg, #5b3d8f, #2c1a4e); }
+        .title-badge { color: #f0cf73; font-weight: 800; font-size: 0.9rem; text-align: center; }
+        .collection-content { max-width: 860px; max-height: 94vh; overflow-y: auto; padding: 16px 20px; }
+        .collection-content .tower-title { font-size: 1.5rem; margin-bottom: 8px; }
+        .col-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 12px; }
+        .col-tab {
+            min-height: 42px;
+            padding: 6px 12px;
+            border: 1px solid #b8913f;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 0.92rem;
+            font-weight: 800;
+            cursor: pointer;
+            color: #4e330a;
+            background: #fffaf0;
+        }
+        .col-tab.active { color: #fff; background: linear-gradient(180deg, #8a6a2b, #5a3d0c); }
+        .col-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+        .col-card {
+            padding: 8px;
+            border: 1px solid #b8913f;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            background: rgba(255, 250, 240, 0.75);
+        }
+        .col-card img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; margin-bottom: 6px; background: #d9c79c; }
+        .col-card.locked img { filter: brightness(0) opacity(0.65); }
+        .col-card b { display: block; font-size: 0.92rem; color: #4e330a; }
+        .col-card.locked { color: #8a7a5a; }
+        .col-group { margin: 14px 0 6px; text-align: left; font-weight: 900; color: #5a3d0c; }
+        .col-titles { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+        .col-title {
+            min-height: 58px;
+            padding: 7px 10px;
+            border: 2px solid #c9b48a;
+            border-radius: 9px;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.78rem;
+            color: #6b5a3a;
+            background: rgba(255, 250, 240, 0.6);
+        }
+        .col-title b { display: block; font-size: 0.95rem; }
+        .col-title.owned { cursor: pointer; color: #4e330a; background: #fffaf0; }
+        .col-title.equipped { border-color: #d98a12; box-shadow: 0 0 0 2px #f0cf73; }
+        .col-title.common.owned { border-color: #9a9a9a; }
+        .col-title.rare.owned { border-color: #3b82d6; }
+        .col-title.epic.owned { border-color: #8b4fd0; }
+        .col-title.legend.owned { border-color: #d6a21f; }
+        .title-toast {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            z-index: 4000;
+            max-width: calc(100vw - 32px);
+            padding: 10px 18px;
+            border: 2px solid #f0cf73;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 800;
+            color: #fff3cf;
+            background: rgba(25, 17, 44, 0.95);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            transform: translateX(-50%);
+            animation: titleToast 2.6s ease both;
+            pointer-events: none;
+        }
+        @keyframes titleToast {
+            0% { opacity: 0; transform: translate(-50%, -14px); }
+            10%, 88% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -8px); }
+        }
+
         /* ===== 인트로 영상 ===== */
         .intro-screen {
             position: fixed;
@@ -2312,6 +2388,9 @@
          <button class="tower-main-btn hall-main-btn" onclick="openHall()">
              🏛️ 노력의 전당
          </button>
+         <button class="tower-main-btn collection-main-btn" onclick="openCollection()">
+             📖 도감
+         </button>
      </div>
    <div class="battle-layout">
     <div class="battle-main">
@@ -2321,6 +2400,7 @@
         <div class="character-name" id="playerName">
             용사
         </div>
+        <div class="title-badge" id="titleBadge"></div>
         <div class="mastery-badge" id="heroMasteryBadge"></div>
         <div class="character-content">
             <div class="character-left">
@@ -2511,7 +2591,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.424</footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.425</footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2630,6 +2710,15 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="tower-modal" id="collectionModal">
+    <div class="tower-content collection-content">
+        <button class="shop-close" onclick="closeCollection()">×</button>
+        <h2 class="tower-title">📖 도감</h2>
+        <div class="col-tabs" id="collectionTabs"></div>
+        <div id="collectionBody"></div>
     </div>
 </div>
 
@@ -3100,6 +3189,7 @@
             addBattleLog(`🦸 ${hero.name}(으)로 변신했습니다! 능력치가 ${hero.name}에 맞게 바뀌었습니다.`);
             playupgradeSound();
             applyHero();
+            checkTitles();
             renderShop();
             saveGameProgress();
         }
@@ -3153,6 +3243,7 @@
 
         function announceElement(result) {
             if (result === 'weak') {
+                bumpRecord('weak');
                 addBattleLog('💥 효과가 굉장했다! (약점 공격 ×2)');
                 shakeAvatar('villain');
                 showBattlePopup('효과가 굉장했다!', 'weak');
@@ -3234,6 +3325,7 @@
 
             combo++;
             saveExtraRecord('combo', combo);
+            noteCorrectAnswer(problem);
             if (combo % FEVER_AT === 0 && !isFever()) {
                 startFever();
             } else if (combo === COMBO_BONUS_AT) {
@@ -3245,6 +3337,7 @@
         }
 
         function onWrongAnswer() {
+            noteWrongAnswer();
             if (combo >= 3) addBattleLog(`💔 콤보가 끊겼습니다... (${combo}콤보)`);
             combo = 0;
             updateComboDisplay();
@@ -3259,6 +3352,7 @@
         function startFever() {
             stopFever();
             feverUntil = Date.now() + FEVER_DURATION;
+            bumpRecord('fever');
             document.body.classList.add('fever-mode');
             addBattleLog('🔥🔥 피버 타임! 30초 동안 코인 2배 + 용사 추가 공격! 🔥🔥');
             showBattlePopup('FEVER TIME!', 'fever');
@@ -3347,6 +3441,7 @@
             const before = getMasteryLevel(heroId);
             data[heroId] = (data[heroId] || 0) + amount;
             secureSave('heroMastery', data);
+            checkTitles();
             const after = getMasteryLevel(heroId);
             if (after > before) {
                 const hero = HEROES.find(h => h.id === heroId);
@@ -3506,6 +3601,7 @@
             data.selected = petId;
             secureSave('petData', data);
             addBattleLog(`🐾 ${pet.name}이(가) 동료가 되었습니다!`);
+            checkTitles();
             playupgradeSound();
             applyPet();
             renderShop();
@@ -3583,6 +3679,7 @@
             const levels = getLevels('skillLevels');
             levels[id] = getSkillLevel(id) + 1;
             secureSave('skillLevels', levels);
+            checkTitles();
             addBattleLog(`⬆️ ${resolveSkill(skill).name} 강화 Lv${levels[id]}! 위력 +${(levels[id] - 1) * 15}%`);
             playupgradeSound();
             renderShop();
@@ -3603,6 +3700,7 @@
             const levels = getLevels('petLevels');
             levels[id] = getPetLevel(id) + 1;
             secureSave('petLevels', levels);
+            checkTitles();
             addBattleLog(`⬆️ ${pet.name} 강화 Lv${levels[id]}! (${petEffectText(pet, levels[id])})`);
             playupgradeSound();
             renderShop();
@@ -3883,6 +3981,7 @@
             const feedback = document.getElementById('towerFeedback');
 
             if (correct) {
+                noteTowerCorrect(q);
                 tower.streak++;
                 const need = getSelectedHero().id === 'ninja' ? 4 : 5;
                 let extra = '';
@@ -3935,6 +4034,7 @@
             tower.coins += coins;
             tower.gate = null;
             tower.gatesPassed++;
+            bumpRecord('gates');
             tower.floor++;
             playupgradeSound();
             renderTowerTrack();   // 다음 구간 색(마왕 테마)으로 바뀜
@@ -3953,6 +4053,7 @@
         function chooseTowerPath(path) {
             if (!tower || !tower.running) return;
             tower.path = path === 'hard' ? 'hard' : 'safe';
+            if (tower.path === 'hard') bumpRecord('hardPath');
             document.getElementById('towerFeedback').textContent = tower.path === 'hard' ? '⚔️ 험한 길을 골랐어요! 보상 2배' : '🛡️ 안전한 길을 골랐어요';
             nextTowerStep();
         }
@@ -3980,6 +4081,7 @@
             if (!tower || !tower.running || !tower.chests) return;
             const kinds = tower.chests;
             tower.chests = null;
+            bumpRecord('chests');
             const label = { heal: '❤️ 회복', time: '⏳ 시간 +8초', coins: '💰 금화' };
             const pick = kinds[i];
             let result;
@@ -4004,6 +4106,7 @@
             gameState.coins += tower.coins;
             setRunes(getRunes() + runes);
             const isNewRecord = saveExtraRecord('tower', cleared);
+            checkTitles();
             document.getElementById('towerResultFloor').textContent = cleared;
             document.getElementById('towerResultReward').textContent =
                 `🔷 룬 조각 ${runes}개 · 💰 금화 ${tower.coins}개를 얻었어요!${isNewRecord ? ' 🎉 최고 기록!' : ''}`;
@@ -4012,6 +4115,373 @@
             addBattleLog(`🗼 실력의 탑 ${cleared}층 도달! 🔷${runes} · 💰${tower.coins} 획득`);
             updateDisplay();
             saveGameProgress();
+        }
+
+        // ===== 도감과 칭호 =====
+        // 꾸미기 전용: 능력치에 영향이 없고, 시즌이 바뀌어도 지워지지 않게 따로 저장
+        const TITLE_GRADES = {
+            common: { label: '일반', coins: 10 },
+            rare: { label: '희귀', coins: 20 },
+            epic: { label: '영웅', coins: 40 },
+            legend: { label: '전설', coins: 80 }
+        };
+        const allHeroMastery = min => HEROES.every(h => getMasteryLevel(h.id) >= min);
+        const killed = (d, i) => d.demons.includes(i);
+        const ownedHeroCount = () => getHeroData().owned.length;
+        const ownedPetCount = () => getPetData().owned.length;
+        const collectionDone = (d, c) => d.demons.length >= VILLAIN_STAGES.length && ownedHeroCount() >= HEROES.length &&
+            ownedPetCount() >= PETS.length && c.hallEnter >= 1;
+        const TITLE_GROUPS = [
+            ['첫걸음', [
+                ['first10', '소수 입문자', 'common', '정답 10개', (c) => c.correct >= 10],
+                ['first50', '곱셈 수련생', 'common', '정답 50개', (c) => c.correct >= 50],
+                ['first200', '소수의 탐험가', 'rare', '정답 200개', (c) => c.correct >= 200],
+                ['first500', '수학 용사', 'epic', '정답 500개', (c) => c.correct >= 500],
+                ['first1000', '곱셈의 현자', 'legend', '정답 1,000개', (c) => c.correct >= 1000]
+            ]],
+            ['수학', [
+                ['decDec', '0.1의 지배자', 'rare', '소수×소수 정답 100개', (c) => c.decimalDecimal >= 100],
+                ['natDec', '자연수 조련사', 'rare', '자연수×소수 정답 100개', (c) => c.naturalDecimal >= 100],
+                ['towerPoint', '소수점 추적자', 'rare', '탑 소수점 찾기 정답 30개', (c) => c.t_point >= 30],
+                ['towerEstimate', '어림의 달인', 'rare', '탑 어림 문제 정답 30개', (c) => c.t_estimate >= 30],
+                ['towerBlank', '봉인 해제사', 'rare', '탑 빈칸 문제 정답 30개', (c) => c.t_blank >= 30],
+                ['towerCompare', '문을 고르는 자', 'rare', '탑 비교 문제 정답 30개', (c) => c.t_compare >= 30],
+                ['fast20', '번개 계산기', 'epic', '내 평균의 절반 이하 시간으로 정답 20번', (c) => c.fast >= 20],
+                ['clean30', '침착한 계산가', 'epic', '오답 없이 정답 30개', (c) => c.bestClean >= 30]
+            ]],
+            ['마왕 사냥', [
+                ['demon0', '마왕 사냥꾼', 'common', '수학 마왕 처치', (c, x, d) => killed(d, 0)],
+                ['demon1', '불을 끄는 자', 'common', '화염 마왕 처치', (c, x, d) => killed(d, 1)],
+                ['demon2', '얼음을 녹이는 자', 'rare', '빙결 마왕 처치', (c, x, d) => killed(d, 2)],
+                ['demon3', '안개를 걷는 자', 'rare', '독안개 마왕 처치', (c, x, d) => killed(d, 3)],
+                ['demon4', '번개를 잡은 자', 'rare', '번개 마왕 처치', (c, x, d) => killed(d, 4)],
+                ['demon5', '대지를 뒤흔든 자', 'epic', '대지 마왕 처치', (c, x, d) => killed(d, 5)],
+                ['demon6', '그림자를 벤 자', 'epic', '그림자 마왕 처치', (c, x, d) => killed(d, 6)],
+                ['demon7', '시간을 멈춘 자', 'epic', '시계태엽 마왕 처치', (c, x, d) => killed(d, 7)],
+                ['demon8', '혼돈을 잠재운 자', 'legend', '혼돈의 숫자 마왕 처치', (c, x, d) => killed(d, 8)],
+                ['demon9', '세계의 구원자', 'legend', '최종 마왕 처치', (c, x, d) => killed(d, 9)],
+                ['weak100', '약점 공략가', 'rare', '약점 공격 100번', (c) => c.weak >= 100]
+            ]],
+            ['콤보', [
+                ['combo5', '집중의 시작', 'common', '5콤보', (c, x) => x.combo >= 5],
+                ['combo10', '불꽃 집중력', 'rare', '10콤보', (c, x) => x.combo >= 10],
+                ['combo30', '흔들림 없는 손', 'epic', '30콤보', (c, x) => x.combo >= 30],
+                ['combo50', '무결점 계산기', 'legend', '50콤보', (c, x) => x.combo >= 50],
+                ['fever10', '피버 애호가', 'rare', '피버 타임 10번', (c) => c.fever >= 10]
+            ]],
+            ['탑', [
+                ['tower10', '탑의 도전자', 'common', '10층', (c, x) => x.tower >= 10],
+                ['tower20', '구름 위의 용사', 'rare', '20층', (c, x) => x.tower >= 20],
+                ['tower30', '탑의 정복자', 'epic', '30층', (c, x) => x.tower >= 30],
+                ['tower50', '하늘에 닿은 자', 'legend', '50층', (c, x) => x.tower >= 50],
+                ['hardPath', '험한 길의 모험가', 'common', '험한 길 첫 선택', (c) => c.hardPath >= 1],
+                ['chests10', '보물 사냥꾼', 'rare', '보물 상자 10개', (c) => c.chests >= 10],
+                ['gates20', '관문 파괴자', 'epic', '관문 20번 돌파', (c) => c.gates >= 20]
+            ]],
+            ['노력', [
+                ['hallEnter', '전당의 초대를 받은 자', 'common', '노력의 전당 첫 입장', (c) => c.hallEnter >= 1],
+                ['seal1', '노력하는 자', 'common', '봉인 1개', (c) => c.sealed >= 1],
+                ['seal10', '포기를 모르는 자', 'rare', '봉인 10개', (c) => c.sealed >= 10],
+                ['seal30', '전당의 제자', 'epic', '봉인 30개', (c) => c.sealed >= 30],
+                ['seal100', '대현자의 후계자', 'legend', '봉인 100개', (c) => c.sealed >= 100],
+                ['hallDays7', '성실한 수련생', 'rare', '수련 7일', (c) => c.hallDays >= 7],
+                ['hallDays30', '꾸준함의 상징', 'legend', '수련 30일', (c) => c.hallDays >= 30]
+            ]],
+            ['수집', [
+                ['firstFriend', '첫 동료', 'common', '새 용사 또는 펫 첫 구매', () => ownedHeroCount() > 1 || ownedPetCount() > 0],
+                ['allHeroes', '용사 수집가', 'epic', '용사 6종', () => ownedHeroCount() >= HEROES.length],
+                ['allPets', '펫의 친구', 'rare', '펫 4종', () => ownedPetCount() >= PETS.length],
+                ['petLv5', '동물 조련사', 'rare', '펫 1마리 Lv5', () => PETS.some(pet => getPetLevel(pet.id) >= PET_MAX_LEVEL)],
+                ['mastery10', '전설의 숙련자', 'epic', '용사 1명 숙련도 Lv10', () => HEROES.some(h => getMasteryLevel(h.id) >= 10)],
+                ['mastery5All', '모두의 스승', 'legend', '용사 6명 모두 숙련도 Lv5', () => allHeroMastery(5)],
+                ['skillLv5', '기술 연구가', 'rare', '기술 1개 Lv5', () => Object.values(getLevels('skillLevels')).some(lv => lv >= 5)],
+                ['collector', '도감 완성자', 'legend', '도감 전체 완성', (c, x, d) => collectionDone(d, c)]
+            ]],
+            ['숨은 칭호', [
+                ['comeback', '다시 일어선 자', 'rare', '게임오버 10번 후에도 계속 도전', (c) => c.gameOvers >= 10, true],
+                ['closeCall', '아슬아슬 생존자', 'rare', '체력 10% 이하에서 마왕 처치', (c) => c.closeCall >= 1, true],
+                ['hallPerfect', '대현자의 인정', 'epic', '노력의 전당 5문제 모두 정답', (c) => c.hallPerfect >= 1, true]
+            ]]
+        ];
+        const ALL_TITLES = TITLE_GROUPS.flatMap(([group, list]) =>
+            list.map(([id, name, grade, desc, test, hidden]) => ({ id, name, grade, desc, test, hidden: !!hidden, group })));
+        let collectionResumeActive = false;
+        let collectionTab = 'demons';
+        const titleToasts = [];
+        let titleToastBusy = false;
+
+        function getCollection() {
+            const d = secureLoad('collection').data;
+            const data = (d && typeof d === 'object') ? JSON.parse(JSON.stringify(d)) : {};
+            return {
+                counters: data.counters && typeof data.counters === 'object' ? data.counters : {},
+                demons: Array.isArray(data.demons) ? data.demons : [],
+                titles: data.titles && typeof data.titles === 'object' ? data.titles : {},
+                equipped: data.equipped || null,
+                backfilled: !!data.backfilled,
+                hallLastDay: data.hallLastDay || ''
+            };
+        }
+
+        const counterProxy = counters => new Proxy(counters, { get: (t, k) => Number(t[k]) || 0 });
+
+        // 새로 얻은 칭호를 기록. silent면 알림과 금화 없이 기록만 (기존 기록 소급용)
+        function checkTitles(silent) {
+            const data = getCollection();
+            const c = counterProxy(data.counters);
+            const extra = getExtraRecords();
+            const gained = ALL_TITLES.filter(t => !data.titles[t.id] && t.test(c, extra, data));
+            if (!gained.length) return 0;
+            const today = localDateKey();
+            gained.forEach(t => { data.titles[t.id] = today; });
+            secureSave('collection', data);
+            if (!silent) {
+                gained.forEach(t => {
+                    const coins = TITLE_GRADES[t.grade].coins;
+                    gameState.coins += coins;
+                    addBattleLog(`🏅 칭호 획득: ${t.name} (💰+${coins})`);
+                    queueTitleToast(`🏅 칭호 획득! ${t.name} · 💰+${coins}`);
+                });
+                updateDisplay();
+            }
+            return gained.length;
+        }
+
+        function bumpRecord(key, amount = 1) {
+            const data = getCollection();
+            data.counters[key] = (Number(data.counters[key]) || 0) + amount;
+            secureSave('collection', data);
+            checkTitles();
+        }
+
+        function noteCorrectAnswer(problem) {
+            const data = getCollection();
+            const c = data.counters;
+            const add = key => { c[key] = (Number(c[key]) || 0) + 1; };
+            add('correct');
+            const whole = Number.isInteger(problem.num1) || Number.isInteger(problem.num2);
+            add(whole ? 'naturalDecimal' : 'decimalDecimal');
+            add('clean');
+            c.bestClean = Math.max(Number(c.bestClean) || 0, c.clean);
+            secureSave('collection', data);
+            checkTitles();
+        }
+
+        function noteWrongAnswer() {
+            const data = getCollection();
+            data.counters.clean = 0;
+            secureSave('collection', data);
+        }
+
+        function noteTowerCorrect(q) {
+            const data = getCollection();
+            const c = data.counters;
+            c.correct = (Number(c.correct) || 0) + 1;
+            const key = `t_${q.type}`;
+            c[key] = (Number(c[key]) || 0) + 1;
+            secureSave('collection', data);
+            checkTitles();
+        }
+
+        function noteHallStart() {
+            const data = getCollection();
+            const today = localDateKey();
+            const c = data.counters;
+            c.hallEnter = 1;
+            if (data.hallLastDay !== today) {
+                data.hallLastDay = today;
+                c.hallDays = (Number(c.hallDays) || 0) + 1;
+            }
+            secureSave('collection', data);
+            checkTitles();
+        }
+
+        // 10레벨마다 마왕이 바뀌므로, 그 구간의 마지막 레벨을 이기면 그 마왕을 처치한 것으로 침
+        function noteVictory(level, hpRatio) {
+            const data = getCollection();
+            const stage = Math.min(VILLAIN_STAGES.length, Math.floor(level / 10));
+            if (level >= 10 && level % 10 === 0 && !data.demons.includes(stage - 1)) data.demons.push(stage - 1);
+            if (hpRatio <= 0.1) data.counters.closeCall = 1;
+            secureSave('collection', data);
+            checkTitles();
+        }
+
+        function noteGameOver() {
+            bumpRecord('gameOvers');
+        }
+
+        // 업데이트 전의 기록으로 도감과 칭호를 한 번만 채움 (금화 없음)
+        function initCollection() {
+            const data = getCollection();
+            let added = 0;
+            if (!data.backfilled) {
+                const best = gameState.bestRecords;
+                const cleared = Math.min(VILLAIN_STAGES.length, Math.floor((Math.max(1, Number(best.level) || 1) - 1) / 10));
+                for (let i = 0; i < cleared; i++) if (!data.demons.includes(i)) data.demons.push(i);
+                data.counters.correct = Math.max(Number(data.counters.correct) || 0, Number(best.problemsSolved) || 0);
+                data.backfilled = true;
+                secureSave('collection', data);
+                added = checkTitles(true);
+            }
+            updateTitleBadge();
+            if (added) queueTitleToast(`🏅 지금까지의 기록으로 칭호 ${added}개를 얻었어요! 📖 도감에서 확인해 보세요`);
+        }
+
+        function queueTitleToast(text) {
+            titleToasts.push(text);
+            showNextTitleToast();
+        }
+
+        function showNextTitleToast() {
+            if (titleToastBusy || !titleToasts.length) return;
+            titleToastBusy = true;
+            if (document.getElementById('introScreen')) {   // 인트로가 끝난 뒤에 보여 줌
+                titleToastBusy = false;
+                setTimeout(showNextTitleToast, 500);
+                return;
+            }
+            const toast = document.createElement('div');
+            toast.className = 'title-toast';
+            toast.setAttribute('role', 'status');
+            toast.textContent = titleToasts.shift();
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+                titleToastBusy = false;
+                showNextTitleToast();
+            }, 2600);
+        }
+
+        function getEquippedTitleName() {
+            const data = getCollection();
+            const title = ALL_TITLES.find(t => t.id === data.equipped);
+            return title && data.titles[title.id] ? title.name : '';
+        }
+
+        function updateTitleBadge() {
+            const name = getEquippedTitleName();
+            document.getElementById('titleBadge').textContent = name ? `🏅 ${name}` : '';
+        }
+
+        function toggleTitle(id) {
+            const data = getCollection();
+            if (!data.titles[id]) return;
+            data.equipped = data.equipped === id ? null : id;
+            secureSave('collection', data);
+            updateTitleBadge();
+            updateCurrentNickLabel();
+            renderCollection();
+        }
+
+        function collectionCard(image, name, lines, unlocked) {
+            const card = document.createElement('div');
+            card.className = 'col-card' + (unlocked ? '' : ' locked');
+            const img = document.createElement('img');
+            img.src = image;
+            img.alt = unlocked ? name : '아직 발견하지 못함';
+            img.loading = 'lazy';
+            const title = document.createElement('b');
+            title.textContent = unlocked ? name : '???';
+            card.append(img, title);
+            (unlocked ? lines : ['아직 발견하지 못했어요']).forEach(text => {
+                const line = document.createElement('div');
+                line.textContent = text;
+                card.appendChild(line);
+            });
+            return card;
+        }
+
+        function renderCollection() {
+            const data = getCollection();
+            const c = counterProxy(data.counters);
+            const heroes = getHeroData().owned;
+            const pets = getPetData().owned;
+            const ownedTitles = ALL_TITLES.filter(t => data.titles[t.id]).length;
+            const tabs = [
+                ['demons', '😈 마왕', `${data.demons.length}/${VILLAIN_STAGES.length}`],
+                ['heroes', '🦸 용사', `${heroes.length}/${HEROES.length}`],
+                ['pets', '🐾 펫', `${pets.length}/${PETS.length}`],
+                ['master', '🏛️ 대현자', `${c.hallEnter ? 1 : 0}/1`],
+                ['titles', '🏅 칭호', `${ownedTitles}/${ALL_TITLES.length}`]
+            ];
+            const tabBox = document.getElementById('collectionTabs');
+            tabBox.textContent = '';
+            tabs.forEach(([id, label, count]) => {
+                const btn = document.createElement('button');
+                btn.className = 'col-tab' + (collectionTab === id ? ' active' : '');
+                btn.textContent = `${label} ${count}`;
+                btn.addEventListener('click', () => { collectionTab = id; renderCollection(); });
+                tabBox.appendChild(btn);
+            });
+
+            const body = document.getElementById('collectionBody');
+            body.textContent = '';
+            if (collectionTab === 'titles') {
+                renderTitleList(body, data);
+                return;
+            }
+            const grid = document.createElement('div');
+            grid.className = 'col-grid';
+            if (collectionTab === 'demons') {
+                VILLAIN_STAGES.forEach((stage, i) => grid.appendChild(collectionCard(stage.image, stage.name,
+                    [`약점 ${elementLabel(stage.weak)}`, `내성 ${elementLabel(stage.resist)}`, stage.special.name], data.demons.includes(i))));
+            } else if (collectionTab === 'heroes') {
+                HEROES.forEach(hero => grid.appendChild(collectionCard(hero.image, hero.name,
+                    [hero.description, getMasteryText(hero.id), `전용기 ${SKILLS[hero.skill].name}`], heroes.includes(hero.id))));
+            } else if (collectionTab === 'pets') {
+                PETS.forEach(pet => grid.appendChild(collectionCard(pet.image, pet.name,
+                    [pet.description, `강화 Lv${getPetLevel(pet.id)}`], pets.includes(pet.id))));
+            } else {
+                grid.appendChild(collectionCard('images/master_sage.webp', '수련의 대현자',
+                    ['노력의 전당을 지키는 스승', '땀 흘린 만큼 강해진다고 믿는다'], c.hallEnter >= 1));
+            }
+            body.appendChild(grid);
+        }
+
+        function renderTitleList(body, data) {
+            TITLE_GROUPS.forEach(([group]) => {
+                const heading = document.createElement('div');
+                heading.className = 'col-group';
+                heading.textContent = group;
+                const list = document.createElement('div');
+                list.className = 'col-titles';
+                ALL_TITLES.filter(t => t.group === group).forEach(title => {
+                    const owned = !!data.titles[title.id];
+                    const hiddenLocked = title.hidden && !owned;
+                    const row = document.createElement(owned ? 'button' : 'div');
+                    row.className = `col-title ${title.grade}${owned ? ' owned' : ''}${data.equipped === title.id ? ' equipped' : ''}`;
+                    const name = document.createElement('b');
+                    name.textContent = hiddenLocked ? '???' : title.name;
+                    const info = document.createElement('span');
+                    const grade = TITLE_GRADES[title.grade].label;
+                    info.textContent = hiddenLocked ? '숨겨진 칭호' :
+                        `${grade} · ${title.desc}${data.equipped === title.id ? ' · 장착 중' : ''}`;
+                    row.append(name, info);
+                    if (owned) row.addEventListener('click', () => toggleTitle(title.id));
+                    list.appendChild(row);
+                });
+                body.append(heading, list);
+            });
+        }
+
+        function openCollection() {
+            collectionResumeActive = gameState.gameActive;
+            gameState.gameActive = false;
+            renderCollection();
+            document.getElementById('collectionModal').style.display = 'flex';
+        }
+
+        function closeCollection() {
+            document.getElementById('collectionModal').style.display = 'none';
+            gameState.gameActive = collectionResumeActive;
+        }
+
+        // 내 컴퓨터(localhost)에서만: ?collectionTest 로 기록을 채워 화면 시험
+        if (location.hostname === 'localhost' && new URLSearchParams(location.search).has('collectionTest')) {
+            secureSave('collection', {
+                counters: { correct: 9, decimalDecimal: 99, naturalDecimal: 40, fast: 3, fever: 9, weak: 99, sealed: 1, hallEnter: 1, gates: 19 },
+                demons: [0, 1, 2], titles: {}, equipped: null, backfilled: true, hallLastDay: ''
+            });
         }
 
         // ===== 노력의 전당 =====
@@ -4026,7 +4496,7 @@
         const HALL_DAILY_RUNES = 3;      // 탑 10층 한 판(약 14개)의 1/5 수준
         const HALL_SEAL_NEED = 2;        // 서로 다른 날 2번 맞히면 봉인 완료
         const HALL_SEAL_COINS = 10;
-        const HALL_MODALS = ['shopModal', 'rankingModal', 'cheatModal', 'towerModal', 'hallModal', 'victoryModal', 'gameOverModal'];
+        const HALL_MODALS = ['shopModal', 'rankingModal', 'cheatModal', 'towerModal', 'hallModal', 'collectionModal', 'victoryModal', 'gameOverModal'];
 
         function localDateKey() {
             const d = new Date();
@@ -4108,6 +4578,7 @@
             if (stats.n >= EFFORT_BASELINE && stats.recent.length) {
                 const average = stats.recent.reduce((sum, v) => sum + v, 0) / stats.recent.length;
                 if (ms >= average * EFFORT_SLOW_RATIO) addHallItem(battleProblemItem(problem));
+                if (ms > 0 && ms <= average * 0.5) bumpRecord('fast');
             }
             if (ms > 0 && ms <= EFFORT_MAX_MS) {
                 stats.n++;
@@ -4178,6 +4649,7 @@
             const list = shuffleArray(getHallToday(data)).slice(0, HALL_DAILY_PROBLEMS - data.done);
             if (!list.length) return;
             hall = { list, index: 0, wrong: 0, runes: 0, coins: 0, sealed: 0, q: null, startedAt: 0, busy: false };
+            noteHallStart();
             setHallBars(1, 1);
             setHallLine('자, 일격을 보여 보아라!');
             askHallQuestion();
@@ -4256,6 +4728,7 @@
                 setRunes(getRunes() + 1);
             }
             if (sealedNow) {
+                bumpRecord('sealed');
                 hall.sealed++;
                 hall.coins += HALL_SEAL_COINS;
                 gameState.coins += HALL_SEAL_COINS;
@@ -4283,6 +4756,7 @@
         }
 
         function finishHall() {
+            if (hall.list.length === HALL_DAILY_PROBLEMS && hall.wrong === 0) bumpRecord('hallPerfect');
             const rewards = [`🔷 룬 조각 ${hall.runes}개`];
             if (hall.coins) rewards.push(`💰 금화 ${hall.coins}개`);
             document.getElementById('hallResultReward').textContent =
@@ -4337,7 +4811,8 @@
             saveProblemState, loadProblemState, getCurrentStage,
             getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
             chooseTowerOption, chooseTowerPath, openTreasure,
-            startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer
+            startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer,
+            initCollection, noteVictory, noteGameOver, openCollection, closeCollection, getEquippedTitleName
         };
         })();
 
@@ -4352,7 +4827,8 @@
             saveProblemState, loadProblemState, getCurrentStage,
             getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
             chooseTowerOption, chooseTowerPath, openTreasure,
-            startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer
+            startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer,
+            initCollection, noteVictory, noteGameOver, openCollection, closeCollection, getEquippedTitleName
         } = GameContent;
 
         // 용사 캐릭터: 상점에서 구매 후 선택 (구매 기록은 게임오버 후에도 유지)
@@ -4883,6 +5359,7 @@
             // 선택한 용사 모습 적용
             applyHero();
             applyPet();
+            initCollection();
             startIntro();
             startPetLoop();
             warmFx([HERO_ULTIMATES[getSelectedHero().id].fx, SKILLS[getSelectedHero().skill].fx, getCurrentStage().special.fx, getSelectedHero().basicFx].filter(Boolean));
@@ -6011,6 +6488,7 @@
 
         // 승리
         function victory() {
+            noteVictory(gameState.level, gameState.player.hp / gameState.player.maxHp);
             gameState.gameActive = false;
             clearInterval(gameState.battleInterval);
             
@@ -6033,6 +6511,7 @@
 
         // 게임 오버
         function gameOver() {
+            noteGameOver();
             gameState.gameActive = false;
             clearInterval(gameState.battleInterval);
             
@@ -6238,7 +6717,8 @@
 
         function updateCurrentNickLabel() {
             const text = parseNickId(gameState.username) ? nickText(gameState.username) : '';
-            document.getElementById('currentUsername').textContent = text ? `현재 닉네임: ${text}` : '현재 닉네임: 없음 (아래에서 만들어 주세요)';
+            const title = getEquippedTitleName();
+            document.getElementById('currentUsername').textContent = text ? `현재 닉네임: ${title ? `[${title}] ` : ''}${text}` : '현재 닉네임: 없음 (아래에서 만들어 주세요)';
         }
 
         function renderNickBuilder() {
