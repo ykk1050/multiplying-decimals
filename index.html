@@ -2530,7 +2530,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.431 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.432 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -3786,10 +3786,11 @@
         }
 
         // ===== 실력의 탑 =====
-        const TOWER_TYPES = ['calc', 'blank', 'compare', 'estimate', 'point'];
+        // 빈칸(□ × b = c) 문제는 소수의 나눗셈 개념이 필요해 '쌍둥이 식'으로 바꿈 (1.432)
+        const TOWER_TYPES = ['calc', 'twin', 'compare', 'estimate', 'point'];
         const TOWER_TYPE_INFO = {
             calc: '🧮 계산의 층',
-            blank: '🔒 봉인된 숫자',
+            twin: '👯 쌍둥이 식',
             compare: '🚪 두 갈래 문',
             estimate: '🎯 어림 자물쇠',
             point: '✨ 소수점 찾기'
@@ -3845,8 +3846,16 @@
         function makeTowerQuestion(floor, type) {
             const [a, b] = towerOperands(floor);
             const c = towerProduct(a, b);
-            if (type === 'blank') {
-                return { type, input: 'pad', text: `□ × ${fmtNum(b)} = ${fmtNum(c)}`, answer: a, reveal: fmtNum(a) };
+            if (type === 'twin') {
+                // 한 수를 10배 하고 다른 수를 0.1배 하면 곱이 같음 (곱의 소수점 위치)
+                const d = Math.random() < 0.5 ? 10 : 0.1;
+                const expr = (x, y) => `${fmtNum(x)} × ${fmtNum(y)}`;
+                const correct = expr(a * d, b / d);
+                const options = shuffleArray([correct, expr(a * d, b), expr(a * d, b * d), expr(a, b / d)]);
+                return {
+                    type, input: 'choice', text: `곱이 같은 식을 고르세요\n${expr(a, b)}`,
+                    options, answer: options.indexOf(correct), reveal: `${correct} = ${fmtNum(c)}`
+                };
             }
             if (type === 'compare') {
                 let a2, b2, c2, tries = 0;
@@ -4221,7 +4230,8 @@
                 ['natDec', '자연수 조련사', 'rare', '자연수×소수 정답 100개', (c) => c.naturalDecimal >= 100],
                 ['towerPoint', '소수점 추적자', 'rare', '탑 소수점 찾기 정답 30개', (c) => c.t_point >= 30],
                 ['towerEstimate', '어림의 달인', 'rare', '탑 어림 문제 정답 30개', (c) => c.t_estimate >= 30],
-                ['towerBlank', '봉인 해제사', 'rare', '탑 빈칸 문제 정답 30개', (c) => c.t_blank >= 30],
+                // 예전 빈칸 문제(t_blank) 정답 수도 이어서 셈
+                ['towerBlank', '쌍둥이 식 탐정', 'rare', '탑 쌍둥이 식 문제 정답 30개', (c) => (Number(c.t_blank) || 0) + (Number(c.t_twin) || 0) >= 30],
                 ['towerCompare', '문을 고르는 자', 'rare', '탑 비교 문제 정답 30개', (c) => c.t_compare >= 30],
                 ['fast20', '번개 계산기', 'epic', '내 평균의 절반 이하 시간으로 정답 20번', (c) => c.fast >= 20],
                 ['clean30', '침착한 계산가', 'epic', '오답 없이 정답 30개', (c) => c.bestClean >= 30]
