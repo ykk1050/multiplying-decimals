@@ -2294,7 +2294,7 @@
    <h1 class="game-title" id="gameTitle">소수의 검: 수학 악마 전쟁 2</h1>  
    <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
        <span class="notice-banner">
-           📢공지사항: 수학 악마 전쟁 2가 출시되었습니다. 향후 몇 주간 간단한 업데이트가 이루어질 수 있습니다.
+           📢공지사항: 이제 패배해도 💰금화가 사라지지 않습니다! 레벨·스킬·능력치만 처음부터 다시 시작해요.
        </span>
    </div>
 
@@ -2524,12 +2524,13 @@
             <div class="game-over">
                 <h2 style="color: #742a2a; margin-bottom: 15px;">💀 패배했습니다 💀</h2>
                 <p style="color: #c53030;">더 많은 문제를 풀어서 강해져야 합니다!</p>
+                <p style="color: #744210; margin-top: 8px;">💰 모은 금화는 그대로 남아 있어요.</p>
                 <button class="next-level-btn" onclick="restartGame()">다시 시작</button>
             </div>
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.430 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.431 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2851,6 +2852,7 @@
 
         // 게임 상태 (변조 방지 적용)
         let lockGameState = function () {};
+        let onCoinsChange = null;   // 금화가 바뀔 때마다 확인 코드와 함께 저장 (아래 GameContent에서 연결)
         const gameState = (function () {
         let stateUnlocked = true;   // 저장 데이터 불러오는 동안만 큰 변화 허용
         lockGameState = function () { stateUnlocked = false; };
@@ -2902,6 +2904,7 @@
                 // 저장된 게임을 불러올 때 레벨 1 -> 레벨 50으로 점프하는 것은 정상이므로
                 if (stateUnlocked && (prop === 'level' || prop === 'coins')) {
                     target[prop] = value;
+                    if (prop === 'coins' && onCoinsChange) onCoinsChange(value);
                     return true;
                 }
 
@@ -2925,6 +2928,7 @@
                 }
 
                 target[prop] = value;
+                if (prop === 'coins' && onCoinsChange) onCoinsChange(value);
                 return true;
             }
         });
@@ -3679,6 +3683,29 @@
 
         function setRunes(n) {
             secureSave('runes', { n: Math.max(0, Math.floor(n)) });
+        }
+
+        // ----- 금화: 게임오버 후에도 유지, 확인 코드를 붙여 따로 저장 -----
+        const WALLET_MAX = 999999999;
+        function clampCoins(n) {
+            return Math.max(0, Math.min(Math.floor(Number(n)) || 0, WALLET_MAX));
+        }
+
+        function saveWallet(n) {
+            secureSave('wallet', { n: clampCoins(n) });
+        }
+
+        // legacyCoins: 1.431 이전에는 금화가 진행 기록(gameProgress)에 있었으므로 처음 한 번만 옮김
+        function loadWallet(legacyCoins) {
+            const d = secureLoad('wallet').data;
+            if (d && Number.isInteger(d.n) && d.n >= 0) return d.n;
+            if (!localStorageHelper.load('walletSecured')) {
+                localStorageHelper.save('walletSecured', true);
+                const n = clampCoins(legacyCoins);
+                saveWallet(n);
+                return n;
+            }
+            return 0;   // 확인 코드가 맞지 않아 지워진 경우
         }
 
         function getLevels(key) {
@@ -4870,7 +4897,7 @@
             applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
             openTower, closeTower, startTower, submitTowerAnswer,
             saveProblemState, loadProblemState, getCurrentStage,
-            getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
+            getRunes, loadWallet, saveWallet, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
             chooseTowerOption, chooseTowerPath, openTreasure,
             startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer,
             initCollection, noteVictory, noteGameOver, openCollection, closeCollection, getEquippedTitleName, evolvePet, runEvolvedPetAttack
@@ -4886,7 +4913,7 @@
             applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
             openTower, closeTower, startTower, submitTowerAnswer,
             saveProblemState, loadProblemState, getCurrentStage,
-            getRunes, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
+            getRunes, loadWallet, saveWallet, getSkillLevel, getSkillLevelMultiplier, skillUpgradeCost, upgradeSkill, upgradePet,
             chooseTowerOption, chooseTowerPath, openTreasure,
             startProblemClock, noteWrongProblem, openHall, closeHall, startHall, submitHallAnswer,
             initCollection, noteVictory, noteGameOver, openCollection, closeCollection, getEquippedTitleName, evolvePet, runEvolvedPetAttack
@@ -5409,6 +5436,11 @@
             // 최고 기록 로드
             loadBestRecords();
             
+            // 금화 로드 (게임오버와 상관없이 유지, 확인 코드로 변조 검사)
+            const legacyProgress = localStorageHelper.load('gameProgress');
+            gameState.coins = loadWallet(legacyProgress ? legacyProgress.coins : 0);
+            onCoinsChange = saveWallet;
+
             // 게임 진행 상황 로드
             loadGameProgress();
             lockGameState();
@@ -5545,8 +5577,7 @@
                 // 데이터 정합성 체크 (삭제 대신 값 보정)
                 gameState.level = Math.min(savedProgress.level, GAME_LIMITS.MAX_LEVEL);
                 
-                // 코인이나 스킬이 비정상적으로 많아도 일단 로드하되, 최대치로 캡을 씌움
-                gameState.coins = Math.min(savedProgress.coins || 0, 999999999); 
+                // 금화는 진행 기록이 아니라 확인 코드가 붙은 'wallet'에서 불러옴 (DOMContentLoaded 참고)
                 gameState.ownedSkills = savedProgress.owned_skills || [];
 
                 // 플레이어 스탯 보정 로드
@@ -6649,7 +6680,7 @@
             // gameState는 Proxy 객체(const)이므로 직접 재할당이 불가능합니다.
             // 대신 내부 속성들을 하나씩 초기화해야 합니다.
             gameState.level = 1;
-            gameState.coins = 0;
+            // 금화는 게임오버 후에도 유지 (레벨·스킬·능력치만 초기화)
             gameState.ownedSkills = []; // 배열 초기화
             gameState.ownedSkills.length = 0; // 배열 비우기 (Proxy 호환성)
             
@@ -6731,8 +6762,6 @@
                 // 3. 시즌 버전 업데이트 (이제 다시 초기화되지 않음)
                 clearSeasonRecords();
                 localStorageHelper.save('seasonVersion', SEASON_VERSION);
-                
-                alert(`📢 새로운 랭킹 시즌${SEASON_VERSION}가 시작되었습니다!\n기존 최고 기록이 초기화되고 새로운 경쟁이 시작됩니다.`);
             }
 
             // 조합형 닉네임만 사용 (예전 직접 입력 닉네임은 새 닉네임을 만들 때 서버에서 기록이 옮겨짐)
