@@ -2538,7 +2538,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.434 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.435 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2968,8 +2968,8 @@
             if (!resume) return;
             gameState.gameActive = resume.active;
             if (resume.problem && resume.problem === gameState.currentProblem && gameState.gameActive) {
-                generateProblem();
-                addBattleLog('🔄 쉬는 동안 문제가 새로 바뀌었어요!');
+                generateProblem(true);   // 바뀐 문제는 항상 어려운 문제 (쉬운 문제 고르기 방지)
+                addBattleLog('🔄 쉬는 동안 문제가 더 어려운 문제로 바뀌었어요!');
             }
         }
 
@@ -6103,24 +6103,35 @@
         }
 
         // 새로운 소수 곱셈 문제 생성
-        function generateProblem() {
+        // hard: 창을 열었다 닫아 문제가 바뀔 때 사용. 쉬운 문제가 나올 때까지 바꾸는 꼼수를 막기 위해
+        //       두 자리 이상인 소수끼리의 곱셈만 냄 (예: 3.7 × 2.4, 6.3 × 0.47 · 답은 소수 셋째 자리까지)
+        function generateProblem(hard = false) {
             // 자연수 배열 (1-20)
             const naturalNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-            
+
             // 한자리 소수 (0.1 ~ 0.9)
             const oneDigitDecimals = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
-            
+
             // 두자리 소수 (0.10 ~ 0.99, 0.05 간격)
             const twoDigitDecimals = [];
             for (let i = 10; i <= 99; i += 5) {
                 twoDigitDecimals.push(i / 100);
             }
-            
+
             // 문제 유형 선택 (1: 자연수×소수, 2: 소수×자연수, 3: 소수×소수)
             const problemType = Math.floor(Math.random() * 3) + 1;
             let num1, num2, answer;
-            
-            if (problemType === 1) {
+
+            if (hard) {
+                // 한 수는 1.1~9.9 (소수 첫째 자리가 0이 아님)
+                // 다른 수는 1.1~9.9 또는 0.11~0.99 (소수 둘째 자리가 0이 아님), 순서는 무작위
+                const rnd = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+                const tenths = () => { let n; do { n = rnd(11, 99); } while (n % 10 === 0); return n / 10; };
+                const hundredths = () => { let n; do { n = rnd(11, 99); } while (n % 10 === 0); return n / 100; };
+                const a = tenths();
+                const b = Math.random() < 0.5 ? tenths() : hundredths();
+                [num1, num2] = Math.random() < 0.5 ? [a, b] : [b, a];
+            } else if (problemType === 1) {
                 // 자연수 × 소수 (한자리 또는 두자리)
                 num1 = naturalNumbers[Math.floor(Math.random() * naturalNumbers.length)];
                 const useOneDigit = Math.random() < 0.5;
