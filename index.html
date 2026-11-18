@@ -2288,6 +2288,40 @@
 
         .upgrade-item-btn:disabled { background: #b9ad93; box-shadow: none; cursor: not-allowed; }
         .upgrade-max { margin-top: 6px; font-weight: 800; color: #8a5d17; }
+
+        /* 정답 후 능력치 강화: 아래로 길게 늘어나지 않고 키패드 위에 떠 있는 창으로 표시 (고르면 사라짐) */
+        .math-section { position: relative; }
+        .math-section .upgrade-section {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            z-index: 30;
+            margin: 0;
+            padding: 14px 12px;
+            background: linear-gradient(180deg, rgba(48, 36, 92, 0.98), rgba(18, 12, 36, 0.98));
+            border: 1px solid var(--gold);
+            border-radius: 14px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 18px rgba(240, 207, 115, 0.35);
+            animation: upgradePop 0.18s ease-out;
+        }
+        .math-section #upgradeTitle { font-size: 1.05rem; line-height: 1.45; margin-bottom: 4px !important; }
+        .math-section .upgrade-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .math-section .upgrade-btn {
+            width: 100%;
+            padding: 14px 8px;
+            font-size: 1.05rem;
+            white-space: nowrap;
+        }
+        @keyframes upgradePop {
+            from { opacity: 0; transform: translateY(14px) scale(0.96); }
+            to { opacity: 1; transform: none; }
+        }
   </style>
  </head>
  <body>
@@ -2538,7 +2572,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.435 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.436 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
