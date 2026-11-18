@@ -2538,7 +2538,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.433 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.434 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2871,6 +2871,7 @@
         // 게임 상태 (변조 방지 적용)
         let lockGameState = function () {};
         let onCoinsChange = null;   // 금화가 바뀔 때마다 확인 코드와 함께 저장 (아래 GameContent에서 연결)
+        let onActiveChange = null;  // 전투가 멈추거나 다시 시작될 때 (피버 시간 멈춤용, 아래에서 연결)
         const gameState = (function () {
         let stateUnlocked = true;   // 저장 데이터 불러오는 동안만 큰 변화 허용
         lockGameState = function () { stateUnlocked = false; };
@@ -2945,12 +2946,32 @@
                      }
                 }
 
+                const wasActive = target.gameActive;
                 target[prop] = value;
                 if (prop === 'coins' && onCoinsChange) onCoinsChange(value);
+                if (prop === 'gameActive' && wasActive !== value && onActiveChange) onActiveChange(value);
                 return true;
             }
         });
         })();
+
+        // 상점·랭킹·탑·전당·도감을 여는 동안 전투(피버 포함)를 멈춤.
+        // 문제를 풀던 중에 열었다면 닫을 때 새 문제로 바꿔서, 창을 띄워 놓고 계산하는 효과를 없앰
+        function pauseBattle() {
+            const resume = { active: gameState.gameActive, problem: null };
+            if (resume.active && !document.getElementById('submitBtn').disabled) resume.problem = gameState.currentProblem;
+            gameState.gameActive = false;
+            return resume;
+        }
+
+        function resumeBattle(resume) {
+            if (!resume) return;
+            gameState.gameActive = resume.active;
+            if (resume.problem && resume.problem === gameState.currentProblem && gameState.gameActive) {
+                generateProblem();
+                addBattleLog('🔄 쉬는 동안 문제가 새로 바뀌었어요!');
+            }
+        }
 
         // 데이터 검증 함수들 (정상 플레이어 보호를 위해 로직 개선)
         const dataValidator = {
@@ -3245,6 +3266,7 @@
         let feverAttackInterval = null;
         let feverTickInterval = null;
         let feverTimers = [];
+        let feverPausedLeft = 0;   // 전투가 멈춘 동안 남은 피버 시간(ms)
 
         function isFever() {
             return Date.now() < feverUntil;
@@ -3299,29 +3321,60 @@
 
         function startFever() {
             stopFever();
-            feverUntil = Date.now() + FEVER_DURATION;
             bumpRecord('fever');
             document.body.classList.add('fever-mode');
             addBattleLog('🔥🔥 피버 타임! 30초 동안 코인 2배 + 용사 추가 공격! 🔥🔥');
             showBattlePopup('FEVER TIME!', 'fever');
             playupgradeSound();
+            runFever(FEVER_DURATION);
+        }
+
+        // 남은 시간(ms)만큼 피버 진행 (처음 시작과 일시정지 후 다시 시작에 함께 사용)
+        function runFever(ms) {
+            feverUntil = Date.now() + ms;
             // 기본 공격 사이사이에 추가 공격 (마왕 공격 속도는 그대로)
             feverTimers.push(setTimeout(() => {
                 if (isFever()) feverAttackInterval = setInterval(feverAttack, 3000);
             }, 1500));
-            feverTimers.push(setTimeout(endFever, FEVER_DURATION));
+            feverTimers.push(setTimeout(endFever, ms));
             feverTickInterval = setInterval(updateComboDisplay, 1000);
             updateComboDisplay();
         }
 
-        function stopFever() {
+        function clearFeverTimers() {
             clearInterval(feverAttackInterval);
             clearInterval(feverTickInterval);
             feverTimers.forEach(clearTimeout);
             feverTimers = [];
             feverAttackInterval = null;
             feverTickInterval = null;
+        }
+
+        // 전투가 멈추면(상점·탑·도감 등) 피버 시간도 멈춤
+        function pauseFever() {
+            if (!isFever()) return;
+            feverPausedLeft = feverUntil - Date.now();
+            clearFeverTimers();
             feverUntil = 0;
+            updateComboDisplay();
+        }
+
+        function resumeFever() {
+            if (!feverPausedLeft) return;
+            const left = feverPausedLeft;
+            feverPausedLeft = 0;
+            runFever(left);
+        }
+
+        function onBattleActiveChange(active) {
+            if (active) resumeFever();
+            else pauseFever();
+        }
+
+        function stopFever() {
+            clearFeverTimers();
+            feverUntil = 0;
+            feverPausedLeft = 0;
             document.body.classList.remove('fever-mode');
         }
 
@@ -3350,6 +3403,8 @@
             if (isFever()) {
                 const left = Math.ceil((feverUntil - Date.now()) / 1000);
                 el.textContent = `🔥 피버 타임! ${left}초 남음 · ${combo}콤보 (코인 2배)`;
+            } else if (feverPausedLeft) {
+                el.textContent = `⏸️ 피버 멈춤 · ${Math.ceil(feverPausedLeft / 1000)}초 남음 · ${combo}콤보`;
             } else if (combo >= 2) {
                 const toFever = FEVER_AT - (combo % FEVER_AT);
                 el.textContent = `${combo}콤보${combo >= COMBO_BONUS_AT ? ' 🔥 코인 +1' : ''} · 피버까지 ${toFever}문제`;
@@ -3824,7 +3879,7 @@
         const TOWER_MAX_LIVES = 5;
         const TOWER_GATE_COUNT = 3;
         let tower = null;
-        let towerResumeActive = false;
+        let towerResumeActive = null;
         let towerFlags = [];
 
         const fmtNum = n => String(Math.round(n * 10000) / 10000);
@@ -3911,8 +3966,7 @@
         const towerSection = floor => Math.floor((floor - 1) / 10);
 
         function openTower() {
-            towerResumeActive = gameState.gameActive;
-            gameState.gameActive = false;   // 탑에 있는 동안 전투 일시정지
+            towerResumeActive = pauseBattle();   // 탑에 있는 동안 전투 일시정지
             tower = null;
             const hero = getSelectedHero();
             document.getElementById('towerBest').textContent = getExtraRecords().tower;
@@ -3927,7 +3981,7 @@
         function closeTower() {
             if (tower && tower.running) finishTower();
             document.getElementById('towerModal').style.display = 'none';
-            gameState.gameActive = towerResumeActive;
+            resumeBattle(towerResumeActive);
         }
 
         function showTowerScreen(id) {
@@ -4312,7 +4366,7 @@
         ];
         const ALL_TITLES = TITLE_GROUPS.flatMap(([group, list]) =>
             list.map(([id, name, grade, desc, test, hidden]) => ({ id, name, grade, desc, test, hidden: !!hidden, group })));
-        let collectionResumeActive = false;
+        let collectionResumeActive = null;
         let collectionTab = 'demons';
         const titleToasts = [];
         let titleToastBusy = false;
@@ -4478,18 +4532,17 @@
         }
 
         const GRADE_ORDER = ['legend', 'epic', 'rare', 'common'];
-        let titlePickerResume = false;
+        let titlePickerResume = null;
 
         function openTitlePicker() {
-            titlePickerResume = gameState.gameActive;
-            gameState.gameActive = false;
+            titlePickerResume = pauseBattle();
             renderTitlePicker();
             document.getElementById('titlePickerModal').style.display = 'flex';
         }
 
         function closeTitlePicker() {
             document.getElementById('titlePickerModal').style.display = 'none';
-            gameState.gameActive = titlePickerResume;
+            resumeBattle(titlePickerResume);
         }
 
         function renderTitlePicker() {
@@ -4638,15 +4691,14 @@
         }
 
         function openCollection() {
-            collectionResumeActive = gameState.gameActive;
-            gameState.gameActive = false;
+            collectionResumeActive = pauseBattle();
             renderCollection();
             document.getElementById('collectionModal').style.display = 'flex';
         }
 
         function closeCollection() {
             document.getElementById('collectionModal').style.display = 'none';
-            gameState.gameActive = collectionResumeActive;
+            resumeBattle(collectionResumeActive);
         }
 
         // 내 컴퓨터(localhost)에서만: ?collectionTest 로 기록을 채워 화면 시험
@@ -4767,7 +4819,7 @@
         }
 
         let hall = null;
-        let hallResumeActive = false;
+        let hallResumeActive = null;
         const HALL_SCREENS = ['hallLocked', 'hallIntro', 'hallPlay', 'hallResult'];
 
         function showHallScreen(id) {
@@ -4791,8 +4843,7 @@
         }
 
         function openHall() {
-            hallResumeActive = gameState.gameActive;
-            gameState.gameActive = false;
+            hallResumeActive = pauseBattle();
             hall = null;
             const hero = getSelectedHero();
             document.getElementById('hallHeroImage').src = hero.image;
@@ -4817,7 +4868,7 @@
         function closeHall() {
             hall = null;
             document.getElementById('hallModal').style.display = 'none';
-            gameState.gameActive = hallResumeActive;
+            resumeBattle(hallResumeActive);
             updateDisplay();
             saveGameProgress();
         }
@@ -4981,7 +5032,7 @@
         return {
             elementLabel, applyElement, announceElement, updateVillainElementInfo, markEffectiveSkills,
             getExtraRecords, clearSeasonRecords,
-            rewardCorrectAnswer, onWrongAnswer, resetCombo, updateComboDisplay,
+            rewardCorrectAnswer, onWrongAnswer, resetCombo, updateComboDisplay, onBattleActiveChange,
             getMasteryLevel, getMasteryMultiplier, getMasteryText, onExclusiveSkillUsed, updateMasteryBadge,
             getHeroData, buyHero, selectHero,
             applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
@@ -4997,7 +5048,7 @@
         const {
             elementLabel, applyElement, announceElement, updateVillainElementInfo, markEffectiveSkills,
             getExtraRecords, clearSeasonRecords,
-            rewardCorrectAnswer, onWrongAnswer, resetCombo, updateComboDisplay,
+            rewardCorrectAnswer, onWrongAnswer, resetCombo, updateComboDisplay, onBattleActiveChange,
             getMasteryLevel, getMasteryMultiplier, getMasteryText, onExclusiveSkillUsed, updateMasteryBadge,
             getHeroData, buyHero, selectHero,
             applyPet, startPetLoop, renderPetShop, buyPet, selectPet,
@@ -5530,6 +5581,7 @@
             const legacyProgress = localStorageHelper.load('gameProgress');
             gameState.coins = loadWallet(legacyProgress ? legacyProgress.coins : 0);
             onCoinsChange = saveWallet;
+            onActiveChange = onBattleActiveChange;
 
             // 게임 진행 상황 로드
             loadGameProgress();
@@ -6403,14 +6455,19 @@
         }
 
         // 훈련장 열기
+        let shopResume = null;
         function openShop() {
-            document.getElementById('shopModal').style.display = 'flex';
+            const modal = document.getElementById('shopModal');
+            if (modal.style.display !== 'flex') shopResume = pauseBattle();   // 상점에 있는 동안 전투 일시정지
+            modal.style.display = 'flex';
             renderShop();
         }
 
         // 훈련장 닫기
         function closeShop() {
             document.getElementById('shopModal').style.display = 'none';
+            resumeBattle(shopResume);
+            shopResume = null;
         }
 
         // 배경 클릭시 닫기
@@ -7168,7 +7225,11 @@
         }
 
         // 랭킹 모달 열기 (수정)
+        let rankingResume = null;
         async function openRanking() {
+            if (document.getElementById('rankingModal').style.display !== 'flex' && !rankingResume) {
+                rankingResume = pauseBattle();   // 랭킹을 보는 동안 전투 일시정지
+            }
             loadUsername();
             renderNickBuilder();
             if (nickPick.every(v => v !== null)) checkNickAvailability();
@@ -7180,6 +7241,8 @@
         // 랭킹 모달 닫기
         function closeRanking() {
             document.getElementById('rankingModal').style.display = 'none';
+            resumeBattle(rankingResume);
+            rankingResume = null;
         }
 
         // 배경 클릭시 닫기
