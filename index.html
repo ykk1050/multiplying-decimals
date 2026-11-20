@@ -2572,7 +2572,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.437 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.438 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2825,11 +2825,47 @@
         }, 100);
         */
 
+        // 진행 기록·최고 기록은 확인 코드를 붙여 저장 (F12에서 숫자를 고치면 무효 처리)
+        // 1.438 이전에 확인 코드 없이 저장된 기록은 처음 한 번만 받아들여 다시 저장
+        const SIGNED_KEYS = ['gameProgress', 'bestRecords'];
+        const SIGN_SALT = 'mh-progress-2026';
+
+        function signText(text) {
+            let h = 2166136261;
+            for (let i = 0; i < text.length; i++) {
+                h ^= text.charCodeAt(i);
+                h = Math.imul(h, 16777619);
+            }
+            return (h >>> 0).toString(36);
+        }
+
+        function signRecord(key, data) {
+            return { d: data, h: signText(key + JSON.stringify(data) + SIGN_SALT) };
+        }
+
+        // 저장된 값을 확인해서 돌려줌 (고친 흔적이 있으면 지우고 null)
+        function openSignedRecord(key, stored) {
+            const securedFlag = key + 'Secured';
+            let firstTime = false;
+            try { firstTime = !localStorage.getItem(securedFlag); localStorage.setItem(securedFlag, '1'); } catch (e) {}
+            if (stored === null || stored === undefined) return null;
+            if (stored && typeof stored === 'object' && 'd' in stored && 'h' in stored) {
+                if (stored.h === signText(key + JSON.stringify(stored.d) + SIGN_SALT)) return stored.d;
+            } else if (firstTime) {
+                try { localStorage.setItem(key, JSON.stringify(signRecord(key, stored))); } catch (e) {}
+                return stored;
+            }
+            try { localStorage.removeItem(key); } catch (e) {}
+            setTimeout(() => { if (typeof addBattleLog === 'function') addBattleLog('⚠️ 저장 데이터를 임의로 고친 흔적이 있어 해당 정보가 초기화되었습니다.'); }, 800);
+            return null;
+        }
+
         // localStorage를 사용한 데이터 저장/로드 함수
         const localStorageHelper = {
             save: function(key, data) {
                 try {
-                    localStorage.setItem(key, JSON.stringify(data));
+                    const value = SIGNED_KEYS.includes(key) ? signRecord(key, data) : data;
+                    localStorage.setItem(key, JSON.stringify(value));
                     console.log(`${key} 저장 완료:`, data);
                     return true;
                 } catch (error) {
@@ -2841,6 +2877,7 @@
             load: function(key) {
                 try {
                     const data = localStorage.getItem(key);
+                    if (SIGNED_KEYS.includes(key)) return openSignedRecord(key, data ? JSON.parse(data) : null);
                     if (data) {
                         console.log(`${key} 로드 완료`);
                         return JSON.parse(data);
