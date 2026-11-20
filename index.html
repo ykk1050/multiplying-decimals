@@ -2572,7 +2572,7 @@
         </div>
     </div>
   </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.436 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.437 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -3059,6 +3059,14 @@
                 // 2. 비정상적인 데미지 비율
                 // 문제 해결 수에 비해 총 데미지가 천문학적인 경우
                 if (problemsSolved > 0 && totalDamage > (problemsSolved * level * 1000000)) {
+                    return true;
+                }
+
+                // 3. 피해량이 그 레벨까지 나온 마왕 체력 합의 3배(+5000)를 넘음 → 피해량 조작
+                //    (정상 기록은 0.7~1.5배. 랭킹 서버 Code.gs의 isDamageTooHigh와 같은 기준)
+                const lv = Math.max(0, Number(level) || 0);
+                const villainHpSum = 80 * (lv + 0.3 * lv * (lv - 1) / 2);
+                if ((Number(totalDamage) || 0) > villainHpSum * 3 + 5000) {
                     return true;
                 }
 
