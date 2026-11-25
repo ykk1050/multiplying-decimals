@@ -2073,6 +2073,37 @@
         .name-title.rare { color: #8cc0ff; }
         .name-title.epic { color: #cfa6ff; }
         .name-title.legend { color: #f6d77a; box-shadow: 0 0 10px rgba(240, 207, 115, 0.35); }
+        /* 전투 기록 보기 */
+        .report-open-btn {
+            min-height: 44px; padding: 10px 18px; margin: 6px; border-radius: 10px; cursor: pointer;
+            font: inherit; font-weight: 800; font-size: 1rem;
+            color: var(--gold-2); background: linear-gradient(180deg, #4a3a86, #261d4d); border: 1px solid var(--gold-dim);
+        }
+        .result-modal { padding: 12px; z-index: 1000; }
+        .result-content { padding: 18px; max-height: 94vh; max-height: 94dvh; overflow-y: auto; }
+        .result-content .victory, .result-content .game-over { padding: 20px; }
+        .result-content .next-level-btn { margin-top: 8px; }
+        #gameOverReason { margin: 12px 0 4px; padding: 10px 12px; border-radius: 10px; background: rgba(163, 58, 58, 0.1); font-weight: 700; line-height: 1.5; word-break: keep-all; }
+        #gameOverReason:empty { display: none; }
+        .report-modal { z-index: 1100; }
+        .report-content { max-width: 720px; padding: 18px 20px; text-align: left; display: flex; flex-direction: column; max-height: 92vh; max-height: 92dvh; overflow: hidden; }
+        .report-content .tower-title { text-align: center; font-size: 1.5rem; margin-bottom: 8px; }
+        .report-tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+        .report-tabs button { min-height: 44px; padding: 8px 18px; border-radius: 10px; border: 1px solid #c9a75e; background: #efe0bb; color: #5a3d10; font: inherit; font-weight: 800; cursor: pointer; }
+        .report-tabs button.active { background: linear-gradient(180deg, #7a5214, #4e330a); color: #f6e3a1; border-color: #4e330a; }
+        .report-scroll { overflow-y: auto; min-height: 0; -webkit-overflow-scrolling: touch; }
+        .report-summary { padding: 10px 14px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #a33a3a; background: #fff3ea; }
+        .report-summary p { margin: 4px 0; word-break: keep-all; }
+        .report-summary p:first-child { font-weight: 900; color: #7a1f1f; }
+        .report-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 7px 4px; border-bottom: 1px solid rgba(138, 106, 43, 0.25); font-size: 0.95rem; }
+        .report-row .t { color: #8a6a2b; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+        .report-row .m { word-break: keep-all; overflow-wrap: anywhere; }
+        .report-row .m small { display: block; color: #7a5a1e; font-size: 0.82rem; }
+        .report-row .h { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; color: #5a3d10; }
+        .report-row .h b.down { color: #b02a2a; }
+        .report-row .h b.up { color: #1f7a3a; }
+        .report-row.away { background: rgba(61, 143, 224, 0.12); }
+        .report-empty { text-align: center; padding: 24px 0; }
         .name-title.empty { color: #b9b0c9; border-style: dashed; font-weight: 600; }
         .title-picker-content { max-width: 640px; max-height: 90vh; overflow-y: auto; padding: 16px 20px; }
         .title-picker-help { margin: 0 0 12px; font-size: 0.9rem; }
@@ -2541,6 +2572,7 @@
      
      <!-- 👇 이 부분 추가 -->
      <div style="text-align: center; margin-top: 15px;">
+         <button class="report-open-btn" onclick="openBattleReport()">📜 전투 기록 보기</button>
          <button class="reset-btn" onclick="resetBestRecords()">
              🔄 기록 초기화
          </button>
@@ -2549,6 +2581,7 @@
    </div>
 
 
+  </div>
    <!-- 승리 모달 -->
     <div class="result-modal" id="victoryModal">
         <div class="result-content">
@@ -2566,13 +2599,14 @@
             <div class="game-over">
                 <h2 style="color: #742a2a; margin-bottom: 15px;">💀 패배했습니다 💀</h2>
                 <p style="color: #c53030;">더 많은 문제를 풀어서 강해져야 합니다!</p>
+                <p id="gameOverReason"></p>
                 <p style="color: #744210; margin-top: 8px;">💰 모은 금화는 그대로 남아 있어요.</p>
+                <button class="report-open-btn" onclick="openBattleReport('last')">📜 전투 기록 보기</button><br>
                 <button class="next-level-btn" onclick="restartGame()">다시 시작</button>
             </div>
         </div>
     </div>
-  </div>
-  <footer class="app-footer">Created by gamtudyssam using AI · 1.438 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
+  <footer class="app-footer">Created by gamtudyssam using AI · 1.439 · <a href="credits.html" target="_blank" rel="noopener" style="color:inherit">출처와 라이선스</a></footer>
 
   <div class="shop-modal" id="shopModal" onclick="closeShopOnBackdrop(event)">
     <div class="shop-content" onclick="event.stopPropagation()">
@@ -2699,6 +2733,18 @@
         <h2 class="tower-title">📖 도감</h2>
         <div class="col-tabs" id="collectionTabs"></div>
         <div id="collectionBody"></div>
+    </div>
+</div>
+
+<div class="tower-modal report-modal" id="battleReportModal" onclick="if (event.target === this) closeBattleReport()">
+    <div class="tower-content report-content">
+        <button class="shop-close" onclick="closeBattleReport()" aria-label="닫기">×</button>
+        <h2 class="tower-title">📜 전투 기록</h2>
+        <div class="report-tabs">
+            <button type="button" id="reportTabLast" onclick="renderBattleReport('last')">지난 판</button>
+            <button type="button" id="reportTabCurrent" onclick="renderBattleReport('current')">지금 판</button>
+        </div>
+        <div class="report-scroll" id="battleReportBody"></div>
     </div>
 </div>
 
@@ -4805,7 +4851,7 @@
         const HALL_DAILY_RUNES = 3;      // 탑 10층 한 판(약 14개)의 1/5 수준
         const HALL_SEAL_NEED = 2;        // 서로 다른 날 2번 맞히면 봉인 완료
         const HALL_SEAL_COINS = 10;
-        const HALL_MODALS = ['shopModal', 'rankingModal', 'towerModal', 'hallModal', 'collectionModal', 'victoryModal', 'gameOverModal'];
+        const HALL_MODALS = ['shopModal', 'rankingModal', 'towerModal', 'hallModal', 'collectionModal', 'victoryModal', 'gameOverModal', 'battleReportModal'];
 
         function localDateKey() {
             const d = new Date();
@@ -5663,8 +5709,10 @@
             onActiveChange = onBattleActiveChange;
 
             // 게임 진행 상황 로드
+            loadBattleReports();
             loadGameProgress();
             lockGameState();
+            settleBattleReports();
 
             // 👇 여기에 추가
             // 사용자 이름 로드
@@ -6403,7 +6451,9 @@
                     const isPenetrationActive = Math.random() < penetrationChance;
                     
                     let villainDamage;
-                    
+                    const hit = { name: document.getElementById('villainName').textContent, atk: gameState.villain.attack, def: gameState.player.defense, pen: 0, special: '', before: gameState.player.hp };
+                    let hitMessage;
+
                     if (isPenetrationActive) {
                         // 부분 관통 발동
                         const armorPenetration = Math.min(0.5, gameState.level * 0.04);
@@ -6412,14 +6462,20 @@
                         playFx(getCurrentStage().special.fx, 'hero', { shake: true });  // 마왕별 특수 공격 (영상+소리)
                         
                         const penetrationPercent = Math.round(armorPenetration * 100);
-                        addBattleLog(`${getCurrentStage().special.icon || ''}${document.getElementById('villainName').textContent}의 ${getCurrentStage().special.name}! (방어력 ${penetrationPercent}% 무시) ${villainDamage}의 피해!`);
+                        hit.eff = effectiveDefense;
+                        hit.pen = penetrationPercent;
+                        hit.special = getCurrentStage().special.name;
+                        hitMessage = `${getCurrentStage().special.icon || ''}${hit.name}의 ${hit.special}! (방어력 ${penetrationPercent}% 무시) ${villainDamage}의 피해!`;
                     } else {
                         // 일반 공격
                         villainDamage = Math.max(1, gameState.villain.attack - gameState.player.defense);
-                        addBattleLog(`${document.getElementById('villainName').textContent}이(가) ${villainDamage}의 피해를 입혔습니다!`);
+                        hitMessage = `${hit.name}이(가) ${villainDamage}의 피해를 입혔습니다!`;
                     }
-                    
+
                     gameState.player.hp = Math.max(0, gameState.player.hp - villainDamage);
+                    hit.dmg = villainDamage;
+                    hit.after = gameState.player.hp;
+                    addBattleLog(hitMessage, hit);
                     // 일반 공격만 기본 소리·GIF (특수 공격은 전용 영상과 소리)
                     if (!isPenetrationActive) {
                         playBossAttackSound();
@@ -6810,11 +6866,173 @@
 
 
         // 전투 로그 추가
-        function addBattleLog(message) {
+        function addBattleLog(message, hit) {
             const log = document.getElementById('battleLog');
             log.innerHTML = message + '<br>' + log.innerHTML;  // 👈 앞에 추가
-            
+            recordBattleEvent(message, hit);
         }
+
+        // ===== 전투 기록 보기 =====
+        // 로그마다 그때의 체력을 함께 적어 두고, 패배한 뒤나 다시 접속한 뒤에도 볼 수 있게 저장
+        var REPORT_KEY = 'battleReports';
+        var REPORT_MAX = 200;
+        var battleReports = { current: newBattleReport(), last: null };
+        var battleReportDirty = false;
+        var battleReportResume = null;
+
+        function newBattleReport() {
+            return { entries: [], ended: false };
+        }
+
+        function recordBattleEvent(message, hit) {
+            const entry = { t: Date.now(), m: String(message), lv: gameState.level, hp: gameState.player.hp, mx: gameState.player.maxHp };
+            if (hit) entry.hit = hit;
+            if (document.visibilityState === 'hidden') entry.away = 1;
+            const entries = battleReports.current.entries;
+            entries.push(entry);
+            if (entries.length > REPORT_MAX) entries.splice(0, entries.length - REPORT_MAX);
+            battleReportDirty = true;
+        }
+
+        function saveBattleReports() {
+            if (!battleReportDirty) return;
+            battleReportDirty = false;
+            try { localStorage.setItem(REPORT_KEY, JSON.stringify(battleReports)); } catch (e) {}
+        }
+
+        function loadBattleReports() {
+            let stored = null;
+            try { stored = JSON.parse(localStorage.getItem(REPORT_KEY)); } catch (e) {}
+            const ok = r => !!r && Array.isArray(r.entries) && r.entries.every(e => e && typeof e === 'object' && typeof e.m === 'string');
+            if (!stored) return;
+            if (ok(stored.last)) battleReports.last = stored.last;
+            if (ok(stored.current)) battleReports.current = stored.current;
+        }
+
+        // 이어하기가 아니라 새 판으로 시작했으면, 남아 있던 기록을 '지난 판'으로 옮김
+        function settleBattleReports() {
+            if (gameLoaded || !battleReports.current.entries.some(e => e.hit)) return;
+            battleReports.last = battleReports.current;
+            battleReports.current = newBattleReport();
+            battleReportDirty = true;
+            saveBattleReports();
+        }
+
+        function endBattleReport() {
+            battleReports.current.ended = true;
+            battleReports.last = battleReports.current;
+            battleReports.current = newBattleReport();
+            battleReportDirty = true;
+            saveBattleReports();
+        }
+
+        function getLastHit(report) {
+            if (!report || !report.ended) return null;
+            for (let i = report.entries.length - 1; i >= 0; i--) if (report.entries[i].hit) return report.entries[i];
+            return null;
+        }
+
+        function hitFormula(hit) {
+            const def = hit.pen ? hit.eff : hit.def;
+            const left = hit.pen ? `내 방어력 ${def} (${hit.def}에서 ${hit.pen}% 무시)` : `내 방어력 ${def}`;
+            const raw = hit.atk - def;
+            return `마왕 공격력 ${hit.atk} − ${left} = ` + (raw === hit.dmg ? `피해 ${hit.dmg}` : `${raw} → 최소 피해 ${hit.dmg}`);
+        }
+
+        function awaySummary(report) {
+            const hits = report.entries.filter(e => e.away && e.hit);
+            if (!hits.length) return '';
+            const lost = hits.reduce((sum, e) => sum + (e.hit.before - e.hit.after), 0);
+            return `📱 게임 화면을 내려 둔 동안에도 전투가 이어져 ${hits.length}번 맞고 체력이 ${lost} 줄었어요.`;
+        }
+
+        function getDefeatLines(report) {
+            const last = getLastHit(report);
+            if (!last) return [];
+            const hit = last.hit;
+            const how = hit.special ? `${hit.special} (특수 공격)` : '기본 공격';
+            return [
+                `💀 ${hit.name}의 ${how}에 쓰러졌어요.`,
+                `❤️ 맞기 전 체력 ${hit.before}/${last.mx}, 받은 피해 ${hit.dmg}`,
+                `🧮 ${hitFormula(hit)}`,
+                awaySummary(report)
+            ].filter(Boolean);
+        }
+
+        function showGameOverReason() {
+            const el = document.getElementById('gameOverReason');
+            el.textContent = '';
+            getDefeatLines(battleReports.last).forEach(line => {
+                if (line.startsWith('🧮')) return;   // 계산식은 전투 기록 창에서
+                const span = document.createElement('span');
+                span.style.display = 'block';
+                span.textContent = line;
+                el.appendChild(span);
+            });
+        }
+
+        function openBattleReport(which) {
+            const modal = document.getElementById('battleReportModal');
+            if (modal.style.display === 'flex') return;
+            battleReportResume = pauseBattle();   // 보는 동안 전투 일시정지
+            modal.style.display = 'flex';
+            renderBattleReport(which || (battleReports.current.entries.length ? 'current' : 'last'));
+        }
+
+        function closeBattleReport() {
+            const modal = document.getElementById('battleReportModal');
+            if (modal.style.display !== 'flex') return;
+            modal.style.display = 'none';
+            resumeBattle(battleReportResume);
+            battleReportResume = null;
+        }
+
+        function renderBattleReport(which) {
+            document.getElementById('reportTabLast').classList.toggle('active', which === 'last');
+            document.getElementById('reportTabCurrent').classList.toggle('active', which === 'current');
+            const body = document.getElementById('battleReportBody');
+            body.textContent = '';
+            body.scrollTop = 0;
+            const make = (tag, cls, text) => {
+                const el = document.createElement(tag);
+                if (cls) el.className = cls;
+                if (text !== undefined) el.textContent = text;
+                return el;
+            };
+            const report = battleReports[which];
+            if (!report || !report.entries.length) {
+                body.appendChild(make('p', 'report-empty', which === 'last' ? '아직 끝난 판이 없어요.' : '아직 기록이 없어요.'));
+                return;
+            }
+            const lines = getDefeatLines(report);
+            if (!lines.length && awaySummary(report)) lines.push(awaySummary(report));
+            if (lines.length) {
+                const box = make('div', 'report-summary');
+                lines.forEach(line => box.appendChild(make('p', '', line)));
+                body.appendChild(box);
+            }
+            // 최근 일이 위로. 바로 전 기록과 비교해 체력이 얼마나 변했는지 함께 표시
+            for (let i = report.entries.length - 1; i >= 0; i--) {
+                const e = report.entries[i];
+                const prev = report.entries[i - 1];
+                const diff = e.hit ? e.hit.after - e.hit.before : (prev ? e.hp - prev.hp : 0);
+                const row = make('div', 'report-row' + (e.away ? ' away' : ''));
+                const time = new Date(e.t);
+                row.appendChild(make('span', 't', [time.getHours(), time.getMinutes(), time.getSeconds()].map(n => String(n).padStart(2, '0')).join(':')));
+                const msg = make('span', 'm', e.m);
+                if (e.hit) msg.appendChild(make('small', '', hitFormula(e.hit)));
+                if (e.away) msg.appendChild(make('small', '', '📱 화면을 내려 둔 동안'));
+                row.appendChild(msg);
+                const hp = make('span', 'h', `❤️ ${e.hp}/${e.mx} `);
+                if (diff) hp.appendChild(make('b', diff < 0 ? 'down' : 'up', diff < 0 ? `−${-diff}` : `+${diff}`));
+                row.appendChild(hp);
+                body.appendChild(row);
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveBattleReports(); });
+        window.addEventListener('pagehide', saveBattleReports);
+        setInterval(saveBattleReports, 5000);
 
         // 승리
         function victory() {
@@ -6856,6 +7074,9 @@
             // 모달로 변경
             document.getElementById('gameOverModal').style.display = 'flex';
             addBattleLog('💀 패배했습니다... 💀');
+            endBattleReport();
+            showGameOverReason();
+            updateDisplay();   // 체력 막대가 맞기 전 숫자로 남아 있지 않게
             playgameoverSound();
         }
 
